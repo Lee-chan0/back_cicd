@@ -38,7 +38,7 @@ router.get('/diary/calendar', authMiddleware, async (req, res, next) => {
             const month = diary.createdAt.getMonth() + 1
             const date = diary.createdAt.getDate()
 
-            diary.createdAt = `${year}.${month}.${date}` ;
+            diary.createdAt = `${year}. ${month}. ${date}.` ;
             return diary
         })
 
@@ -52,11 +52,14 @@ router.get('/diary/calendar', authMiddleware, async (req, res, next) => {
 
         const arrayedDiaries = new Array(getDate(endDate)).fill(null)
 
-        modifiedDiaries.forEach(diary => {
-            console.log('*****====>',diary.createdAt.split(".")[2] ,'<====*****')
+        modifiedDiaries.map(diary => {
+            let index = diary.createdAt.split(".")[2].trim()
+            arrayedDiaries[index-1] = diary
+            return arrayedDiaries
         })
+        
 
-        res.status(200).json({ data: modifiedDiaries, userProfileImg })
+        res.status(200).json({ data: arrayedDiaries, userProfileImg })
     } catch(error) {
         return res.status(400).json({ error: error.message})
     }

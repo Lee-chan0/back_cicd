@@ -69,7 +69,7 @@ router.post('/diary/posting', authMiddleware, async(req, res, next) => {
     })
 
     if (diaryExists) {
-        return res.status(400).json({ message : "오늘은 이미 작성한 글이 있습니다"})
+        return res.status(300).json({ message : "오늘은 이미 작성한 글이 있습니다. 수정하시겠습니까?"})
     }
 
     const diary = await prisma.diary.create({
