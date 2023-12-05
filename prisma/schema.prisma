@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  userId      Int     @id @default(autoincrement()) @map("userId")
+  nickname    String  @unique @map("nickname")
+  password    String  @map("password")
+  email       String  @map("email")
+  job         String  @map("job")
+  profileImg  String?  @map("profileImg")
+
+  createdAt   DateTime  @default(now()) @map("createdAt")
+  updatedAt   DateTime  @updatedAt  @map("updatedAt")
+  deletedAt   DateTime? @map("deletedAt")
+
+  diary     diary[]
+
+  @@map("Users")
+}
+
+model diary {
+  diaryId     Int   @id @default(autoincrement()) @map("diaryId")
+  UserId      Int   @map("UserId")
+  ImotionStatus   Int   @map("ImotionalStatus")
+  image       String?  @map("image")
+  content     String  @map("content")
+
+  createdAt   DateTime  @default(now()) @map("createdAt")
+  updatedAt   DateTime  @updatedAt  @map("updatedAt")
+  deletedAt   DateTime? @map("deletedAt")
+
+  User      Users     @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+
+  @@map("diary")
+}
