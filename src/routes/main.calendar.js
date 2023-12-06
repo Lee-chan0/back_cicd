@@ -38,7 +38,7 @@ router.get('/diary/calendar', authMiddleware, async (req, res, next) => {
             const month = diary.createdAt.getMonth() + 1
             const date = diary.createdAt.getDate()
 
-            diary.createdAt = `${year}. ${month}. ${date}.` ;
+            diary.createdAt = `${year}. ${month}. ${date}.` ; // 프론트에서 원하는 형식으로 데이터를 정리해서 보내주기 위한 코드
             return diary
         })
 
@@ -50,10 +50,10 @@ router.get('/diary/calendar', authMiddleware, async (req, res, next) => {
             }
         })
 
-        const arrayedDiaries = new Array(getDate(endDate)).fill(null)
+        const arrayedDiaries = new Array(getDate(endDate)).fill(null) // 입력값이 없는 날의 경우 null값을 기본값으로 가지도록 배열을 만든다.
 
         modifiedDiaries.map(diary => {
-            let index = diary.createdAt.split(".")[2].trim()
+            let index = diary.createdAt.split(".")[2].trim() // diary.createdAt = "2023. 1. 1." 형태의 값을 가지기에, 'day'에 해당하는 값을 가져오기 위한 코드
             arrayedDiaries[index-1] = diary
             return arrayedDiaries
         })
