@@ -1,9 +1,11 @@
 import joi from "joi";
 
+// const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,20}$/;
+
 const validAccountInfo = joi.object({
-  nickname: joi.string().min(3).max(20),
+  username: joi.string().min(3).max(20),
   password: joi.string(),
-  job: joi.string(),
+//   .pattern(passwordRegex).required(),
   email: joi.string().email()
 });
 

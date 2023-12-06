@@ -10,7 +10,7 @@ const router = express.Router();
 /* 회원가입 */
 router.post("/signup", async (req, res, next) => {
   try {
-    const { email, nickname, password, job } =
+    const { email, username, password } =
       await validAccountInfo.validateAsync(req.body);
 
     const isExistUser = await prisma.users.findFirst({
@@ -26,9 +26,8 @@ router.post("/signup", async (req, res, next) => {
     await prisma.users.create({
       data: {
         email,
-        nickname,
+        username,
         password: hashedPassword,
-        job,
       },
     });
 
@@ -62,7 +61,7 @@ router.post("/signin", async (req, res, next) => {
     return res
       .status(200)
       .json({
-        message: `${user.nickname}님 로그인에 성공하셨습니다`,
+        message: `${user.username}님 환영합니다`,
         data: user, // data 부분은 테스팅이 끝난 후에는 삭제할것 ** 유출되면 안되는 개인정보 **
       });
   } catch (error) {
@@ -80,7 +79,7 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
       select: {
         userId: true,
         email: true,
-        nickname: true,
+        username: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -91,7 +90,7 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
   }
 });
 
-/* 회원 탈퇴 */
+/* 회원 탈퇴 (개인정보임으로 softDelete를 적용하지 않고 hardDelete로 진행) */
 router.delete("/signoff", authMiddleware, async (req, res, next) => {
   try {
     const { userId } = req.user;

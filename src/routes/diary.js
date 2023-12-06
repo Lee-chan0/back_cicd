@@ -64,7 +64,7 @@ router.post('/diary/posting', authMiddleware, async(req, res, next) => {
         where : { createdAt: {
             gte : startOfToday,
             lte : endOfToday
-        }
+        }, UserId : userId
         }
     })
 
