@@ -5,7 +5,6 @@ import { startOfMonth, endOfMonth, getDate } from 'date-fns'
 
 const router = express.Router()
 
-
 /* 메인페이지 조회 ( 캘린더, 회원정보(회원프로필 이미지) ) */
 
 /* 기본 페이지 조회일 뿐, 좌우 버튼으로 몇월달을 선택하느냐에 따라 startDate, endDate 값이 변화할 수 있어야 함
@@ -57,7 +56,6 @@ router.get('/diary/calendar', authMiddleware, async (req, res, next) => {
             arrayedDiaries[index-1] = diary
             return arrayedDiaries
         })
-        
 
         res.status(200).json({ data: arrayedDiaries, userProfileImg })
     } catch(error) {
