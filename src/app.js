@@ -1,6 +1,8 @@
 import express from "express"
 import cookieParser from "cookie-parser"
 import cors from 'cors'
+import passport from 'passport'
+
 
 import UserRouter from "./routes/users.js"
 import MainCalendar from "./routes/main.calendar.js"
@@ -13,6 +15,7 @@ app.use(cors()); // CORS 설정 추가. 추후에 디테일한 cors 설정 필�
 
 app.use(express.json())
 app.use(cookieParser())
+app.use(passport.initialize())
 app.use("/", [UserRouter, MainCalendar, diary])
 
 app.listen(PORT, () => {

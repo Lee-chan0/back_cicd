@@ -16,7 +16,7 @@ router.get("/diary/calendar", authMiddleware, async (req, res, next) => {
     const startDate = startOfMonth(currentDate);
     const endDate = endOfMonth(currentDate);
 
-    const diaries = await prisma.diary.findMany({
+    const diaries = await prisma.diaries.findMany({
       where: {
         UserId: userId,
         createdAt: {

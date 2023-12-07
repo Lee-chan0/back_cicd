@@ -11,7 +11,7 @@ router.get('/diary/detail/:diaryId', async (req, res, next) => {
     try {
         const { diaryId } = req.params;
 
-        const diaryDetail = await prisma.diary.findFirst({
+        const diaryDetail = await prisma.diaries.findFirst({
             where: { diaryId: +diaryId }
         });
         return res.status(200).json({ data: diaryDetail });
@@ -20,49 +20,19 @@ router.get('/diary/detail/:diaryId', async (req, res, next) => {
     }
 });
 
-/* 피드에 글 조회 */
-router.get('/diary', authMiddleware, async (req, res, next) => {
-    try {
-        // const { userId } = req.user;    ==> 추가적으로 친구기능등이 포함되어 특정 유저에게만 노출되는 피드 글이 있다면 인증이 필요함.
-        const page = parseInt(req.query.page) || 1;
-        const pageSize = 10;
-        const skip = (page - 1) * pageSize;
-
-        const today = new Date();
-        const timeZone = 'Asia/Seoul';
-        const twoMonthsAgo = utcToZonedTime(startOfDay(subMonths(today, 2)), timeZone);
-        const todaySeoulTime = utcToZonedTime(endOfDay(today), timeZone);
-
-        const diaryEntries = await prisma.diary.findMany({
-            where: {
-                createdAt: {
-                    gte: twoMonthsAgo,
-                    lte: todaySeoulTime
-                }
-            },
-            skip: skip,
-            take: pageSize,
-            orderBy: { createdAt: 'desc' }
-        });
-
-        res.status(200).json(diaryEntries);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
 
 /* 오늘의 일기 작성 */
 router.post('/diary/posting', authMiddleware, async (req, res, next) => {
     try {
         const { userId } = req.user;
-        const { ImotionStatus, content, image } = req.body;
+        const { EmotionStatus, content, image } = req.body;
         const today = new Date();
         const timeZone = 'Asia/Seoul';
         const todaySeoulTime = utcToZonedTime(today, timeZone);
         const startOfToday = startOfDay(todaySeoulTime);
         const endOfToday = endOfDay(todaySeoulTime);
 
-        const diaryExists = await prisma.diary.findFirst({
+        const diaryExists = await prisma.diaries.findFirst({
             where: {
                 createdAt: {
                     gte: startOfToday,
@@ -76,10 +46,10 @@ router.post('/diary/posting', authMiddleware, async (req, res, next) => {
             return res.status(300).json({ message: "오늘은 이미 작성한 글이 있습니다. 수정하시겠습니까?" });
         }
 
-        const diary = await prisma.diary.create({
+        const diary = await prisma.diaries.create({
             data: {
                 UserId: userId,
-                ImotionStatus,
+                EmotionStatus,
                 content,
                 image,
             }
@@ -94,10 +64,10 @@ router.post('/diary/posting', authMiddleware, async (req, res, next) => {
 router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
     try {
         const { userId } = req.user;
-        const { ImotionStatus, content, image } = req.body;
+        const { EmotionStatus, content, image } = req.body;
         const { diaryId } = req.params;
 
-        const diary = await prisma.diary.findFirst({
+        const diary = await prisma.diaries.findFirst({
             where: { diaryId: +diaryId }
         });
 
@@ -109,9 +79,9 @@ router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
             return res.status(400).json({ message: "수정하려는 일기가 존재하지 않습니다" });
         }
 
-        await prisma.diary.update({
+        await prisma.diaries.update({
             where: { diaryId: +diaryId },
-            data: { content, image, ImotionStatus }
+            data: { content, image, EmotionStatus }
         });
         return res.status(201).json({ message: "수정완료" });
 
