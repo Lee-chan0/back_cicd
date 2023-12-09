@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  userId      Int     @id @default(autoincrement()) @map("userId")
+  username    String  @unique @map("nickname")
+  password    String  @map("password")
+  email       String  @map("email")
+  profileImg  String?  @map("profileImg")
+
+  createdAt   DateTime  @default(now()) @map("createdAt")
+  updatedAt   DateTime  @updatedAt  @map("updatedAt")
+
+  diary     diaries[]
+  comment   comments[]
+
+  @@map("Users")
+}
+
+model diaries {
+  diaryId     Int   @id @default(autoincrement()) @map("diaryId")
+  UserId      Int   @map("UserId")
+  EmotionStatus   Int   @map("EmotionalStatus")
+  image       String?  @map("image")
+  content     String  @map("content")
+  isPublic    Boolean @default(false) @map("isPublic")
+
+  createdAt   DateTime  @default(now()) @map("createdAt")
+  updatedAt   DateTime  @updatedAt  @map("updatedAt")
+  deletedAt   DateTime? @map("deletedAt")
+
+  comment     comments[]
+  User        Users     @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+
+  @@map("diary")
+}
+
+model comments {
+  commentId      Int   @id   @default(autoincrement()) @map("commentId")
+  DiaryId        Int   @map("DiaryId")
+  UserId         Int   @map("UserId")
+  content        String  @map("content")
+  isEdited      Boolean @default(false) @map("isEdited")
+  
+  createdAt      DateTime   @default(now()) @map("createdAt")
+  updatedAt      DateTime   @updatedAt      @map("updatedAt")
+  deletedAt      DateTime?  @map("deletedAt")
+
+  User         Users        @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+  diary        diaries      @relation(fields: [DiaryId], references: [diaryId], onDelete: Cascade) 
+}

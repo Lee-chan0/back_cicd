@@ -1,0 +1,64 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+
+    - name: Check npm -v
+      run: npm -v
+
+    - name: create env file
+      working-directory: ./
+      run: |
+        pwd
+        touch .env
+        echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
+        cat .env
+   
+
+
+
+    - name: zip file
+      run: zip -r CI.zip ./src/* ./prisma/* ./scripts ./appspec.yml ./package.json ./package-lock.json ./.env
+
+    - name: AWS configure credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_PRIVATE_ACCESS_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: upload to S3
+      run: aws s3 cp --region ap-northeast-2 ./CI.zip s3://myscope-bucket/deploy/
+
+
+    - name: deploy with AWS codeDeploy
+      run: aws deploy create-deployment
+        --application-name my-codedeploy-app
+        --deployment-config-name CodeDeployDefault.OneAtATime
+        --deployment-group-name codedeploygroup
+        --s3-location bucket=myscope-bucket,bundleType=zip,key=deploy/CI.zip
