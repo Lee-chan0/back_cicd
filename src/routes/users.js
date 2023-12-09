@@ -8,7 +8,11 @@ import redis from "ioredis";
 
 dotenv.config();
 
-const client = new redis();
+const client = new redis({
+  host : `15.165.141.94`,
+  port : 6379,
+  password : `ok700607`
+});
 const router = express.Router();
 
 // 회원가입
