@@ -1,5 +1,4 @@
 import express from "express";
-import cookieParser from "cookie-parser";
 import UserRouter from "./routes/users.js";
 import MainCalender from "./routes/main.calender.js";
 import DiaryRouter from "./routes/diary.js";
