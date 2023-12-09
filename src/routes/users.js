@@ -126,6 +126,6 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
 
 /* 내 정보 수정 API */
 
-/* 회원 탈퇴 */
+/* 회원 탈퇴 API*/
 
 export default router;
