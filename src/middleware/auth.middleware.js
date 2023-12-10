@@ -4,10 +4,11 @@ import dotenv from "dotenv";
 import redis from "ioredis";
 
 dotenv.config();
+
 const client = new redis({
-  host : `15.165.141.94`,
-  port : 6379,
-  password : `ok700607`
+  host : process.env.REDIS_HOST,
+  port : process.env.REDIS_PORT,
+  password : process.env.REDIS_PASSWORD
 });
 
 export default async (req, res, next) => {

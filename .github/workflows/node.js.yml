@@ -37,13 +37,16 @@ jobs:
         pwd
         touch .env
         echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
+        echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
+        echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env
+        echo REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} >> .env
         cat .env
    
 
 
 
     - name: zip file
-      run: zip -r CI.zip ./src/* ./prisma/* ./scripts ./appspec.yml ./package.json ./package-lock.json ./.env
+      run: zip -r CI.zip ./src/* ./prisma/* ./scripts ./appspec.yml ./package.json ./package-lock.json ./.env ./.prettier.json
 
     - name: AWS configure credentials
       uses: aws-actions/configure-aws-credentials@v1
