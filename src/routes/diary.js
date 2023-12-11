@@ -62,33 +62,98 @@ router.post('/diary/posting', authMiddleware, async (req, res, next) => {
 });
 
 /* 일기 수정 */
+// router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
+//   try {
+//       const { userId } = req.user;
+//       const { EmotionStatus, content, image, isPublic } = req.body;
+//       const { diaryId } = req.params;
+
+//       const diary = await prisma.diaries.findFirst({
+//           where: { diaryId: +diaryId }
+//       });
+
+//       if (diary.UserId !== userId) {
+//           return res.status(401).json({ message: "수정 권한이 없는 게시물입니다" });
+//       }
+
+//       if (!diary) {
+//           return res.status(400).json({ message: "수정하려는 일기가 존재하지 않습니다" });
+//       }
+
+//       await prisma.diaries.update({
+//           where: { diaryId: +diaryId },
+//           data: { content, image, EmotionStatus, isPublic }
+//       });
+//       return res.status(201).json({ message: "수정완료" });
+
+//   } catch (error) {
+//       return res.status(400).json({ error: error.message });
+//   }
+// });
+
 router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
-  try {
+    try {
       const { userId } = req.user;
-      const { EmotionStatus, content, image, isPublic } = req.body;
+      const { EmotionStatus, content, isPublic } = req.body;
       const { diaryId } = req.params;
-
+  
       const diary = await prisma.diaries.findFirst({
-          where: { diaryId: +diaryId }
+        where: { diaryId: +diaryId }
       });
-
-      if (diary.UserId !== userId) {
-          return res.status(401).json({ message: "수정 권한이 없는 게시물입니다" });
-      }
-
+  
       if (!diary) {
-          return res.status(400).json({ message: "수정하려는 일기가 존재하지 않습니다" });
+        return res.status(400).json({ message: "수정하려는 일기가 존재하지 않습니다" });
       }
-
-      await prisma.diaries.update({
+  
+      if (diary.UserId !== userId) {
+        return res.status(401).json({ message: "수정 권한이 없는 게시물입니다" });
+      }
+  
+      // 이미지 업데이트를 위한 처리
+      const { imageId } = req.body; // 업데이트할 이미지의 ID를 받아옵니다.
+  
+      // 이미지 ID가 제공되었고, 이미지가 존재하는지 확인
+      if (imageId) {
+        const imageExists = await prisma.Images.findFirst({
+          where: { imageId: +imageId }
+        });
+  
+        if (!imageExists) {
+          return res.status(400).json({ message: "업데이트하려는 이미지가 존재하지 않습니다" });
+        }
+  
+        // 기존 일기와 이미지 연결 업데이트
+        await prisma.diaries.update({
           where: { diaryId: +diaryId },
-          data: { content, image, EmotionStatus, isPublic }
-      });
+          data: {
+            content,
+            EmotionStatus,
+            isPublic,
+            image: {
+              connect: {
+                imageId: +imageId // 이미지 ID로 기존 이미지와 연결합니다.
+              }
+            }
+          }
+        });
+      } else {
+        // 이미지 ID가 없는 경우 이미지 필드를 업데이트하지 않습니다.
+        await prisma.diaries.update({
+          where: { diaryId: +diaryId },
+          data: {
+            content,
+            EmotionStatus,
+            isPublic
+          }
+        });
+      }
+  
       return res.status(201).json({ message: "수정완료" });
-
-  } catch (error) {
+  
+    } catch (error) {
       return res.status(400).json({ error: error.message });
-  }
-});
+    }
+  });
+  
 
 export default router;
