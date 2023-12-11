@@ -80,8 +80,8 @@ router.post("/signin", async (req, res, next) => {
 
     await client.set(`RefreshToken:${findUser.userId}`, refreshToken, "EX", 7 * 24 * 60 * 60 );
 
-    res.setHeader("authorization", `Bearer ${accessToken}`);
-    res.setHeader("refreshtoken", `${refreshToken}`);
+    res.setHeader("Authorization", `Bearer ${accessToken}`);
+    res.setHeader("Refreshtoken", `${refreshToken}`);
  
     return res.status(200).json({msg: `${findUser.username}님 환영합니다.`, profileImage: profileImage,});
   } catch (err) {
