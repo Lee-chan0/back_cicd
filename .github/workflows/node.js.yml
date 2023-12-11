@@ -37,6 +37,7 @@ jobs:
         pwd
         touch .env
         echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
+        echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
         echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
         echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env
         echo REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} >> .env
