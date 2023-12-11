@@ -99,8 +99,8 @@ router.post("/logout", authMiddleware, async (req, res, next) => {
     const result = await client.del(`RefreshToken:${userId}`);
     console.log(`키 삭제 결과: ${result}`);
 
-    res.setHeader(`authorization`, "");
-    res.setHeader(`refreshtoken`, "");
+    res.setHeader(`Authorization`, "");
+    res.setHeader(`Refreshtoken`, "");
 
     return res.status(200).json({ msg: "로그아웃 되었습니다." });
   } catch (err) {
