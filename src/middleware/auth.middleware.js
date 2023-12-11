@@ -44,7 +44,7 @@ export default async (req, res, next) => {
         const storedRefreshToken = await client.get(`RefreshToken:${userId}`);
         if (storedRefreshToken === Refreshtoken) {
           const newAccessToken = jwt.sign({ userId: +userId }, key, {
-            expiresIn: "10s",
+            expiresIn: "30m",
           });
           const newRefreshToken = jwt.sign({ userId: +userId }, key, {
             expiresIn: "7d" 
