@@ -11,7 +11,9 @@ const PORT = 3000;
 
 app.use(cors(
     {
-    exposedHeaders: ["Authorization", "Refreshtoken"]
+    origin: 'http://localhost:3000',
+    credentials: true,
+    exposedHeaders: ["Authorization", "Refreshtoken"],
   }
 ));
 app.use(express.json());

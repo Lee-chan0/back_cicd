@@ -51,6 +51,7 @@ router.post("/signup", async (req, res, next) => {
     return res.status(500).json({ msg: "server Error" });
   }
 });
+
 // 일반 로그인
 router.post("/signin", async (req, res, next) => {
   try {
