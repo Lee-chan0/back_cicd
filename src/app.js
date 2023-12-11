@@ -9,7 +9,11 @@ import cors from "cors";
 const app = express();
 const PORT = 3000;
 
-app.use(cors());
+app.use(cors(
+    {
+    exposedHeaders: ["Authorization", "Refreshtoken"]
+  }
+));
 app.use(express.json());
 
 app.use("/", [
