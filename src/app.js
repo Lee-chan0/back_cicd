@@ -9,14 +9,27 @@ import cors from "cors";
 const app = express();
 const PORT = 3000;
 
-app.use(cors(
-    {
-    origin: 'http://localhost:3000',
-    credentials: true,
-    exposedHeaders: ["Authorization", "Refreshtoken"],
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", 'http://localhost:3000');
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Refreshtoken");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+
+  if (req.method === "OPTIONS") {
+    res.sendStatus(200); // OPTIONS 요청에 대한 응답으로 200을 보냅니다.
+  } else {
+    next();
   }
-));
-app.use(express.json());
+});
+
+// app.use(cors(
+//     {
+//     origin: 'http://localhost:3000',
+//     credentials: true,
+//     exposedHeaders: ["Authorization", "Refreshtoken"],
+//   }
+// ));
+// app.use(express.json());
 
 app.use("/", [
   UserRouter,
