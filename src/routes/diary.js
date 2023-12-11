@@ -28,8 +28,6 @@ router.get('/diary/detail/:diaryId', async (req, res, next) => {
 
 /* 오늘의 일기 작성 */
 const s3 = new AWS.S3({
-    // process.env.S3_ACCESS_KEY
-    // process.env.S3_SECRET_ACCESS_KEY
     accessKeyId: process.env.S3_ACCESS_KEY,
     secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
     region: 'ap-northeast-2',
@@ -49,7 +47,7 @@ const upload = multer({
     }),
   });
   
-  app.post('/diary/posting', authMiddleware, upload.single('picture'), async (req, res, next) => {
+  app.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
     try {
       const { userId } = req.user;
       const { EmotionStatus, content } = req.body;
