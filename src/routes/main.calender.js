@@ -42,13 +42,17 @@ router.get("/diary/calendar", authMiddleware, async (req, res, next) => {
       return diary;
     });
 
-    const userProfileImg = await prisma.users.findFirst({
+    let userProfileImg = await prisma.users.findFirst({
       where: { userId },
       select: {
         userId: true,
         profileImg: true,
       },
     });
+
+    if (!userProfileImg) {
+      userProfileImg = null
+    }
 
     const arrayedDiaries = new Array(getDate(endDate)).fill(null); // 입력값이 없는 날의 경우 null값을 기본값으로 가지도록 배열을 만든다.
 
