@@ -1,6 +1,6 @@
 import express from 'express'
 import { prisma } from '../utils/prisma/index.js';
-import authMiddleware from '../middlewares/auth.middleware.js';
+import authMiddleware from '../middleware/auth.middleware.js';
 import { startOfDay, endOfDay } from 'date-fns';
 import { utcToZonedTime, format } from 'date-fns-tz';
 import multer from 'multer'
@@ -47,7 +47,7 @@ const upload = multer({
     }),
   });
   
-  app.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
+  router.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
     try {
       const { userId } = req.user;
       const { EmotionStatus, content } = req.body;

@@ -9,7 +9,14 @@ import cors from "cors";
 const app = express();
 const PORT = 3000;
 
-app.use(cors());
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true,
+    exposedHeaders: ["Authorization", "Refreshtoken"]
+}
+
+app.use(cors(corsOptions))
+
 app.use(express.json());
 
 app.use("/", [
@@ -21,11 +28,11 @@ app.use("/", [
 ]);
 
 app.get("/", (req, res) => {
-  res.send(`<h1>Success</h1>`);
+  res.send(`<h1>Success</h1>`)
 });
-
+ 
 app.listen(PORT, () => {
   console.log(`${PORT}번 SERVER OPEN`);
 });
-
+ 
 export default app;

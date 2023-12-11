@@ -58,13 +58,13 @@ router.post("/signin", async (req, res, next) => {
     const { email, password } = req.body;
     const key = process.env.SECRET_KEY;
 
-    const findUser = await prisma.users.findFirst({ where: { email: email } }); 
+    const findUser = await prisma.users.findFirst({ where: { email: email } });
     if (!findUser) {
       return res.status(400).json({ msg: `존재하지 않는 email입니다.` });
     }
 
     const decodedPassword = await bcrypt.compare(password, findUser.password);
-    
+
     if (!decodedPassword) {
       return res.status(400).json({ msg: "비밀번호가 일치하지 않습니다." });
     }
@@ -72,7 +72,7 @@ router.post("/signin", async (req, res, next) => {
     let profileImage = findUser.profileImg;
 
     const accessToken = jwt.sign({ userId: findUser.userId }, key, {
-      expiresIn: "10s",
+      expiresIn: "10m",
     });
 
     const refreshToken = jwt.sign({ userId: findUser.userId }, key, {
@@ -81,15 +81,17 @@ router.post("/signin", async (req, res, next) => {
 
     await client.set(`RefreshToken:${findUser.userId}`, refreshToken, "EX", 7 * 24 * 60 * 60 );
 
-    res.setHeader("authorization", `Bearer ${accessToken}`);
-    res.setHeader("refreshtoken", `${refreshToken}`);
- 
+    res.set("Authorization", `Bearer ${accessToken}`);
+    res.set("Refreshtoken", `${refreshToken}`);
+
     return res.status(200).json({msg: `${findUser.username}님 환영합니다.`, profileImage: profileImage,});
   } catch (err) {
     console.error(err);
     return res.status(500).json({ msg: `server Error` });
   }
 });
+
+
 
 // 로그아웃
 router.post("/logout", authMiddleware, async (req, res, next) => {
@@ -99,8 +101,8 @@ router.post("/logout", authMiddleware, async (req, res, next) => {
     const result = await client.del(`RefreshToken:${userId}`);
     console.log(`키 삭제 결과: ${result}`);
 
-    res.setHeader(`authorization`, "");
-    res.setHeader(`refreshtoken`, "");
+    res.setHeader(`Authorization`, "");
+    res.setHeader(`Refreshtoken`, "");
 
     return res.status(200).json({ msg: "로그아웃 되었습니다." });
   } catch (err) {
