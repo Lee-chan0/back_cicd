@@ -11,11 +11,10 @@ import qs from 'qs';
 dotenv.config();
 const router = express.Router();
 
-router.post('/kakao/code', async function (req, res){
+router.get('/callback', async function (req, res){
     const {code} = req.query;
     console.log(code);
     const key = process.env.SECRET_KEY;
-
     try { 
         const response = await axios({
             method : 'POST',
