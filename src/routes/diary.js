@@ -34,6 +34,9 @@ const s3 = new S3({
   },
 
   region: 'ap-northeast-2',
+  sslEnabled: false,
+  s3ForcePathStyle: true,
+  signatureVersion: 'v4'
 });
 
 const BUCKET_NAME = 'finaldrawings'
@@ -41,7 +44,7 @@ const BUCKET_NAME = 'finaldrawings'
 const upload = multer({
     storage: multerS3({
       s3: s3,
-      bucket: BUCKET_NAME,
+      bucket: 'finaldrawings',
       contentType: multerS3.AUTO_CONTENT_TYPE,
       acl: 'public-read', // 접근 권한 설정 (public-read로 설정하면 URL로 접근 가능)
       key: function (req, file, cb) {
