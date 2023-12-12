@@ -11,8 +11,8 @@ import qs from 'qs';
 dotenv.config();
 const router = express.Router();
 
-router.get('/callback', async function (req, res){
-    const {code} = req.query;
+router.post('/callback', async function (req, res){
+    const {code} = req.body;
     console.log(code);
     const key = process.env.SECRET_KEY;
     try { 
@@ -42,13 +42,17 @@ router.get('/callback', async function (req, res){
         
         const findUser = await prisma.users.findFirst({where : {email : userResponse.data.kakao_account.email}});
         if(findUser){
-            const token = jwt.sign({userId : findUser.userId}, key, {expiresIn : '10m'});
+            const accesstoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : '10m'});
+            const refreshtoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : '7d'});
             const token_time = jwt.verify(token, key);
 
-            res.setHeader('Authorization', token);
+            res.setHeader('Authorization', accesstoken);
+            res.setHeader('Refreshtoken', refreshtoken);
             res.setHeader('Expiredtime', token_time.exp);
 
-            return res.json({message : "로그인 성공"}).redirect('http://localhost:3000/auth/kakao/callback')
+            console.log('======성공1======');
+
+            return res.json({message : "로그인 성공"});
         }else {
             const createUser = await prisma.users.create({
                 data : {
@@ -58,12 +62,15 @@ router.get('/callback', async function (req, res){
                     profileImg : userResponse.data.kakao_account.profile.profile_image_url
                 }
             })
-            const token = jwt.sign({userId : createUser.userId}, key, {expiresIn : '10m'});
+            const accesstoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : '10m'});
+            const refreshtoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : '7d'});
             const token_time = jwt.verify(token, key);
 
-            res.setHeader('Authorization', token);
+            res.setHeader('Authorization', accesstoken);
+            res.setHeader('Refreshtoken', refreshtoken);
             res.setHeader('Expiredtime', token_time.exp);
-            return res.json({message : "회원가입 성공"}).redirect('http://localhost:3000/auth/kakao/callback')
+            console.log('======성공2======');
+            return res.json({message : "회원가입 성공"});
         }
         // console.log(userResponse.data);
     }catch(err) {
