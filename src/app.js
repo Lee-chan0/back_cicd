@@ -4,6 +4,9 @@ import MainCalender from "./routes/main.calender.js";
 import DiaryRouter from "./routes/diary.js";
 import CommentsRouter from "./routes/comments.js";
 import FeedsRouter from "./routes/feeds.js";
+import githubLogin from './Oauth/github.login.js'
+import kakaoLogin from './Oauth/kakao.login.js'
+import googleLogin from './Oauth/google.login.js'
 import cors from "cors";
 
 const app = express();
@@ -25,6 +28,9 @@ app.use("/", [
   DiaryRouter,
   CommentsRouter,
   FeedsRouter,
+  githubLogin,
+  kakaoLogin,
+  googleLogin
 ]);
 
 app.get("/", (req, res) => {

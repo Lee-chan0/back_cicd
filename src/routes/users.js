@@ -81,6 +81,9 @@ router.post("/signin", async (req, res, next) => {
 
     await client.set(`RefreshToken:${findUser.userId}`, refreshToken, "EX", 7 * 24 * 60 * 60 );
 
+    const access_token_time = jwt.verify(accessToken, process.env.SECRET_KEY);
+    const refresh_token_time = jwt.verify(accessToken, process.env.SECRET_KEY);
+
     res.set("Authorization", `Bearer ${accessToken}`);
     res.set("Refreshtoken", `${refreshToken}`);
 
