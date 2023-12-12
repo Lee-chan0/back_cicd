@@ -46,7 +46,7 @@ const upload = multer({
       s3: s3,
       bucket: 'finaldrawings',
       contentType: multerS3.AUTO_CONTENT_TYPE,
-      acl: 'public-read', // 접근 권한 설정 (public-read로 설정하면 URL로 접근 가능)
+      // acl: 'public-read', // 접근 권한 설정 (public-read로 설정하면 URL로 접근 가능)
       key: function (req, file, cb) {
         cb(null, Date.now().toString() + '-' + file.originalname); // 파일 이름 설정
       },
