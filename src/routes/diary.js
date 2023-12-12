@@ -50,7 +50,7 @@ const upload = multer({
   router.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
     try {
       const { userId } = req.user;
-      const { EmotionStatus, content } = req.body;
+      const { EmotionStatus, content, image } = req.body;
       const imageBuffer = req.file.buffer;
   
       const today = new Date();
@@ -115,7 +115,7 @@ const upload = multer({
 router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
     try {
       const { userId } = req.user;
-      const { EmotionStatus, content, isPublic } = req.body;
+      const { EmotionStatus, content, isPublic, image } = req.body;
       const { diaryId } = req.params;
   
       const diary = await prisma.diaries.findFirst({
