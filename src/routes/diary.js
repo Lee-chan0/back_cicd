@@ -67,7 +67,7 @@ const upload = multer({
       const startOfToday = startOfDay(todaySeoulTime);
       const endOfToday = endOfDay(todaySeoulTime);
   
-      const diaryExists = await prisma.diaries.findFirst({
+      const diaryExists = await prisma.diary.findFirst({
         where: {
           createdAt: {
             gte: startOfToday,
@@ -82,7 +82,7 @@ const upload = multer({
       }
   
       // 업로드된 이미지 URL 활용하여 데이터베이스에 저장
-      const savedDiary = await prisma.diaries.create({
+      const savedDiary = await prisma.diary.create({
         data: {
           UserId: userId,
           EmotionStatus,
@@ -165,7 +165,7 @@ const upload = multer({
 router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
     try {
       const { userId } = req.user;
-      const { EmotionStatus, content, isPublic } = req.body;
+      const { EmotionalStatus, content, isPublic } = req.body;
       const { diaryId } = req.params;
   
       const diary = await prisma.diaries.findFirst({
@@ -194,7 +194,7 @@ router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
           where: { diaryId: +diaryId },
           data: {
             content,
-            EmotionStatus,
+            EmotionalStatus,
             isPublic,
             image: {
               connect: {
@@ -209,7 +209,7 @@ router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
           where: { diaryId: +diaryId },
           data: {
             content,
-            EmotionStatus,
+            EmotionalStatus,
             isPublic,
           },
         });
