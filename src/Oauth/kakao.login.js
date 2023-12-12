@@ -41,6 +41,7 @@ router.get('/kakao/code', async function (req, res){
         })
         console.log(userResponse.data);
 
+        return redirect('http://localhost:3000/auth/kakao/callback');
     }catch(err) {
         console.error(err);
         return res.status(500).json({message : 'Server_Error'});

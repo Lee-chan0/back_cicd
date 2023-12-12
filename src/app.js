@@ -15,7 +15,7 @@ const PORT = 3000;
 const corsOptions = {
     origin: 'http://localhost:3000',
     credentials: true,
-    exposedHeaders: ["Authorization", "Refreshtoken"]
+    exposedHeaders: ["Authorization", "Refreshtoken", "Expiredtime"]
 }
 
 app.use(cors(corsOptions))

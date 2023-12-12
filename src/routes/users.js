@@ -83,7 +83,8 @@ router.post("/signin", async (req, res, next) => {
 
     const access_token_time = jwt.verify(accessToken, process.env.SECRET_KEY);
     const refresh_token_time = jwt.verify(accessToken, process.env.SECRET_KEY);
-
+    
+    res.set("Expiredtime", access_token_time.exp);
     res.set("Authorization", `Bearer ${accessToken}`);
     res.set("Refreshtoken", `${refreshToken}`);
 
@@ -137,10 +138,11 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
 // AccessToken 재발급 로직
 router.get('/token', authMiddleware, async(req, res) => {
   const {userId} = req.user;
-  const {authorization, refreshtoken} = req.header;
+  const {authorization, refreshtoken} = req.headers;
+  const token = authorization.split(' ')[1];
   const key = process.env.SECRET_KEY;
 
-  console.log(authorization);
+  console.log('헤더에서 받은 accesstoken : ', token);
   console.log(refreshtoken);
 
   const storedRefreshToken = await client.get(`RefreshToken:${userId}`);
@@ -148,19 +150,19 @@ router.get('/token', authMiddleware, async(req, res) => {
   if(refreshtoken !== storedRefreshToken){
     return res.status(401).json({message : "비정상적인 접근입니다."})
   }else {
-    const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '10m'});
+    const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '30m'});
     const newRefreshToken = jwt.sign({userId : +userId}, key, {expiresIn : '7d'});
+
+    const newAccessToken_time = jwt.verify(newAceessToken, key);
 
     await client.set(`RefreshToken:${userId}`, newRefreshToken, "EX", 7 * 24 * 60 * 60 );
 
+    res.setHeader('Expiredtime', newAccessToken_time.exp);
     res.setHeader('Authorization', newAceessToken);
     res.setHeader('Refreshtoken', newRefreshToken);
 
-    return res.status(201).json({message : "AccessToken 발급 완료"})
-
+    return res.status(201).json({message : "AccessToken 발급 완료"});
   }
-
-  
 })
 
 /* 내 정보 수정 API */
