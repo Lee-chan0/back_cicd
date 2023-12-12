@@ -39,7 +39,8 @@ router.get('/callback', async function (req, res){
                 Authorization : `Bearer ${access_token}`
             }
         })
-        const findUser = await prisma.users.findFirst({where : {email : userResponse.data.kakao_acount.email}});
+        
+        const findUser = await prisma.users.findFirst({where : {email : userResponse.data.kakao_account.email}});
         if(findUser){
             const token = jwt.sign({userId : findUser.userId}, key, {expiresIn : '10m'});
             const token_time = jwt.verify(token, key);
@@ -51,10 +52,10 @@ router.get('/callback', async function (req, res){
         }else {
             const createUser = await prisma.users.create({
                 data : {
-                    email : userResponse.data.kakao_acount.email,
-                    username : userResponse.data.kakao_acount.profile.nickname,
+                    email : userResponse.data.kakao_account.email,
+                    username : userResponse.data.kakao_account.profile.nickname,
                     password : 'ok12341234',
-                    profileImg : userResponse.data.kakao_acount.profile.profile_image_url
+                    profileImg : userResponse.data.kakao_account.profile.profile_image_url
                 }
             })
             const token = jwt.sign({userId : createUser.userId}, key, {expiresIn : '10m'});
@@ -62,17 +63,38 @@ router.get('/callback', async function (req, res){
 
             res.setHeader('Authorization', token);
             res.setHeader('Expiredtime', token_time.exp);
-
             return res.json({message : "회원가입 성공"}).redirect('http://localhost:3000/auth/kakao/callback')
-
         }
         // console.log(userResponse.data);
-
-        return res.redirect('http://localhost:3000/auth/kakao/callback');
     }catch(err) {
         console.error(err);
         return res.status(500).json({message : 'Server_Error'});
     }
 })
-
+/**
+ * {
+  id: 3218322262,
+  connected_at: '2023-12-10T12:52:28Z',
+  properties: {
+    nickname: '이찬영',
+    profile_image: 'http://k.kakaocdn.net/dn/byciWz/btsAYHRZIp1/ksVmh1tVepeFOQnwQUg8Ek/img_640x640.jpg',
+    thumbnail_image: 'http://k.kakaocdn.net/dn/byciWz/btsAYHRZIp1/ksVmh1tVepeFOQnwQUg8Ek/img_110x110.jpg'
+  },
+  kakao_account: {
+    profile_nickname_needs_agreement: false,
+    profile_image_needs_agreement: false,
+    profile: {
+      nickname: '이찬영',
+      thumbnail_image_url: 'http://k.kakaocdn.net/dn/byciWz/btsAYHRZIp1/ksVmh1tVepeFOQnwQUg8Ek/img_110x110.jpg',
+      profile_image_url: 'http://k.kakaocdn.net/dn/byciWz/btsAYHRZIp1/ksVmh1tVepeFOQnwQUg8Ek/img_640x640.jpg',
+      is_default_image: false
+    },
+    has_email: true,
+    email_needs_agreement: false,
+    is_email_valid: true,
+    is_email_verified: true,
+    email: 'yab0403@kakao.com'
+  }
+}
+ */
 export default router;
