@@ -41,6 +41,8 @@ jobs:
         echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
         echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env
         echo REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} >> .env
+        echo KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }} >> .env
+        echo KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} >> .env
         cat .env
    
 
