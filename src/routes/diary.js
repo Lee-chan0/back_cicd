@@ -34,9 +34,9 @@ const s3 = new S3({
   },
 
   region: 'ap-northeast-2',
-  sslEnabled: false,
+  sslEnabled: true,
   s3ForcePathStyle: true,
-  signatureVersion: 'v4'
+  signatureVersion: 'v2'
 });
 
 const BUCKET_NAME = 'finaldrawings'
