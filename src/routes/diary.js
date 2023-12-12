@@ -50,8 +50,10 @@ const upload = multer({
   router.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
     try {
       const { userId } = req.user;
-      const { EmotionStatus, content, image } = req.body;
-      const imageBuffer = req.file.buffer;
+      const { EmotionStatus, content } = req.body;
+  
+      // 이미지가 S3에 업로드되고 해당 URL이 req.file.location으로 제공됨
+      const imageUrl = req.file.location;
   
       const today = new Date();
       const timeZone = 'Asia/Seoul';
@@ -73,49 +75,91 @@ const upload = multer({
         return res.status(300).json({ message: '오늘은 이미 작성한 글이 있습니다. 수정하시겠습니까?' });
       }
   
-      const params = {
-        Bucket: BUCKET_NAME,
-        Key: Date.now().toString() + '-' + req.file.originalname,
-        Body: imageBuffer,
-        ContentType: req.file.mimetype,
-        ACL: 'public-read',
-      };
-  
-      const s3Upload = await s3.upload(params).promise();
-  
-      const savedImage = await prisma.Images.create({
-        data: {
-          filename: req.file.originalname,
-          mimetype: req.file.mimetype,
-          // S3에 저장된 이미지의 URL을 사용하도록 수정
-          data: s3Upload.Location,
-        },
-      });
-  
-      const diary = await prisma.diaries.create({
+      // 업로드된 이미지 URL 활용하여 데이터베이스에 저장
+      const savedDiary = await prisma.diaries.create({
         data: {
           UserId: userId,
           EmotionStatus,
           content,
-          image: {
-            connect: {
-              imageId: savedImage.imageId,
-            },
-          },
+          image: imageUrl, // 이미지 URL을 데이터베이스에 저장
         },
       });
   
-      return res.status(201).json({ message: '다이어리 등록 완료', data: diary });
+      return res.status(201).json({ message: '다이어리 등록 완료', data: savedDiary });
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }
   });
+  
+ // router.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
+  //   try {
+  //     const { userId } = req.user;
+  //     const { EmotionStatus, content } = req.body;
+  //     const imageBuffer = req.file.buffer;
+  
+  //     const today = new Date();
+  //     const timeZone = 'Asia/Seoul';
+  //     const todaySeoulTime = utcToZonedTime(today, timeZone);
+  //     const startOfToday = startOfDay(todaySeoulTime);
+  //     const endOfToday = endOfDay(todaySeoulTime);
+  
+  //     const diaryExists = await prisma.diaries.findFirst({
+  //       where: {
+  //         createdAt: {
+  //           gte: startOfToday,
+  //           lte: endOfToday,
+  //         },
+  //         UserId: userId,
+  //       },
+  //     });
+  
+  //     if (diaryExists) {
+  //       return res.status(300).json({ message: '오늘은 이미 작성한 글이 있습니다. 수정하시겠습니까?' });
+  //     }
+  
+  //     const params = {
+  //       Bucket: BUCKET_NAME,
+  //       Key: Date.now().toString() + '-' + req.file.originalname,
+  //       Body: imageBuffer,
+  //       ContentType: req.file.mimetype,
+  //       ACL: 'public-read',
+  //     };
+  
+  //     const s3Upload = await s3.upload(params).promise();
+  
+  //     const savedImage = await prisma.Images.create({
+  //       data: {
+  //         filename: req.file.originalname,
+  //         mimetype: req.file.mimetype,
+  //         // S3에 저장된 이미지의 URL을 사용하도록 수정
+  //         data: s3Upload.Location,
+  //       },
+  //     });
+  
+  //     const diary = await prisma.diaries.create({
+  //       data: {
+  //         UserId: userId,
+  //         EmotionStatus,
+  //         content,
+  //         image: {
+  //           connect: {
+  //             imageId: savedImage.imageId,
+  //           },
+  //         },
+  //       },
+  //     });
+  
+  //     return res.status(201).json({ message: '다이어리 등록 완료', data: diary });
+  //   } catch (error) {
+  //     return res.status(400).json({ error: error.message });
+  //   }
+  // });
 
 /* 일기수정 */
 router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
     try {
       const { userId } = req.user;
-      const { EmotionStatus, content, isPublic, image } = req.body;
+      const { EmotionStatus, content, isPublic } = req.body;
       const { diaryId } = req.params;
   
       const diary = await prisma.diaries.findFirst({
