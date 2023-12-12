@@ -44,7 +44,6 @@ export default async (req, res, next) => {
       res.setHeader('Authorization', '');
       res.setHeader('Refreshtoken', '');
 
-      const result = await client.del(`RefreshToken:${userId}`);
       return res.status(400).json({message : "비정상적인 요청입니다. 자동으로 로그아웃 됩니다."})}
   }
 };

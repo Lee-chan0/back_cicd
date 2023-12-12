@@ -102,7 +102,7 @@ router.post("/logout", authMiddleware, async (req, res, next) => {
   try {
     const { userId } = req.user;
 
-    const result = await client.del(`RefreshToken:${userId}`);
+    const result = await client.del(`RefreshToken:${userId}`)
     console.log(`키 삭제 결과: ${result}`);
 
     res.setHeader(`Authorization`, "");
