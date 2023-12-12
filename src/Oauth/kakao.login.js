@@ -39,9 +39,36 @@ router.get('/callback', async function (req, res){
                 Authorization : `Bearer ${access_token}`
             }
         })
-        console.log(userResponse.data);
+        const findUser = await prisma.users.findFirst({where : {email : userResponse.data.kakao_acount.email}});
+        if(findUser){
+            const token = jwt.sign({userId : findUser.userId}, key, {expiresIn : '10m'});
+            const token_time = jwt.verify(token, key);
 
-        return redirect('http://localhost:3000/auth/kakao/callback');
+            res.setHeader('Authorization', token);
+            res.setHeader('Expiredtime', token_time.exp);
+
+            return res.json({message : "로그인 성공"}).redirect('http://localhost:3000/auth/kakao/callback')
+        }else {
+            const createUser = await prisma.users.create({
+                data : {
+                    email : userResponse.data.kakao_acount.email,
+                    username : userResponse.data.kakao_acount.profile.nickname,
+                    password : 'ok12341234',
+                    profileImg : userResponse.data.kakao_acount.profile.profile_image_url
+                }
+            })
+            const token = jwt.sign({userId : createUser.userId}, key, {expiresIn : '10m'});
+            const token_time = jwt.verify(token, key);
+
+            res.setHeader('Authorization', token);
+            res.setHeader('Expiredtime', token_time.exp);
+
+            return res.json({message : "회원가입 성공"}).redirect('http://localhost:3000/auth/kakao/callback')
+
+        }
+        // console.log(userResponse.data);
+
+        return res.redirect('http://localhost:3000/auth/kakao/callback');
     }catch(err) {
         console.error(err);
         return res.status(500).json({message : 'Server_Error'});
