@@ -5,7 +5,7 @@ import { startOfDay, endOfDay } from 'date-fns';
 import { utcToZonedTime, format } from 'date-fns-tz';
 import multer from 'multer'
 import multerS3 from 'multer-s3'
-import AWS from 'aws-sdk'
+import { S3 } from '@aws-sdk/client-s3';
 import dotenv from "dotenv"
 
 const router = express.Router();
@@ -27,11 +27,14 @@ router.get('/diary/detail/:diaryId', async (req, res, next) => {
 
 
 /* 오늘의 일기 작성 */
-const s3 = new AWS.S3({
+const s3 = new S3({
+  credentials: {
     accessKeyId: process.env.S3_ACCESS_KEY,
     secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-    region: 'ap-northeast-2',
-  });
+  },
+
+  region: 'ap-northeast-2',
+});
 
 const BUCKET_NAME = 'finaldrawings'
 
