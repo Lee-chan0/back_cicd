@@ -134,6 +134,35 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
   return res.status(200).json({ data: user })
 });
 
+// AccessToken 재발급 로직
+router.get('/token', authMiddleware, async(req, res) => {
+  const {userId} = req.user;
+  const {authorization, refreshtoken} = req.header;
+  const key = process.env.SECRET_KEY;
+
+  console.log(authorization);
+  console.log(refreshtoken);
+
+  const storedRefreshToken = await client.get(`RefreshToken:${userId}`);
+
+  if(refreshtoken !== storedRefreshToken){
+    return res.status(401).json({message : "비정상적인 접근입니다."})
+  }else {
+    const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '10m'});
+    const newRefreshToken = jwt.sign({userId : +userId}, key, {expiresIn : '7d'});
+
+    await client.set(`RefreshToken:${userId}`, newRefreshToken, "EX", 7 * 24 * 60 * 60 );
+
+    res.setHeader('Authorization', newAceessToken);
+    res.setHeader('Refreshtoken', newRefreshToken);
+
+    return res.status(201).json({message : "AccessToken 발급 완료"})
+
+  }
+
+  
+})
+
 /* 내 정보 수정 API */
 
 /* 회원 탈퇴 API*/

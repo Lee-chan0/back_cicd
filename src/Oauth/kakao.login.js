@@ -11,19 +11,7 @@ import qs from 'qs';
 dotenv.config();
 const router = express.Router();
 
-// app.get('/', (req, res) => {
-//     res.send(`
-//         <h1>login</h1>
-//         <a href="/login">sign in</a>
-//     `)
-// });
-
-// app.get('/login', (req, res) => {
-//     const url=`https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
-//     res.redirect(url);
-// });
-
-router.get('/auth/kakao/callback', async function (req, res){
+router.get('/kakao/code', async function (req, res){
     const {code} = req.query;
     const key = process.env.SECRET_KEY;
 
@@ -51,20 +39,7 @@ router.get('/auth/kakao/callback', async function (req, res){
                 Authorization : `Bearer ${access_token}`
             }
         })
-
-        const findUser = await prisma.users.findFirst({where : {email : userResponse.data.kakao_account.email}})
-        if(findUser){
-            const token = jwt.sign({userId : findUser.userId}, key, {expiresIn : '30m'});
-            return res.setHeader('authorization', token).redirect('http://localhost:3000/auth/kakao/callback');
-        }else {
-            await prisma.users.create({
-                data : {
-                    email : userResponse.data.kakao_account.email,
-                    profileImg : userResponse.data.properties.profile_image,
-                    username : userResponse.data.properties.nickname
-                }
-            })
-        }
+        console.log(userResponse.data);
 
     }catch(err) {
         console.error(err);
