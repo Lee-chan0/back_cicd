@@ -42,11 +42,11 @@ router.post('/callback', async function (req, res){
         
         const findUser = await prisma.users.findFirst({where : {email : userResponse.data.kakao_account.email}});
         if(findUser){
-            const accesstoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : '10m'});
-            const refreshtoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : '7d'});
-            const token_time = jwt.verify(token, key);
+            const accesstoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : '10m'});
+            const refreshtoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : '7d'});
+            const token_time = jwt.verify(accesstoken, key);
 
-            res.setHeader('Authorization', accesstoken);
+            res.setHeader('Authorization', `Bearer ${accesstoken}`);
             res.setHeader('Refreshtoken', refreshtoken);
             res.setHeader('Expiredtime', token_time.exp);
 
@@ -64,15 +64,14 @@ router.post('/callback', async function (req, res){
             })
             const accesstoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : '10m'});
             const refreshtoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : '7d'});
-            const token_time = jwt.verify(token, key);
+            const token_time = jwt.verify(accesstoken, key);
 
-            res.setHeader('Authorization', accesstoken);
+            res.setHeader('Authorization', `Bearer ${accesstoken}`);
             res.setHeader('Refreshtoken', refreshtoken);
             res.setHeader('Expiredtime', token_time.exp);
             console.log('======성공2======');
             return res.json({message : "회원가입 성공"});
         }
-        // console.log(userResponse.data);
     }catch(err) {
         console.error(err);
         return res.status(500).json({message : 'Server_Error'});
