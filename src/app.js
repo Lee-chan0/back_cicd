@@ -13,11 +13,12 @@ const app = express();
 const PORT = 3000;
 
 const corsOptions = {
-    origin: 'http://localhost:3001',
+    origin: 'http://localhost:3000',
     credentials: true,
     exposedHeaders: ["Authorization", "Refreshtoken", "Expiredtime"]
 }
 
+app.use(express.urlencoded({extended : true}))
 app.use(cors(corsOptions))
 
 app.use(express.json());
