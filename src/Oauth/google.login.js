@@ -27,7 +27,7 @@ const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo'
 
 router.post('/google/callback', async(req, res, next) => {
     const {code} = req.body;
-
+    console.log('code=======', code);
     const resp = await axios.post(GOOGLE_TOKEN_URL, {
         code : code,
         client_id : process.env.GOOGLE_CLIENT_ID,
@@ -35,7 +35,7 @@ router.post('/google/callback', async(req, res, next) => {
         redirect_uri : process.env.REACT_APP_GOOGLE_AUTH_REDIRECT_URI,
         grant_type : `authorization_code`
     });
-
+    console.log('-=--------------------------------------------------------------')
     const resp2 = await axios.get(GOOGLE_USERINFO_URL, {
         headers : {
             authorization: `Bearer ${resp.data.access_token}`
