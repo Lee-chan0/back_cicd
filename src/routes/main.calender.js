@@ -76,7 +76,7 @@ router.get("/diary/calendar/previousMonth/:year/:month/:date", authMiddleware, a
   try {
     const { userId } = req.user;
     let { year, month, date } = req.params
-    month === 1 ? year -= 1 : year
+    year = month === 1 ? year - 1 : year;
     const currentDate = addHours(new Date(year, month -1, date));
     const startDate = startOfMonth(currentDate);
     const endDate = endOfMonth(currentDate);

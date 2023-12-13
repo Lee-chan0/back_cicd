@@ -43,7 +43,7 @@ router.get('/diary/detail/comment/:diaryId', async(req, res, next) => {
 })
 
 /* 댓글 수정 */
-router.patch('/comment/:commentId', authMiddleware, async(req, res, next) => {
+router.patch('/diary/detail/comment/:commentId', authMiddleware, async(req, res, next) => {
   try{
       const { commentId } = req.params;
       const { userId } = req.user
@@ -68,6 +68,29 @@ router.patch('/comment/:commentId', authMiddleware, async(req, res, next) => {
   } catch(error) {
       res.status(400).json({ error: error.message })
   }
+})
+
+/* 댓글 삭제 */
+router.delete('/diary/detail/comment/:commentId', authMiddleware, async(req, res, next) => {
+    try{
+        const { commentId } = req.params;
+        const { userId } = req.user
+
+        const comment = await prisma.comments.findFirst({
+            where :{ commentId : + commentId}
+        })
+
+        if (!comment) {
+            return res.status(401).json({ message: "댓글이 존재하지 않습니다"})
+        }
+
+        await prisma.comments.delete({
+            where : {commentId : +commentId}
+        })
+        return res.status(201).json({ message: "댓글 삭제 완료"})
+    } catch(error) {
+        res.status(400).json({ error: error.message })
+    }
 })
 
 
