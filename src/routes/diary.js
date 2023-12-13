@@ -43,10 +43,10 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
         EmotionStatus : +EmotionStatus,
         content,
         image: imageUrl,
-        isPublic: Boolean(isPublic)
+        isPublic: Boolean(isPublic),
+        User: {
+          connect : {userId}
       },  
-      Users: {
-        connect : {userId}
       }
     });
 
