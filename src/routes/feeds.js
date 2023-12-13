@@ -50,6 +50,7 @@ router.get('/feeds', authMiddleware, async (req, res, next) => {
               }
           },
           take: pageSize,
+          skip: page > 1 ? (page - 1) * pageSize : 0,
           orderBy: { createdAt: 'asc' }
       });
 
