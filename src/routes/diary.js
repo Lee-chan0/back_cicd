@@ -8,8 +8,21 @@ import { upload } from '../middleware/S3.upload/multer.js'
 
 
 const router = express.Router();
+/* 일기 상세 조회 */
+router.get('/diary/detail/:diaryId', async (req, res, next) => {
+  try {
+      const { diaryId } = req.params;
 
+      const diaryDetail = await prisma.diaries.findFirst({
+          where: { diaryId: +diaryId }
+      });
+      return res.status(200).json({ data: diaryDetail });
+  } catch (error) {
+      return res.status(400).json({ error: error.message });
+  }
 
+});
+/* 일기 등록 */
 router.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
   try {
     const { userId } = req.user;
@@ -39,12 +52,15 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
 
     const savedDiary = await prisma.diaries.create({
       data: {
-        UserId: userId,
+        // UserId: userId,
         EmotionStatus : +EmotionStatus,
         content,
         image: imageUrl,
-        isPublic: Boolean(isPublic)
+        isPublic: Boolean(isPublic),
+        User: {
+          connect : {userId}
       },  
+      }
     });
 
     return res.status(201).json({ message: '다이어리 등록 완료', data: savedDiary });
@@ -54,66 +70,74 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
 });
  
 /* 일기수정 */
-// router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
-//     try {
-//       const { userId } = req.user;
-//       const { EmotionStatus, content, isPublic } = req.body;
-//       const { diaryId } = req.params;
+router.patch('/diary/edit/:diaryId', authMiddleware, upload.single('image'), async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { diaryId } = req.params
+    const { EmotionStatus, content, isPublic } = req.body;
+
+    const  imageUrl = req.file.location
+
+    const today = new Date();
+    const timeZone = 'Asia/Seoul';
+    const todaySeoulTime = utcToZonedTime(today, timeZone);
+    const startOfToday = startOfDay(todaySeoulTime);
+    const endOfToday = endOfDay(todaySeoulTime);
+
+    const diaryExists = await prisma.diaries.findFirst({
+      where: {
+        diaryId : +diaryId,
+        UserId: userId,
+      },
+    });
+
+    if (!diaryExists) {
+      return res.status(300).json({ message: '작성된 일기가 없습니다' });
+    }
+
+    const savedDiary = await prisma.diaries.update({
+      where : {
+        diaryId : +diaryId
+      },
+      data: {
+        EmotionStatus : +EmotionStatus,
+        content,
+        image: imageUrl,
+        isPublic: Boolean(isPublic),
+        User: {
+          connect : {userId}
+      },  
+      }
+    });
+
+    return res.status(201).json({ message: '다이어리 수정 완료', data: savedDiary });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+});
   
-//       const diary = await prisma.diaries.findFirst({
-//         where: { diaryId: +diaryId }
-//       });
-  
-//       if (!diary) {
-//         return res.status(400).json({ message: "수정하려는 일기가 존재하지 않습니다" });
-//       }
-  
-//       if (diary.UserId !== userId) {
-//         return res.status(401).json({ message: "수정 권한이 없는 게시물입니다" });
-//       }
-  
-//       // 이미지가 수정되는 경우에만 처리
-//       if (req.file) {
-//         const savedImage = await prisma.Images.create({
-//           data: {
-//             filename: req.file.originalname,
-//             mimetype: req.file.mimetype,
-//             data: `https://${req.file.bucket}.s3.amazonaws.com/${req.file.key}`,
-//           },
-//         });
-  
-//         await prisma.diaries.update({
-//           where: { diaryId: +diaryId },
-//           data: {
-//             content,
-//             EmotionStatus : +EmotionStatus,
-//             isPublic,
-//             image: {
-//               connect: {
-//                 imageId: savedImage.imageId,
-//               },
-//             },
-//           },
-//         });
-//       } else {
-//         // 이미지가 수정되지 않은 경우에는 이미지 필드를 업데이트하지 않음
-//         await prisma.diaries.update({
-//           where: { diaryId: +diaryId },
-//           data: {
-//             content,
-//             EmotionStatus,
-//             isPublic,
-//           },
-//         });
-//       }
-  
-//       return res.status(201).json({ message: "수정완료" });
-  
-//     } catch (error) {
-//       return res.status(400).json({ error: error.message });
-//     }
-//   });
-  
+/* 일기 삭제 */
+router.delete('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
+try{
+  const {diaryId} = req.params
+
+  const diary = await prisma.diaries.findFirst({
+    where: {diaryId : +diaryId}
+  })
+
+  if (!diary) {
+    return res.status(401).json({ message : "삭제하려는 일기가 존재하지 않습니다"})
+  }
+
+  await prisma.diaries.delete({
+    where: {diaryId : +diaryId}
+  })
+
+  return res.status(201).json({ message : "삭제 완료"})
+}catch(error) {
+  return res.status(400).json({ error: error.message })
+}
+})
   
 
 export default router;

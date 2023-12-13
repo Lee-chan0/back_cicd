@@ -5,7 +5,7 @@ import authMiddleware from "../middleware/auth.middleware.js";
 const router = express.Router();
 
 /* 댓글 등록 */
-router.post('/comment/:diaryId', authMiddleware, async(req, res, next) => {
+router.post('/diary/detail/comment/:diaryId', authMiddleware, async(req, res, next) => {
   try{
   const { diaryId } = req.params;
   const { content } = req.body;
@@ -26,13 +26,13 @@ res.status(201).json({ message: "댓글이 등록되었습니다"})
 
 /* 댓글 조회 */
 /* 댓글 조회의 경우, 댓글만 조회하는 경우는 없을것. 특정 포스팅등에 있는 댓글을 조회할것이기때문에 diaryId만을 필요로 한다 */
-router.get('/comment/:diaryId', async(req, res, next) => {
+router.get('/diary/detail/comment/:diaryId', async(req, res, next) => {
   try{
   const { diaryId } = req.params
 
   const comments = await prisma.comments.findMany({
       where : {
-          DiaryId: diaryId
+          DiaryId: +diaryId
       }
   })
 
@@ -43,7 +43,7 @@ router.get('/comment/:diaryId', async(req, res, next) => {
 })
 
 /* 댓글 수정 */
-router.patch('/comment/:commentId', authMiddleware, async(req, res, next) => {
+router.patch('/diary/detail/comment/:commentId', authMiddleware, async(req, res, next) => {
   try{
       const { commentId } = req.params;
       const { userId } = req.user
@@ -68,6 +68,29 @@ router.patch('/comment/:commentId', authMiddleware, async(req, res, next) => {
   } catch(error) {
       res.status(400).json({ error: error.message })
   }
+})
+
+/* 댓글 삭제 */
+router.delete('/diary/detail/comment/:commentId', authMiddleware, async(req, res, next) => {
+    try{
+        const { commentId } = req.params;
+        const { userId } = req.user
+
+        const comment = await prisma.comments.findFirst({
+            where :{ commentId : + commentId}
+        })
+
+        if (!comment) {
+            return res.status(401).json({ message: "댓글이 존재하지 않습니다"})
+        }
+
+        await prisma.comments.delete({
+            where : {commentId : +commentId}
+        })
+        return res.status(201).json({ message: "댓글 삭제 완료"})
+    } catch(error) {
+        res.status(400).json({ error: error.message })
+    }
 })
 
 

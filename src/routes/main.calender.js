@@ -76,11 +76,14 @@ router.get("/diary/calendar/previousMonth/:year/:month/:date", authMiddleware, a
   try {
     const { userId } = req.user;
     let { year, month, date } = req.params
-    month === 1 ? year -= 1 : year
-    const currentDate = addHours(new Date(year, month -1, date));
+    year = month === 0 ? year - 1 : year;
+
+    console.log(`year ${year}, month ${month}, date ${date}`)
+    const currentDate = addHours(new Date(year, month -2, date), 0);
     const startDate = startOfMonth(currentDate);
     const endDate = endOfMonth(currentDate);
 
+  
     const diaries = await prisma.diaries.findMany({
       where: {
         UserId: userId,
@@ -106,7 +109,7 @@ router.get("/diary/calendar/previousMonth/:year/:month/:date", authMiddleware, a
       diary.createdAt = `${year}. ${month}. ${date}.`; // 프론트에서 원하는 형식으로 데이터를 정리해서 보내주기 위한 코드
       return diary;
     });
-
+  
     let userProfileImg = await prisma.users.findFirst({
       where: { userId },
       select: {
@@ -138,11 +141,14 @@ router.get("/diary/calendar/nextMonth/:year/:month/:date", authMiddleware, async
   try {
     const { userId } = req.user;
     let { year, month, date } = req.params
-    month === 12 ? year += 1 : year
-    const currentDate = addHours(new Date(year, month +1, date));
+    year = month === 11 ? year + 1 : year;
+
+    console.log(`year ${year}, month ${month}, date ${date}`)
+    const currentDate = addHours(new Date(year, month , date), 0);
     const startDate = startOfMonth(currentDate);
     const endDate = endOfMonth(currentDate);
 
+  
     const diaries = await prisma.diaries.findMany({
       where: {
         UserId: userId,
@@ -168,7 +174,7 @@ router.get("/diary/calendar/nextMonth/:year/:month/:date", authMiddleware, async
       diary.createdAt = `${year}. ${month}. ${date}.`; // 프론트에서 원하는 형식으로 데이터를 정리해서 보내주기 위한 코드
       return diary;
     });
-
+  
     let userProfileImg = await prisma.users.findFirst({
       where: { userId },
       select: {
