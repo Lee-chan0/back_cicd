@@ -38,7 +38,7 @@ model diaries {
   comment     comments[]
   User        Users     @relation(fields: [UserId], references: [userId], onDelete: Cascade)
 
-  @@map("diary")
+  @@map("diaries")
 }
 
 model comments {
@@ -53,5 +53,7 @@ model comments {
   deletedAt      DateTime?  @map("deletedAt")
 
   User         Users        @relation(fields: [UserId], references: [userId], onDelete: Cascade)
-  diary        diaries      @relation(fields: [DiaryId], references: [diaryId], onDelete: Cascade) 
+  diary        diaries      @relation(fields: [DiaryId], references: [diaryId], onDelete: Cascade)
+
+  @@map("comments") 
 }

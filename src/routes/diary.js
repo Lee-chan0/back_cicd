@@ -3,33 +3,11 @@ import { prisma } from '../utils/prisma/index.js';
 import authMiddleware from '../middleware/auth.middleware.js';
 import { startOfDay, endOfDay } from 'date-fns';
 import { utcToZonedTime } from 'date-fns-tz';
-import multer from 'multer';
-import multerS3 from 'multer-s3';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { fromIni } from '@aws-sdk/credential-provider-ini';
-import dotenv from 'dotenv';
+import { upload } from '../middleware/S3.upload/multer.js'
+
 
 const router = express.Router();
-dotenv.config();
 
-const s3 = new S3Client({
-  region: 'ap-northeast-2',
-  credentials: fromIni(), // AWS 자격 증명 관리
-});
-
-const BUCKET_NAME = 'finaldrawings';
-
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: BUCKET_NAME,
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-    acl: 'public-read',
-    key: function (req, file, cb) {
-      cb(null, Date.now().toString() + '-' + file.originalname);
-    },
-  }),
-});
 
 router.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
   try {
@@ -44,7 +22,7 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
     const startOfToday = startOfDay(todaySeoulTime);
     const endOfToday = endOfDay(todaySeoulTime);
 
-    const diaryExists = await prisma.diary.findFirst({
+    const diaryExists = await prisma.diaries.findFirst({
       where: {
         createdAt: {
           gte: startOfToday,
@@ -58,23 +36,13 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
       return res.status(300).json({ message: '오늘은 이미 작성한 글이 있습니다. 수정하시겠습니까?' });
     }
 
-    const putObjectCommand = new PutObjectCommand({
-      Bucket: BUCKET_NAME,
-      Key: Date.now().toString() + '-' + req.file.originalname,
-      Body: req.file.buffer,
-      ContentType: req.file.mimetype,
-      ACL: 'public-read',
-    });
-
-    const s3Upload = await s3.send(putObjectCommand);
-
-    const savedDiary = await prisma.diary.create({
+    const savedDiary = await prisma.diaries.create({
       data: {
         UserId: userId,
         EmotionStatus,
         content,
         image: imageUrl,
-      },
+      },  
     });
 
     return res.status(201).json({ message: '다이어리 등록 완료', data: savedDiary });
@@ -87,7 +55,7 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
 router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
     try {
       const { userId } = req.user;
-      const { EmotionalStatus, content, isPublic } = req.body;
+      const { EmotionStatus, content, isPublic } = req.body;
       const { diaryId } = req.params;
   
       const diary = await prisma.diaries.findFirst({
@@ -116,7 +84,7 @@ router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
           where: { diaryId: +diaryId },
           data: {
             content,
-            EmotionalStatus,
+            EmotionStatus,
             isPublic,
             image: {
               connect: {
@@ -131,7 +99,7 @@ router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
           where: { diaryId: +diaryId },
           data: {
             content,
-            EmotionalStatus,
+            EmotionStatus,
             isPublic,
           },
         });
