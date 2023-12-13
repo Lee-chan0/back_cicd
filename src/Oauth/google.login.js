@@ -29,16 +29,16 @@ router.post('/google/callback', async(req, res, next) => {
     });
 
     const findUser = await prisma.users.findFirst({where : {email : resp2.data.email}});
-    if(findUser.profileImg !== resp2.data.picture){
-        await prisma.users.update({
-            where : {userId : findUser.userId},
-            data : {
-                profileImg : resp2.data.picture
-            }
-        })
-    }
 
     if(findUser){
+        if(findUser.profileImg !== resp2.data.picture){
+            await prisma.users.update({
+                where : {userId : findUser.userId},
+                data : {
+                    profileImg : resp2.data.picture
+                }
+            })
+        }
         const accesstoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : '30m'});
         const refreshtoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : '7d'});
 

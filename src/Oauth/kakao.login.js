@@ -43,23 +43,22 @@ router.post("/kakao/callback", async function (req, res) {
       where: { email: userResponse.data.kakao_account.email },
     });
 
-    if (findUser.profileImg !== userResponse.data.kakao_account.profile.profile_image_url) {
-      await prisma.users.update({
-        where: { userId: findUser.userId },
-        data: {
-          profileImg: userResponse.data.kakao_account.profile.profile_image_url,
-        },
-      });
-    } else if (findUser.username !== userResponse.data.kakao_account.profile.nickname){
-      await prisma.users.update({
-        where : {userId : findUser.userId},
-        data : {
-          username : userResponse.data.kakao_account.profile.nickname
-        }
-      })
-    }
-
     if (findUser) {
+      if (findUser.profileImg !== userResponse.data.kakao_account.profile.profile_image_url) {
+        await prisma.users.update({
+          where: { userId: findUser.userId },
+          data: {
+            profileImg: userResponse.data.kakao_account.profile.profile_image_url,
+          },
+        });
+      } else if (findUser.username !== userResponse.data.kakao_account.profile.nickname){
+        await prisma.users.update({
+          where : {userId : findUser.userId},
+          data : {
+            username : userResponse.data.kakao_account.profile.nickname
+          }
+        })
+      }
       const accesstoken = jwt.sign({ userId: findUser.userId }, key, {
         expiresIn: "10m",
       });
