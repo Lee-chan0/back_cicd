@@ -27,7 +27,7 @@ const router = express.Router();
 //   res.redirect(naverAuthUrl);
 // });
 
-router.post("/callback/naver", async (req, res) => {
+router.post("/naver/callback", async (req, res) => {
   const key = process.env.SECRET_KEY;
   const clientId = process.env.NAVER_CLIENT_ID;
   const clientSecret = process.env.NAVER_CLIENT_SECRET;
