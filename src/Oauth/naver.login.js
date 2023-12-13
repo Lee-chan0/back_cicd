@@ -26,7 +26,6 @@ const router = express.Router();
 
 //   res.redirect(naverAuthUrl);
 // });
-
 router.post("/naver/callback", async (req, res) => {
   const key = process.env.SECRET_KEY;
   const clientId = process.env.NAVER_CLIENT_ID;
@@ -95,7 +94,7 @@ router.post("/naver/callback", async (req, res) => {
     const accesstoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : "10m"});
     const refreshtoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : "7d"});
 
-    await client.set(`RefreshToken:${findUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60 );
+    await client.set(`RefreshToken:${createUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60 );
 
     const accesstoken_time = jwt.verify(accesstoken, key);
 
