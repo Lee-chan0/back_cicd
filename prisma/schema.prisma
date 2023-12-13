@@ -11,9 +11,6 @@ model Users {
   username    String   @map("username")
   password    String  @map("password")
   email       String  @unique @map("email")
-  username    String  @map("username")
-  password    String  @map("password")
-  email       String @unique @map("email")
   profileImg  String?  @map("profileImg")
 
   createdAt   DateTime  @default(now()) @map("createdAt")
