@@ -87,8 +87,8 @@ router.post("/naver/callback", async (req, res) => {
       data : {
         email : userInfo.email,
         password : '1234567',
-        name : userInfo.name,
-        userInfo : userInfo.profile_image
+        username : userInfo.name,
+        profileImg : userInfo.profile_image
       }
     })
     const accesstoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : "10m"});
