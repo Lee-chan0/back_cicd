@@ -45,7 +45,7 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
         image: imageUrl,
         isPublic: Boolean(isPublic)
       },  
-      User: {
+      Users: {
         connect : {userId}
       }
     });
