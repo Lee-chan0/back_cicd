@@ -1,7 +1,6 @@
 generator client {
   provider = "prisma-client-js"
 }
-
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -19,10 +18,8 @@ model Users {
 
   diary     diaries[]
   comment   comments[]
-
   @@map("Users")
 }
-
 model diaries {
   diaryId     Int   @id @default(autoincrement()) @map("diaryId")
   UserId      Int   @map("UserId")
@@ -37,10 +34,8 @@ model diaries {
 
   comment     comments[]
   User        Users     @relation(fields: [UserId], references: [userId], onDelete: Cascade)
-
   @@map("diaries")
 }
-
 model comments {
   commentId      Int   @id   @default(autoincrement()) @map("commentId")
   DiaryId        Int   @map("DiaryId")
@@ -51,9 +46,8 @@ model comments {
   createdAt      DateTime   @default(now()) @map("createdAt")
   updatedAt      DateTime   @updatedAt      @map("updatedAt")
   deletedAt      DateTime?  @map("deletedAt")
-
+  
   User         Users        @relation(fields: [UserId], references: [userId], onDelete: Cascade)
   diary        diaries      @relation(fields: [DiaryId], references: [diaryId], onDelete: Cascade)
-
   @@map("comments") 
 }

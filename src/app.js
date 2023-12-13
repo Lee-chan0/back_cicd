@@ -4,6 +4,9 @@ import MainCalender from "./routes/main.calender.js";
 import DiaryRouter from "./routes/diary.js";
 import CommentsRouter from "./routes/comments.js";
 import FeedsRouter from "./routes/feeds.js";
+import githubLogin from './Oauth/github.login.js'
+import kakaoLogin from './Oauth/kakao.login.js'
+import googleLogin from './Oauth/google.login.js'
 import cors from "cors";
 
 const app = express();
@@ -12,9 +15,10 @@ const PORT = 3000;
 const corsOptions = {
     origin: 'http://localhost:3000',
     credentials: true,
-    exposedHeaders: ["Authorization", "Refreshtoken"]
+    exposedHeaders: ["Authorization", "Refreshtoken", "Expiredtime"]
 }
-
+//
+app.use(express.urlencoded({extended : true}))
 app.use(cors(corsOptions))
 
 app.use(express.json());
@@ -25,6 +29,9 @@ app.use("/", [
   DiaryRouter,
   CommentsRouter,
   FeedsRouter,
+  githubLogin,
+  kakaoLogin,
+  googleLogin
 ]);
 
 app.get("/", (req, res) => {
