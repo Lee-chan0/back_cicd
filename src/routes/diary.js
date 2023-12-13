@@ -116,6 +116,28 @@ router.patch('/diary/edit/:diaryId', authMiddleware, upload.single('image'), asy
   }
 });
   
+/* 일기 삭제 */
+router.delete('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
+try{
+  const {diaryId} = req.params
+
+  const diary = await prisma.diaries.findFirst({
+    where: {diaryId : +diaryId}
+  })
+
+  if (!diary) {
+    return res.status(401).json({ message : "삭제하려는 일기가 존재하지 않습니다"})
+  }
+
+  await prisma.diaries.delete({
+    where: {diaryId : +diaryId}
+  })
+
+  return res.status(201).json({ message : "삭제 완료"})
+}catch(error) {
+  return res.status(400).json({ error: error.message })
+}
+})
   
 
 export default router;
