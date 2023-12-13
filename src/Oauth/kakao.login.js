@@ -3,8 +3,7 @@ import { prisma } from "../utils/prisma/index.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-import authMiddleware from "../middleware/auth.middleware.js";
-import redis from "ioredis";
+import {client} from '../redis/redis.js';
 import axios from "axios";
 import qs from "qs";
 
@@ -44,10 +43,7 @@ router.post("/kakao/callback", async function (req, res) {
       where: { email: userResponse.data.kakao_account.email },
     });
 
-    if (
-      findUser.profileImg !==
-      userResponse.data.kakao_account.profile.profile_image_url
-    ) {
+    if (findUser.profileImg !== userResponse.data.kakao_account.profile.profile_image_url) {
       await prisma.users.update({
         where: { userId: findUser.userId },
         data: {
@@ -55,7 +51,12 @@ router.post("/kakao/callback", async function (req, res) {
         },
       });
     } else if (findUser.username !== userResponse.data.kakao_account.profile.nickname){
-      await prisma.users.update()
+      await prisma.users.update({
+        where : {userId : findUser.userId},
+        data : {
+          username : userResponse.data.kakao_account.profile.nickname
+        }
+      })
     }
 
     if (findUser) {
@@ -75,7 +76,7 @@ router.post("/kakao/callback", async function (req, res) {
 
       console.log("======성공1======");
 
-      return res.json({ message: "로그인 성공" });
+      return res.json({ message: `${findUser.username}님 환영합니다.` });
     } else {
       var userResponseIdString = userResponse.data.id.toString(); 
       var kakaoIdsubString = userResponseIdString.substring(0, 8);

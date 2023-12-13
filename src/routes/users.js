@@ -4,15 +4,9 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import authMiddleware from "../middleware/auth.middleware.js";
-import redis from "ioredis";
+import {client} from '../redis/redis.js';
 
 dotenv.config();
-
-const client = new redis({
-  host : process.env.REDIS_HOST,
-  port : process.env.REDIS_PORT,
-  password : process.env.REDIS_PASSWORD
-});
 
 const router = express.Router();
 
@@ -101,7 +95,7 @@ router.post("/logout", authMiddleware, async (req, res, next) => {
   try {
     const { userId } = req.user;
 
-    const result = await client.del(`RefreshToken:${userId}`)
+    const result = await client.del(`RefreshToken:${userId}`);
     console.log(`키 삭제 결과: ${result}`);
 
     res.setHeader(`Authorization`, "");
@@ -135,7 +129,7 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
 });
 
 // AccessToken 재발급 로직
-router.get('/token', authMiddleware, async(req, res) => {
+router.get('/token', authMiddleware, async(req, res, next) => {
   const {userId} = req.user;
   const {authorization, refreshtoken} = req.headers;
   const token = authorization.split(' ')[1];
@@ -147,7 +141,9 @@ router.get('/token', authMiddleware, async(req, res) => {
   const storedRefreshToken = await client.get(`RefreshToken:${userId}`);
 
   if(refreshtoken !== storedRefreshToken){
-    return res.status(401).json({message : "비정상적인 접근입니다."})
+    res.setHeader('Authorization', '');
+    res.setHeader('Refreshtoken', '');
+    return res.status(401).json({message : "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."})
   }else {
     const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '30m'});
     const newRefreshToken = jwt.sign({userId : +userId}, key, {expiresIn : '7d'});
@@ -156,16 +152,53 @@ router.get('/token', authMiddleware, async(req, res) => {
 
     await client.set(`RefreshToken:${userId}`, newRefreshToken, "EX", 7 * 24 * 60 * 60 );
 
-    res.setHeader('Expiredtime', newAccessToken_time.exp);
     res.setHeader('Authorization', newAceessToken);
     res.setHeader('Refreshtoken', newRefreshToken);
+    res.setHeader('Expiredtime', newAccessToken_time.exp);
 
     return res.status(201).json({message : "AccessToken 발급 완료"});
   }
 })
 
-/* 내 정보 수정 API */
+// 내 정보 수정 API (Oauth를 사용해서 만든 password는 어떻게 할지 고민하기) 
+// 이메일 인증번호 구현도 넣어볼까 // 휴대폰 인증번호는 예민할수도있으니까 ㄴㄴ
+// Oauth같은 경우엔 애초에 카카오 아이디 비밀번호로 가입하는 구조이기 때문에 회원정보 수정이 필요없다고 생각
+router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
+  try{
+    const {userId} = req.user;
+    const {email, password, username, profileImg} = req.body;
 
-/* 회원 탈퇴 API*/
+    const editmyInfo = await prisma.users.update({
+      where : {userId : +userId},
+      data : {
+        email : email,
+        password : password,
+        username : username,
+        profileImg : profileImg
+      }
+    })
 
+    return res.status(201).json({message : "수정이 완료 되었습니다."});
+  }catch(err) {
+    console.error(err);
+    return res.status(500).json({message : "Server Error"});
+  }
+});
+
+
+
+
+// 회원 탈퇴 API (탈퇴에 필요한 보류시간 ex.15일뒤에 삭제되는 로직 생각)
+router.delete('/myInfo/deleteInfo', authMiddleware, async(req, res, next) => {
+  try{
+    const {userId} = req.user;
+
+    const deleteUser = await prisma.users.delete({where : {userId : +userId}});
+
+    return res.status(201).json({message : "회원탈퇴가 완료되었습니다."});
+  }catch(err){
+    console.error(err);
+    return res.status(500).json({message : "Server Error"});
+  }
+})
 export default router;

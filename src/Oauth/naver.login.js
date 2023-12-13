@@ -3,40 +3,38 @@ import { prisma } from "../utils/prisma/index.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-import authMiddleware from "../middleware/auth.middleware.js";
-import redis from "ioredis";
+import {client} from '../redis/redis.js';
 import axios from 'axios';
 import qs from 'qs';
 
-const NAVER_CLIENT_ID = "xG9Urio7o7JnngV1Lkdt";
-const NAVER_CLIENT_SECRET = "sbUPVPtMiY";
-const NAVER_REDIRECT_URI = "http://localhost:3000/auth/naver/callback";
+dotenv.config();
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    return res.send(`
-        <a href="/login/naver">log in</a>
-    `)
-})
+// router.get('/', (req, res) => {
+//     return res.send(`
+//         <a href="/login/naver">log in</a>
+//     `)
+// })
 
-router.get("/login/naver", (req, res) => {
-  const clientId = NAVER_CLIENT_ID;
-  const redirectUri = "http://localhost:3000/callback/naver";
-  const state = "random_state";
+// router.get("/login/naver", (req, res) => {
+//   const clientId = NAVER_CLIENT_ID;
+//   const redirectUri = "http://localhost:3000/callback/naver";
+//   const state = "random_state";
 
-  const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`;
+//   const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`;
 
-  res.redirect(naverAuthUrl);
-});
+//   res.redirect(naverAuthUrl);
+// });
 
-router.get("/callback/naver", async (req, res) => {
-  const clientId = NAVER_CLIENT_ID;
-  const clientSecret = NAVER_CLIENT_SECRET
-  const redirectUri = "http://localhost:3000/callback/naver";
+router.post("/callback/naver", async (req, res) => {
+  const key = process.env.SECRET_KEY;
+  const clientId = process.env.NAVER_CLIENT_ID;
+  const clientSecret = process.env.NAVER_CLIENT_SECRET;
+  const redirectUri = process.env.NAVER_REDIRECT_URI;
 
-  const code = req.query.code;
-  const state = req.query.state;
+  const {code} = req.body;
+  const {state} = req.body;
 
   // 토큰 요청
   const tokenParams = {
@@ -60,7 +58,6 @@ router.get("/callback/naver", async (req, res) => {
 
   const accessToken = tokenResponse.data.access_token;
 
-  // 네이버 사용자 정보 조회
   const userInfoResponse = await axios.get(
     "https://openapi.naver.com/v1/nid/me",
     {
@@ -72,13 +69,42 @@ router.get("/callback/naver", async (req, res) => {
 
   const userInfo = userInfoResponse.data.response;
 
-  // 여기에서 userInfo를 사용하여 사용자의 정보를 처리할 수 있습니다.
-  console.log(userInfo.email);
-  console.log(userInfo.nickname);
-  console.log(userInfo.name);
-  console.log(userInfo.profile_image);
+  const findUser = await prisma.users.findFirst({where : {email : userInfo.email}});
+  if(findUser){
+    const accesstoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : "10m"});
+    const refreshtoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : "7d"});
 
-  res.send(userInfo);
+    await client.set(`RefreshToken:${findUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60 );
+
+    const accesstoken_time = jwt.verify(accesstoken, key);
+
+    res.setHeader('Authorization', `Bearer ${accesstoken}`);
+    res.setHeader('Refreshtoken', refreshtoken);
+    res.setHeader('Expiredtime', accesstoken_time.exp);
+
+    return res.status(201).json({message : `${findUser.username}님 환영합니다.`});
+  }else {
+    const createUser = await prisma.users.create({
+      data : {
+        email : userInfo.email,
+        password : '1234567',
+        name : userInfo.name,
+        userInfo : userInfo.profile_image
+      }
+    })
+    const accesstoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : "10m"});
+    const refreshtoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : "7d"});
+
+    await client.set(`RefreshToken:${findUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60 );
+
+    const accesstoken_time = jwt.verify(accesstoken, key);
+
+    res.setHeader('Authorization', `Bearer ${accesstoken}`);
+    res.setHeader('Refreshtoken', refreshtoken);
+    res.setHeader('Expiredtime', accesstoken_time.exp);
+
+    return res.status(201).json({message : `회원가입 성공`});
+  };
 });
 
 export default router;
