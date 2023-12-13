@@ -1,15 +1,9 @@
 import jwt from "jsonwebtoken";
 import { prisma } from "../utils/prisma/index.js";
 import dotenv from "dotenv";
-import redis from "ioredis";
+import {client} from '../redis/redis.js';
 
 dotenv.config();
-
-const client = new redis({
-  host : process.env.REDIS_HOST,
-  port : process.env.REDIS_PORT,
-  password : process.env.REDIS_PASSWORD
-});
 
 export default async (req, res, next) => {
   try {
@@ -43,6 +37,7 @@ export default async (req, res, next) => {
     else{
       res.setHeader('Authorization', '');
       res.setHeader('Refreshtoken', '');
+      await client.del(`RefreshToken:${userId}`);
 
       return res.status(400).json({message : "비정상적인 요청입니다. 자동으로 로그아웃 됩니다."})}
   }

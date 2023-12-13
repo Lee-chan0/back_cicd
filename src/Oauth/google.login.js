@@ -3,8 +3,7 @@ import { prisma } from "../utils/prisma/index.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-import authMiddleware from "../middleware/auth.middleware.js";
-import redis from "ioredis";
+import {client} from '../redis/redis.js';
 import axios from 'axios';
 
 const router = express.Router();
@@ -16,7 +15,6 @@ const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo'
 router.post('/google/callback', async(req, res, next) => {
     const key = process.env.SECRET_KEY;
     const {code} = req.body;
-    console.log('code=======', code);
     const resp = await axios.post(GOOGLE_TOKEN_URL, {
         code : code,
         client_id : process.env.GOOGLE_CLIENT_ID,
@@ -31,22 +29,36 @@ router.post('/google/callback', async(req, res, next) => {
     });
 
     const findUser = await prisma.users.findFirst({where : {email : resp2.data.email}});
+
     if(findUser){
+        if(findUser.profileImg !== resp2.data.picture){
+            await prisma.users.update({
+                where : {userId : findUser.userId},
+                data : {
+                    profileImg : resp2.data.picture
+                }
+            })
+        }
         const accesstoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : '30m'});
         const refreshtoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : '7d'});
 
         const access_token_time = jwt.verify(accesstoken, key);
 
+        await client.set(`RefreshToken:${findUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60 );
+
         res.setHeader('Authorization', `Bearer ${accesstoken}`);
         res.setHeader('Refreshtoken', refreshtoken);
         res.setHeader('Expiredtime', access_token_time.exp);
 
-        return res.status(201).json({message : "로그인 성공"});
+        return res.status(201).json({message : `${findUser.username}님 환영합니다.`});
     }else {
+        const googleUserId = resp2.data.id.substring(0, 8);
+        const encryptionPassword = await bcrypt.hash(googleUserId, 10);
+
         const createUser = await prisma.users.create({
             data : {
                 email : resp2.data.email,
-                password : '124okOK1234',
+                password : encryptionPassword,
                 username : resp2.data.name,
                 profileImg : resp2.data.picture
             }
@@ -56,6 +68,8 @@ router.post('/google/callback', async(req, res, next) => {
 
         const access_token_time = jwt.verify(accesstoken, key);
 
+        await client.set(`RefreshToken:${findUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60 );
+
         res.setHeader('Authorization', `Bearer ${accesstoken}`);
         res.setHeader('Refreshtoken', refreshtoken);
         res.setHeader('Expiredtime', access_token_time.exp);
@@ -63,5 +77,4 @@ router.post('/google/callback', async(req, res, next) => {
         return res.status(201).json({message : "회원가입 성공"})
     }
 })
-
 export default router;
