@@ -45,6 +45,9 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
         image: imageUrl,
         isPublic: Boolean(isPublic)
       },  
+      User: {
+        connect : {userId}
+      }
     });
 
     return res.status(201).json({ message: '다이어리 등록 완료', data: savedDiary });
@@ -112,7 +115,7 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
 //     } catch (error) {
 //       return res.status(400).json({ error: error.message });
 //     }
-//   });
+//   });  
   
   
 
