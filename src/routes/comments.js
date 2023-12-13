@@ -49,7 +49,7 @@ router.patch('/comment/:commentId', authMiddleware, async(req, res, next) => {
       const { userId } = req.user
       const { content } = req.body
 
-  let comment = await prisma.comments.findfirst({
+  let comment = await prisma.comments.findFirst({
       where: {commentId : +commentId}
   })
 

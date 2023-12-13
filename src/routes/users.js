@@ -72,7 +72,7 @@ router.post("/signin", async (req, res, next) => {
     let profileImage = findUser.profileImg;
 
     const accessToken = jwt.sign({ userId: findUser.userId }, key, {
-      expiresIn: "10m",
+      expiresIn: "30m",
     });
 
     const refreshToken = jwt.sign({ userId: findUser.userId }, key, {
