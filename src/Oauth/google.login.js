@@ -37,7 +37,7 @@ router.post('/google/callback', async(req, res, next) => {
 
         const access_token_time = jwt.verify(accesstoken, key);
 
-        res.setHeader('Authorization', accesstoken);
+        res.setHeader('Authorization', `Bearer ${accesstoken}`);
         res.setHeader('Refreshtoken', refreshtoken);
         res.setHeader('Expiredtime', access_token_time.exp);
 
@@ -56,7 +56,7 @@ router.post('/google/callback', async(req, res, next) => {
 
         const access_token_time = jwt.verify(accesstoken, key);
 
-        res.setHeader('Authorization', accesstoken);
+        res.setHeader('Authorization', `Bearer ${accesstoken}`);
         res.setHeader('Refreshtoken', refreshtoken);
         res.setHeader('Expiredtime', access_token_time.exp);
 
