@@ -77,5 +77,4 @@ router.post('/google/callback', async(req, res, next) => {
         return res.status(201).json({message : "회원가입 성공"})
     }
 })
-
 export default router;

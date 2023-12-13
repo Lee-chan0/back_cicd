@@ -8,9 +8,9 @@ datasource db {
 
 model Users {
   userId      Int     @id @default(autoincrement()) @map("userId")
-  username    String  @unique @map("nickname")
+  username    String  @map("username")
   password    String  @map("password")
-  email       String  @map("email")
+  email       String @unique @map("email")
   profileImg  String?  @map("profileImg")
 
   createdAt   DateTime  @default(now()) @map("createdAt")
