@@ -5,7 +5,7 @@ import authMiddleware from "../middleware/auth.middleware.js";
 const router = express.Router();
 
 /* 댓글 등록 */
-router.post('/comment/:diaryId', authMiddleware, async(req, res, next) => {
+router.post('/diary/detail/comment/:diaryId', authMiddleware, async(req, res, next) => {
   try{
   const { diaryId } = req.params;
   const { content } = req.body;
@@ -32,7 +32,7 @@ router.get('/diary/detail/comment/:diaryId', async(req, res, next) => {
 
   const comments = await prisma.comments.findMany({
       where : {
-          DiaryId: diaryId
+          DiaryId: +diaryId
       }
   })
 
