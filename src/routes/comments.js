@@ -26,7 +26,7 @@ res.status(201).json({ message: "댓글이 등록되었습니다"})
 
 /* 댓글 조회 */
 /* 댓글 조회의 경우, 댓글만 조회하는 경우는 없을것. 특정 포스팅등에 있는 댓글을 조회할것이기때문에 diaryId만을 필요로 한다 */
-router.get('/comment/:diaryId', async(req, res, next) => {
+router.get('/diary/detail/comment/:diaryId', async(req, res, next) => {
   try{
   const { diaryId } = req.params
 

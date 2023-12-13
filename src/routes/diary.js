@@ -8,8 +8,21 @@ import { upload } from '../middleware/S3.upload/multer.js'
 
 
 const router = express.Router();
+/* 일기 상세 조회 */
+router.get('/diary/detail/:diaryId', async (req, res, next) => {
+  try {
+      const { diaryId } = req.params;
 
-
+      const diaryDetail = await prisma.diaries.findFirst({
+          where: { diaryId: +diaryId }
+      });
+      return res.status(200).json({ data: diaryDetail });
+  } catch (error) {
+      return res.status(400).json({ error: error.message });
+  }
+  
+});
+/* 일기 등록 */
 router.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
   try {
     const { userId } = req.user;
