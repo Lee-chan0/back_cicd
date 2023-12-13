@@ -46,6 +46,8 @@ jobs:
         echo GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} >> .env
         echo GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} >> .env
         echo REACT_APP_GOOGLE_AUTH_REDIRECT_URI=${{ secrets.REACT_APP_GOOGLE_AUTH_REDIRECT_URI }} >> .env
+        echo S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }} >> .env
+        echo S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }} >> .env
         cat .env
    
 
