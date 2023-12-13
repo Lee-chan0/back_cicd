@@ -25,7 +25,7 @@ const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo'
 //     res.redirect(url);
 // });
 
-router.post('/googlelogin/redirect', async(req, res, next) => {
+router.post('/google/callback', async(req, res, next) => {
     const {code} = req.body;
 
     const resp = await axios.post(GOOGLE_TOKEN_URL, {
