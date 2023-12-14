@@ -16,10 +16,12 @@ model Users {
   createdAt   DateTime  @default(now()) @map("createdAt")
   updatedAt   DateTime  @updatedAt  @map("updatedAt")
 
+  diarylike DiaryLikes[]
   diary     diaries[]
   comment   comments[]
   @@map("Users")
 }
+
 model diaries {
   diaryId     Int   @id @default(autoincrement()) @map("diaryId")
   UserId      Int   @map("UserId")
@@ -27,15 +29,19 @@ model diaries {
   image       String?  @map("image")
   content     String  @map("content")
   isPublic    Boolean @default(false) @map("isPublic")
+  likeCount Int @default(0) @map("likeCount")
 
   createdAt   DateTime  @default(now()) @map("createdAt")
   updatedAt   DateTime  @updatedAt  @map("updatedAt")
   deletedAt   DateTime? @map("deletedAt")
-
+  
+  diarylike DiaryLikes[]
   comment     comments[]
+  
   User        Users     @relation(fields: [UserId], references: [userId], onDelete: Cascade)
   @@map("diaries")
 }
+
 model comments {
   commentId      Int   @id   @default(autoincrement()) @map("commentId")
   DiaryId        Int   @map("DiaryId")
@@ -50,4 +56,18 @@ model comments {
   User         Users        @relation(fields: [UserId], references: [userId], onDelete: Cascade)
   diary        diaries      @relation(fields: [DiaryId], references: [diaryId], onDelete: Cascade)
   @@map("comments") 
+}
+
+model DiaryLikes {
+  diarylikeId Int @id @default(autoincrement()) @map("diarylikeId")
+  UserId Int @map("UserId")
+  DiaryId Int @map("DiaryId")
+  
+  createdAt DateTime @default(now()) @map("createdAt")
+  updatedAt DateTime @updatedAt @map("updatedAt")
+
+  User Users @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+  Diary diaries @relation(fields: [DiaryId], references: [diaryId], onDelete: Cascade)
+
+  @@map("DiaryLikes")
 }

@@ -69,6 +69,7 @@ router.post("/kakao/callback", async function (req, res) {
 
       await client.set(`RefreshToken:${findUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60 );
 
+
       res.setHeader("Authorization", `Bearer ${accesstoken}`);
       res.setHeader("Refreshtoken", refreshtoken);
       res.setHeader("Expiredtime", token_time.exp);
@@ -111,30 +112,5 @@ router.post("/kakao/callback", async function (req, res) {
     return res.status(500).json({ message: "Server_Error" });
   }
 });
-/**
- * {
-  id: 3218322262,
-  connected_at: '2023-12-10T12:52:28Z',
-  properties: {
-    nickname: '이찬영',
-    profile_image: 'http://k.kakaocdn.net/dn/byciWz/btsAYHRZIp1/ksVmh1tVepeFOQnwQUg8Ek/img_640x640.jpg',
-    thumbnail_image: 'http://k.kakaocdn.net/dn/byciWz/btsAYHRZIp1/ksVmh1tVepeFOQnwQUg8Ek/img_110x110.jpg'
-  },
-  kakao_account: {
-    profile_nickname_needs_agreement: false,
-    profile_image_needs_agreement: false,
-    profile: {
-      nickname: '이찬영',
-      thumbnail_image_url: 'http://k.kakaocdn.net/dn/byciWz/btsAYHRZIp1/ksVmh1tVepeFOQnwQUg8Ek/img_110x110.jpg',
-      profile_image_url: 'http://k.kakaocdn.net/dn/byciWz/btsAYHRZIp1/ksVmh1tVepeFOQnwQUg8Ek/img_640x640.jpg',
-      is_default_image: false
-    },
-    has_email: true,
-    email_needs_agreement: false,
-    is_email_valid: true,
-    is_email_verified: true,
-    email: 'yab0403@kakao.com'
-  }
-}
- */
+
 export default router;
