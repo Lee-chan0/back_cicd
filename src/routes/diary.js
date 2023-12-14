@@ -9,14 +9,28 @@ import { upload } from '../middleware/S3.upload/multer.js'
 
 const router = express.Router();
 /* 일기 상세 조회 */
-router.get('/diary/detail/:diaryId', async (req, res, next) => {
+router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
   try {
       const { diaryId } = req.params;
+      const { userId } = req.user
 
       const diaryDetail = await prisma.diaries.findFirst({
           where: { diaryId: +diaryId }
       });
-      return res.status(200).json({ data: diaryDetail });
+
+      if (!diaryDetail) {
+        return res.status(400).json({ message : "존재하지 않는 일기입니다."})
+      }
+
+      if (diaryDetail.UserId !== +userId) {
+        return res.status(200).json({ data: diaryDetail });
+      } else {
+        const diaryDetailViewCount = await prisma.diaries.update({
+          where: { diaryId: +diaryId },
+          data: { viewCount : viewCount ++ }
+        })
+        return res.status(200).json({ data: diaryDetailViewCount})
+      }
   } catch (error) {
       return res.status(400).json({ error: error.message });
   }

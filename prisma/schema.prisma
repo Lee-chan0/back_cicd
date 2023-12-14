@@ -8,15 +8,9 @@ datasource db {
 
 model Users {
   userId      Int     @id @default(autoincrement()) @map("userId")
-<<<<<<< HEAD
   username    String   @map("username")
   password    String  @map("password")
-  email       String  @unique @map("email")
-=======
-  username    String  @map("username")
-  password    String  @map("password")
-  email       String @unique @map("email")
->>>>>>> f90e38a3ce71aa130263c7f65b8f9ee523f2cbc3
+  email       String  @unique @map("email") 
   profileImg  String?  @map("profileImg")
 
   createdAt   DateTime  @default(now()) @map("createdAt")
@@ -34,6 +28,7 @@ model diaries {
   image       String?  @map("image")
   content     String  @map("content")
   isPublic    Boolean @default(false) @map("isPublic")
+  viewCount   Int     @default(0) @map("viewCount")
 
   createdAt   DateTime  @default(now()) @map("createdAt")
   updatedAt   DateTime  @updatedAt  @map("updatedAt")
