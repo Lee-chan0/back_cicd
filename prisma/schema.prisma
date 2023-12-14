@@ -8,9 +8,9 @@ datasource db {
 
 model Users {
   userId      Int     @id @default(autoincrement()) @map("userId")
-  username    String  @map("username")
+  username    String   @map("username")
   password    String  @map("password")
-  email       String @unique @map("email")
+  email       String  @unique @map("email")
   profileImg  String?  @map("profileImg")
 
   createdAt   DateTime  @default(now()) @map("createdAt")
@@ -19,6 +19,7 @@ model Users {
   diarylike DiaryLikes[]
   diary     diaries[]
   comment   comments[]
+  secondaryComment    secondaryComments[]
   @@map("Users")
 }
 
@@ -39,6 +40,7 @@ model diaries {
   comment     comments[]
   
   User        Users     @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+  secondaryComment    secondaryComments[]
   @@map("diaries")
 }
 
@@ -55,6 +57,7 @@ model comments {
   
   User         Users        @relation(fields: [UserId], references: [userId], onDelete: Cascade)
   diary        diaries      @relation(fields: [DiaryId], references: [diaryId], onDelete: Cascade)
+  secondaryComment    secondaryComments[]
   @@map("comments") 
 }
 
@@ -71,3 +74,23 @@ model DiaryLikes {
 
   @@map("DiaryLikes")
 }
+
+
+model secondaryComments {
+  secondaryCommentId    Int        @id   @default(autoincrement()) @map("secondaryCommentId")
+  DiaryId               Int        @map("DiaryId")
+  UserId                Int        @map("UserId")
+  CommentId             Int        @map("CommentId")
+  content               String     @map("content")
+
+  createdAt    DateTime   @default(now()) @map("createdAt")
+  updatedAt    DateTime   @updatedAt   @map("updatedAt")
+  deletedAt    DateTime?  @map("deletedAt")
+
+  User         Users      @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+  diary        diaries    @relation(fields: [DiaryId], references: [diaryId], onDelete: Cascade)
+  comment      comments   @relation(fields: [CommentId], references: [commentId], onDelete: Cascade)
+
+  @@map("secondaryComments")
+}
+

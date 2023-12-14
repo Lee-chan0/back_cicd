@@ -17,7 +17,7 @@ const corsOptions = {
     credentials: true,
     exposedHeaders: ["Authorization", "Refreshtoken", "Expiredtime"]
 }
-//
+
 app.use(express.urlencoded({extended : true}))
 app.use(cors(corsOptions))
 
@@ -35,7 +35,7 @@ app.use("/", [
 ]);
 
 app.get("/", (req, res) => {
-  res.send(`<h1>Success</h1>`)
+  res.send(`<h1>Success</h1>`);
 });
  
 app.listen(PORT, () => {
