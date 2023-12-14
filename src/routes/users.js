@@ -240,19 +240,17 @@ router.get('/token', authMiddleware, async(req, res, next) => {
   }
 })
 
-// 내 정보 수정 API (Oauth를 사용해서 만든 password는 어떻게 할지 고민하기) 
-// 이메일 인증번호 구현도 넣어볼까 // 휴대폰 인증번호는 예민할수도있으니까 ㄴㄴ
-// Oauth같은 경우엔 애초에 카카오 아이디 비밀번호로 가입하는 구조이기 때문에 회원정보 수정이 필요없다고 생각
+// 내 정보 수정 API 
 router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
   try{
     const {userId} = req.user;
-    const {email, password, username, profileImg} = req.body;
+    const {email, username, profileImg} = req.body;
+
 
     const editmyInfo = await prisma.users.update({
       where : {userId : +userId},
       data : {
         email : email,
-        password : password,
         username : username,
         profileImg : profileImg
       }
@@ -265,8 +263,31 @@ router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
   }
 });
 
+// 비밀번호 변경 API
+router.patch('/myInfo/editpw', authMiddleware, async(req, res, next) => {
+  try{
+    const {password, newPassword} = req.body;
+    const {userId} = req.user;
 
+    const userPWinfo = await prisma.users.findFirst({where : {userId : +userId}});
+    const encryptPW = await bcrypt.hash(password, 10);
+    if(userPWinfo.password !== encryptPW)
+    {return res.status(400).json({message : "비밀번호가 틀립니다."})};
 
+    const encryptionPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.users.update({where : {userId : +userId},
+    data : {
+      password : encryptionPassword,
+    }})
+
+    return res.status(201).json({message : "비밀번호가 변경되었습니다."});
+
+  }catch(err){
+    console.error(err);
+    return res.status(500).json({message : "Server Error"});
+  }
+});
 
 // 회원 탈퇴 API (탈퇴에 필요한 보류시간 ex.15일뒤에 삭제되는 로직 생각)
 router.delete('/signoff', authMiddleware, async(req, res, next) => {
