@@ -42,7 +42,7 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
     const { userId } = req.user;
     const { EmotionStatus, content, isPublic } = req.body;
 
-    const  imageUrl = req.file.location
+    // const  imageUrl = req.file.location
 
     const today = new Date();
     const timeZone = 'Asia/Seoul';

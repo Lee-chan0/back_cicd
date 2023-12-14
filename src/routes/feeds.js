@@ -42,7 +42,49 @@ router.get('/feeds', authMiddleware, async (req, res, next) => {
 });
 
 
-/* 피드에 좋아요 기능 */
+// 피드에 좋아요 기능
+router.post('/feeds/:diaryId/like', authMiddleware, async(req, res, next) => {
+    try{
+        const {userId} = req.user;
+        const {diaryId} = req.params;
+
+        const existsLike = await prisma.diaryLikes.findFirst({where : {DiaryId : +diaryId, UserId : +userId}});
+        const existsDiary = await prisma.diaries.findFirst({where : {diaryId : +diaryId}})
+        if(!existsDiary){
+            return res.status(400).json({message : "해당하는 일기가 없습니다."})
+        }else{
+            if(existsLike){
+                await prisma.diaryLikes.delete({where : {diarylikeId : existsLike.diarylikeId ,DiaryId : +diaryId, UserId : +userId}});
+
+                const islike = await prisma.diaries.update({where : {diaryId : +diaryId}, 
+                data : {
+                    likeCount : {
+                        decrement : 1,
+                    }
+                }})
+                return res.status(400).json({message : "좋아요가 취소되었습니다.", data : islike.likeCount });
+            }
+            await prisma.diaryLikes.create({
+                data : {
+                    UserId : +userId,
+                    DiaryId : +diaryId,
+                }
+            });
+            const likeClick = await prisma.diaries.update({
+                where : {diaryId : +diaryId},
+                data : {
+                    likeCount : {
+                        increment : 1,
+                    }
+                }
+            })
+            return res.status(201).json({message : "좋아요가 추가되었습니다.", data : likeClick.likeCount});
+        }
+    }catch(err){
+        console.error(err);
+        return res.status(500).json({message : "서버오류"});
+    }
+})
 
 
 

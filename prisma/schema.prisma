@@ -10,17 +10,19 @@ model Users {
   userId      Int     @id @default(autoincrement()) @map("userId")
   username    String   @map("username")
   password    String  @map("password")
-  email       String  @unique @map("email") 
+  email       String  @unique @map("email")
   profileImg  String?  @map("profileImg")
 
   createdAt   DateTime  @default(now()) @map("createdAt")
   updatedAt   DateTime  @updatedAt  @map("updatedAt")
 
+  diarylike DiaryLikes[]
   diary     diaries[]
   comment   comments[]
   secondaryComment    secondaryComments[]
   @@map("Users")
 }
+
 model diaries {
   diaryId     Int   @id @default(autoincrement()) @map("diaryId")
   UserId      Int   @map("UserId")
@@ -29,16 +31,20 @@ model diaries {
   content     String  @map("content")
   isPublic    Boolean @default(false) @map("isPublic")
   viewCount   Int     @default(0) @map("viewCount")
+  likeCount Int @default(0) @map("likeCount")
 
   createdAt   DateTime  @default(now()) @map("createdAt")
   updatedAt   DateTime  @updatedAt  @map("updatedAt")
   deletedAt   DateTime? @map("deletedAt")
-
+  
+  diarylike DiaryLikes[]
   comment     comments[]
+  
   User        Users     @relation(fields: [UserId], references: [userId], onDelete: Cascade)
   secondaryComment    secondaryComments[]
   @@map("diaries")
 }
+
 model comments {
   commentId      Int   @id   @default(autoincrement()) @map("commentId")
   DiaryId        Int   @map("DiaryId")
@@ -55,6 +61,21 @@ model comments {
   secondaryComment    secondaryComments[]
   @@map("comments") 
 }
+
+model DiaryLikes {
+  diarylikeId Int @id @default(autoincrement()) @map("diarylikeId")
+  UserId Int @map("UserId")
+  DiaryId Int @map("DiaryId")
+  
+  createdAt DateTime @default(now()) @map("createdAt")
+  updatedAt DateTime @updatedAt @map("updatedAt")
+
+  User Users @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+  Diary diaries @relation(fields: [DiaryId], references: [diaryId], onDelete: Cascade)
+
+  @@map("DiaryLikes")
+}
+
 
 model secondaryComments {
   secondaryCommentId    Int        @id   @default(autoincrement()) @map("secondaryCommentId")
@@ -73,3 +94,4 @@ model secondaryComments {
 
   @@map("secondaryComments")
 }
+

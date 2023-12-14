@@ -23,7 +23,6 @@ router.post("/signup", async (req, res, next) => {
     }
 
     const encryptionPassword = await bcrypt.hash(password, 10);
-    console.log(encryptionPassword);
 
     await prisma.users.create({
       data: {
@@ -34,6 +33,7 @@ router.post("/signup", async (req, res, next) => {
     });
 
     const userdata = await prisma.users.findFirst({
+      where : {email : email},
       where : { email },
       select: {
         userId: true,

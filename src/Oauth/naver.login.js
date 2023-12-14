@@ -11,21 +11,6 @@ dotenv.config();
 
 const router = express.Router();
 
-// router.get('/', (req, res) => {
-//     return res.send(`
-//         <a href="/login/naver">log in</a>
-//     `)
-// })
-
-// router.get("/login/naver", (req, res) => {
-//   const clientId = NAVER_CLIENT_ID;
-//   const redirectUri = "http://localhost:3000/callback/naver";
-//   const state = "random_state";
-
-//   const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`;
-
-//   res.redirect(naverAuthUrl);
-// });
 router.post("/naver/callback", async (req, res) => {
   const key = process.env.SECRET_KEY;
   const clientId = process.env.NAVER_CLIENT_ID;
