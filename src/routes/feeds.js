@@ -23,6 +23,7 @@ router.get("/feeds", authMiddleware, async (req, res, next) => {
     );
     const todaySeoulTime = utcToZonedTime(endOfDay(today), timeZone);
 
+
     const diaryEntries = await prisma.diaries.findMany({
       where: {
         createdAt: {
@@ -36,7 +37,6 @@ router.get("/feeds", authMiddleware, async (req, res, next) => {
       skip: page > 1 ? (page - 1) * pageSize : 0,
       orderBy: { createdAt: "asc" },
     });
-
     res.status(200).json({ data: diaryEntries });
   } catch (error) {
     res.status(400).json({ error: error.message });
