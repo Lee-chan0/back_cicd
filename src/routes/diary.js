@@ -8,8 +8,8 @@ import { upload } from '../middleware/S3.upload/multer.js'
 
 
 const router = express.Router();
-/* 일기 상세 조회 */
 
+/* 일기 상세 조회 */
 let lastViewTime = {};
 
 setInterval(() => {
@@ -115,8 +115,6 @@ router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
     const { userId } = req.user;
     const { diaryId } = req.params
     const { content, isPublic } = req.body;
-
-    const  imageUrl = req.file.location
 
     const today = new Date();
     const timeZone = 'Asia/Seoul';
