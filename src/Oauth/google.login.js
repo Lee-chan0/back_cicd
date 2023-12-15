@@ -31,14 +31,6 @@ router.post('/google/callback', async(req, res, next) => {
     const findUser = await prisma.users.findFirst({where : {email : resp2.data.email}});
 
     if(findUser){
-        if(findUser.profileImg !== resp2.data.picture){
-            await prisma.users.update({
-                where : {userId : findUser.userId},
-                data : {
-                    profileImg : resp2.data.picture
-                }
-            })
-        }
         const accesstoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : '30m'});
         const refreshtoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : '7d'});
 
@@ -60,7 +52,8 @@ router.post('/google/callback', async(req, res, next) => {
                 email : resp2.data.email,
                 password : encryptionPassword,
                 username : resp2.data.name,
-                profileImg : resp2.data.picture
+                profileImg : resp2.data.picture,
+                userType : 'G'
             }
         })
         const accesstoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : '30m'});
@@ -74,7 +67,7 @@ router.post('/google/callback', async(req, res, next) => {
         res.setHeader('Refreshtoken', refreshtoken);
         res.setHeader('Expiredtime', access_token_time.exp);
 
-        return res.status(201).json({message : "회원가입 성공"})
+        return res.status(201).json({message : "회원가입이 완료되었습니다."})
     }
 })
 export default router;

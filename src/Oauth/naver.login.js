@@ -54,8 +54,9 @@ router.post("/naver/callback", async (req, res) => {
   const userInfo = userInfoResponse.data.response;
 
   const findUser = await prisma.users.findFirst({where : {email : userInfo.email}});
+
   if(findUser){
-    const accesstoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : "10m"});
+    const accesstoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : "30m"});
     const refreshtoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : "7d"});
 
     await client.set(`RefreshToken:${findUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60 );
@@ -68,15 +69,18 @@ router.post("/naver/callback", async (req, res) => {
 
     return res.status(201).json({message : `${findUser.username}님 환영합니다.`});
   }else {
+    const randomPW = Math.random().toString(36).substring(2, 12);
+    const hashedRandomPW = await bcrypt.hash(randomPW, 10);
     const createUser = await prisma.users.create({
       data : {
         email : userInfo.email,
-        password : '1234567',
+        password : hashedRandomPW,
         username : userInfo.name,
-        profileImg : userInfo.profile_image
+        profileImg : userInfo.profile_image,
+        userType : 'N'
       }
     })
-    const accesstoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : "10m"});
+    const accesstoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : "30m"});
     const refreshtoken = jwt.sign({userId : createUser.userId}, key, {expiresIn : "7d"});
 
     await client.set(`RefreshToken:${createUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60 );
@@ -87,7 +91,7 @@ router.post("/naver/callback", async (req, res) => {
     res.setHeader('Refreshtoken', refreshtoken);
     res.setHeader('Expiredtime', accesstoken_time.exp);
 
-    return res.status(201).json({message : `회원가입 성공`});
+    return res.status(201).json({message : `회원가입이 완료되었습니다.`});
   };
 });
 
