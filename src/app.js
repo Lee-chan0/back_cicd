@@ -10,7 +10,7 @@ import googleLogin from './Oauth/google.login.js'
 import cors from "cors";
 
 const app = express();
-const PORT = 3001;
+const PORT = 3000;
 
 const corsOptions = {
     origin: 'http://localhost:3000',
