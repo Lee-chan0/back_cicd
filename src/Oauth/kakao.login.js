@@ -44,27 +44,13 @@ router.post("/kakao/callback", async function (req, res) {
     });
 
     if (findUser) {
-      if (findUser.profileImg !== userResponse.data.kakao_account.profile.profile_image_url) {
-        await prisma.users.update({
-          where: { userId: findUser.userId },
-          data: {
-            profileImg: userResponse.data.kakao_account.profile.profile_image_url,
-          },
-        });
-      } else if (findUser.username !== userResponse.data.kakao_account.profile.nickname){
-        await prisma.users.update({
-          where : {userId : findUser.userId},
-          data : {
-            username : userResponse.data.kakao_account.profile.nickname
-          }
-        })
-      }
       const accesstoken = jwt.sign({ userId: findUser.userId }, key, {
-        expiresIn: "10m",
+        expiresIn: "30m",
       });
       const refreshtoken = jwt.sign({ userId: findUser.userId }, key, {
         expiresIn: "7d",
       });
+      
       const token_time = jwt.verify(accesstoken, key);
 
       await client.set(`RefreshToken:${findUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60 );
@@ -82,16 +68,18 @@ router.post("/kakao/callback", async function (req, res) {
       var kakaoIdsubString = userResponseIdString.substring(0, 8);
 
       const encryptionPassword = await bcrypt.hash(kakaoIdsubString, 10);
+
       const createUser = await prisma.users.create({
         data: {
           email: userResponse.data.kakao_account.email,
           username: userResponse.data.kakao_account.profile.nickname,
           password: encryptionPassword,
           profileImg: userResponse.data.kakao_account.profile.profile_image_url,
+          userType : 'K'
         },
       });
       const accesstoken = jwt.sign({ userId: createUser.userId }, key, {
-        expiresIn: "10m",
+        expiresIn: "30m",
       });
       const refreshtoken = jwt.sign({ userId: createUser.userId }, key, {
         expiresIn: "7d",
@@ -105,7 +93,7 @@ router.post("/kakao/callback", async function (req, res) {
       res.setHeader("Refreshtoken", refreshtoken);
       res.setHeader("Expiredtime", token_time.exp);
       console.log("======성공2======");
-      return res.json({ message: "회원가입 성공" });
+      return res.json({ message: "회원가입이 완료되었습니다." });
     }
   } catch (err) {
     console.error(err);

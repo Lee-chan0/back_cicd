@@ -59,7 +59,6 @@ router.post("/signup", async (req, res, next) => {
 //     if(isExitsEmail){return res.status(400).json({message : "이미 가입된 이메일 입니다."})};
 
 //     const Authenticationcode = Math.random().toString(36).substring(2, 8);
-    
 
 //     const mailer = nodemailer.createTransport({
 //       service : "gmail",
@@ -103,7 +102,7 @@ router.post("/signup", async (req, res, next) => {
 //   }
 // })
 
-// 이메일 인증 후, 회원가입 완료 로직
+// // 이메일 인증 후, 회원가입 완료 로직
 // router.post("/complete-signup", async(req, res) => {
 //   const {email, Authenticationcode, password, username} = req.body;
 //   try{
@@ -128,7 +127,6 @@ router.post("/signup", async (req, res, next) => {
 //     return res.status(500).json({message : "Server Error"});
 //   }
 // })
-
 // 일반 로그인
 router.post("/signin", async (req, res, next) => {
   try {
@@ -172,7 +170,6 @@ router.post("/signin", async (req, res, next) => {
 });
 
 
-
 // 로그아웃
 router.post("/logout", authMiddleware, async (req, res, next) => {
   try {
@@ -214,8 +211,7 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
 // AccessToken 재발급 로직
 router.get('/token', authMiddleware, async(req, res, next) => {
   const {userId} = req.user;
-  const {authorization, refreshtoken} = req.headers;
-  const token = authorization.split(' ')[1];
+  const {refreshtoken} = req.headers;
   const key = process.env.SECRET_KEY;
 
   const storedRefreshToken = await client.get(`RefreshToken:${userId}`);
@@ -245,13 +241,29 @@ router.get('/token', authMiddleware, async(req, res, next) => {
 router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
   try{
     const {userId} = req.user;
-    const {email, username, profileImg} = req.body;
+    const {username, profileImg, password, newPassword} = req.body;
 
+    if(password){
+      const userPWinfo = await prisma.users.findFirst({where : {userId : +userId}});
+      if(userPWinfo.userType === 'K' || userPWinfo.userType === 'G' || userPWinfo.userType === 'N'){
+        return res.status(400).json({message : "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다."})
+      }
+      const decodedPW = await bcrypt.compare(password, userPWinfo.password);
+  
+      if(!decodedPW)
+      {return res.status(400).json({message : "비밀번호가 틀립니다."})};
+
+      const encryptionPassword = await bcrypt.hash(newPassword, 10);
+
+      await prisma.users.update({where : {userId : +userId},
+        data : {
+          password : encryptionPassword,
+        }})
+    }
 
     const editmyInfo = await prisma.users.update({
       where : {userId : +userId},
       data : {
-        email : email,
         username : username,
         profileImg : profileImg
       }
@@ -264,32 +276,6 @@ router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
   }
 });
 
-// 비밀번호 변경 API
-router.patch('/myInfo/editpw', authMiddleware, async(req, res, next) => {
-  try{
-    const {password, newPassword} = req.body;
-    const {userId} = req.user;
-
-    const userPWinfo = await prisma.users.findFirst({where : {userId : +userId}});
-    const encryptPW = await bcrypt.hash(password, 10);
-    if(userPWinfo.password !== encryptPW)
-    {return res.status(400).json({message : "비밀번호가 틀립니다."})};
-
-    const encryptionPassword = await bcrypt.hash(newPassword, 10);
-
-    await prisma.users.update({where : {userId : +userId},
-    data : {
-      password : encryptionPassword,
-    }})
-
-    return res.status(201).json({message : "비밀번호가 변경되었습니다."});
-
-  }catch(err){
-    console.error(err);
-    return res.status(500).json({message : "Server Error"});
-  }
-});
-
 // 회원 탈퇴 API (탈퇴에 필요한 보류시간 ex.15일뒤에 삭제되는 로직 생각)
 router.delete('/signoff', authMiddleware, async(req, res, next) => {
   try{
@@ -297,10 +283,11 @@ router.delete('/signoff', authMiddleware, async(req, res, next) => {
 
     const deleteUser = await prisma.users.delete({where : {userId : +userId}});
 
-    return res.status(201).json({message : "회원탈퇴가 완료되었습니다."});
+    return res.status(201).json({message : "탈퇴처리 되었습니다."});
   }catch(err){
     console.error(err);
     return res.status(500).json({message : "Server Error"});
   }
 })
+
 export default router;
