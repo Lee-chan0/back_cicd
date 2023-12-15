@@ -8,27 +8,71 @@ import { upload } from '../middleware/S3.upload/multer.js'
 
 
 const router = express.Router();
+
 /* 일기 상세 조회 */
-router.get('/diary/detail/:diaryId', async (req, res, next) => {
+let lastViewTime = {};
+
+setInterval(() => {
+  const currentTime = new Date().getTime();
+  for (const userId in lastViewTime) {
+    if (currentTime - lastViewTime[userId] >= 600000) {
+      delete lastViewTime[userId];
+    }
+  }
+}, 600000);
+
+router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
   try {
       const { diaryId } = req.params;
+      const { userId } = req.user
 
       const diaryDetail = await prisma.diaries.findFirst({
-          where: { diaryId: +diaryId }
+          where: { 
+            diaryId: +diaryId,  
+            OR : {
+              UserId : userId,
+              isPublic : true
+            }
+          }
       });
-      return res.status(200).json({ data: diaryDetail });
+
+      if (!diaryDetail) {
+        return res.status(400).json({ message : "존재하지 않는 일기입니다."})
+      }
+
+      if (userId in lastViewTime) {
+        const lastTime = lastViewTime[userId]
+        const currentTime = new Date().getTime()
+
+        if (currentTime - lastTime < 600000) {
+          return res.status(200).json({ data: diaryDetail})
+        }
+      }
+      /* 조회수 기능 추가 */
+      if (diaryDetail.UserId !== +userId) {
+
+        lastViewTime[userId] = new Date().getTime()
+
+        const updatedDiary = await prisma.diaries.update({
+          where: { diaryId: +diaryId },
+          data: { viewCount : diaryDetail.viewCount + 1 }
+        })
+        return res.status(200).json({ data: updatedDiary})
+      } else {
+        return res.status(200).json({ data: diaryDetail})
+      }
   } catch (error) {
       return res.status(400).json({ error: error.message });
   }
-
 });
+
 /* 일기 등록 */
 router.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { EmotionStatus, content, isPublic } = req.body;
+    const { EmotionStatus, content, isPublic, weather, sentence } = req.body;
 
-    // const  imageUrl = req.file.location
+    const  imageUrl = req.file.location
 
     const today = new Date();
     const timeZone = 'Asia/Seoul';
@@ -52,11 +96,12 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
 
     const savedDiary = await prisma.diaries.create({
       data: {
-        // UserId: userId,
         EmotionStatus : +EmotionStatus,
         content,
         image: imageUrl,
         isPublic: Boolean(isPublic),
+        weather,
+        sentence,
         User: {
           connect : {userId}
       },  
@@ -70,19 +115,11 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
 });
  
 /* 일기수정 */
-router.patch('/diary/edit/:diaryId', authMiddleware, upload.single('image'), async (req, res, next) => {
+router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { diaryId } = req.params
-    const { EmotionStatus, content, isPublic } = req.body;
-
-    const  imageUrl = req.file.location
-
-    const today = new Date();
-    const timeZone = 'Asia/Seoul';
-    const todaySeoulTime = utcToZonedTime(today, timeZone);
-    const startOfToday = startOfDay(todaySeoulTime);
-    const endOfToday = endOfDay(todaySeoulTime);
+    const { content, isPublic } = req.body;
 
     const diaryExists = await prisma.diaries.findFirst({
       where: {
@@ -100,13 +137,8 @@ router.patch('/diary/edit/:diaryId', authMiddleware, upload.single('image'), asy
         diaryId : +diaryId
       },
       data: {
-        EmotionStatus : +EmotionStatus,
         content,
-        image: imageUrl,
         isPublic: Boolean(isPublic),
-        User: {
-          connect : {userId}
-      },  
       }
     });
 

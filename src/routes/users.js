@@ -38,6 +38,7 @@ router.post("/signup", async (req, res, next) => {
 
     const userdata = await prisma.users.findFirst({
       where : {email : email},
+      where : { email },
       select: {
         userId: true,
         username: true,

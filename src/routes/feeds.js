@@ -24,20 +24,21 @@ router.get("/feeds", authMiddleware, async (req, res, next) => {
     const todaySeoulTime = utcToZonedTime(endOfDay(today), timeZone);
 
 
-    const diaryEntries = await prisma.diaries.findMany({
-      where: {
-        createdAt: {
-          gte: twoMonthsAgo,
-          lte: todaySeoulTime,
-          // lastCreatedAt 값보다 큰 데이터만 가져오기 (중복 제거)
-          gt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
-        },
-      },
-      take: pageSize,
-      skip: page > 1 ? (page - 1) * pageSize : 0,
-      orderBy: { createdAt: "asc" },
-    });
-    res.status(200).json({ data: diaryEntries });
+      const diaryEntries = await prisma.diaries.findMany({
+          where: {
+              createdAt: {
+                  gte: twoMonthsAgo,
+                  lte: todaySeoulTime,
+                  // lastCreatedAt 값보다 큰 데이터만 가져오기 (중복 제거)
+                  gt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
+              }
+          },
+          take: pageSize,
+          skip: page > 1 ? (page - 1) * pageSize : 0,
+          orderBy: { createdAt: 'desc' }
+      });
+
+      res.status(200).json({ data: diaryEntries });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

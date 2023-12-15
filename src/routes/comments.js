@@ -53,6 +53,10 @@ router.patch('/diary/detail/comment/:commentId', authMiddleware, async(req, res,
       where: {commentId : +commentId}
   })
 
+  if (!comment) {
+    return res.status(400).json({ message: "존재하지 않는 댓글입니다"})
+  }
+
   if (comment.UserId !== userId) {
       return res.status(401).json({ message: "수정 권한이 없습니다"})
   }
@@ -84,8 +88,15 @@ router.delete('/diary/detail/comment/:commentId', authMiddleware, async(req, res
             return res.status(401).json({ message: "댓글이 존재하지 않습니다"})
         }
 
+        if (comment.UserId !== +userId) {
+            return res.status(401).json({ message: "삭제 권한이 없습니다"})
+        }
+
         await prisma.comments.delete({
-            where : {commentId : +commentId}
+            where : {
+                commentId : +commentId,
+                UserId: userId
+            }
         })
         return res.status(201).json({ message: "댓글 삭제 완료"})
     } catch(error) {
