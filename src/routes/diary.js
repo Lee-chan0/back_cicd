@@ -29,10 +29,11 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
       const diaryDetail = await prisma.diaries.findFirst({
           where: { 
             diaryId: +diaryId,  
-            OR : {
-              UserId : userId,
-              isPublic : true
-            }
+            OR : [
+              {UserId : userId},
+              {isPublic : true}
+            ]
+            
           }
       });
 
