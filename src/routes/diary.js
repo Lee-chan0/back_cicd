@@ -40,7 +40,7 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
 router.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { EmotionStatus, content, isPublic } = req.body;
+    const { EmotionStatus, content, isPublic, weather, sentence } = req.body;
 
     // const  imageUrl = req.file.location
 
@@ -71,6 +71,8 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
         content,
         image: imageUrl,
         isPublic: Boolean(isPublic),
+        weather,
+        sentence,
         User: {
           connect : {userId}
       },  
@@ -84,11 +86,11 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
 });
  
 /* 일기수정 */
-router.patch('/diary/edit/:diaryId', authMiddleware, upload.single('image'), async (req, res, next) => {
+router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { diaryId } = req.params
-    const { EmotionStatus, content, isPublic } = req.body;
+    const { content, isPublic } = req.body;
 
     const  imageUrl = req.file.location
 
@@ -114,13 +116,8 @@ router.patch('/diary/edit/:diaryId', authMiddleware, upload.single('image'), asy
         diaryId : +diaryId
       },
       data: {
-        EmotionStatus : +EmotionStatus,
         content,
-        image: imageUrl,
         isPublic: Boolean(isPublic),
-        User: {
-          connect : {userId}
-      },  
       }
     });
 

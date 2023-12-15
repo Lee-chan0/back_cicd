@@ -24,18 +24,20 @@ model Users {
 }
 
 model diaries {
-  diaryId     Int   @id @default(autoincrement()) @map("diaryId")
-  UserId      Int   @map("UserId")
-  EmotionStatus   Int   @map("EmotionalStatus")
-  image       String?  @map("image")
-  content     String  @map("content")
-  isPublic    Boolean @default(false) @map("isPublic")
-  viewCount   Int     @default(0) @map("viewCount")
-  likeCount Int @default(0) @map("likeCount")
+  diaryId     Int         @id @default(autoincrement()) @map("diaryId")
+  UserId      Int         @map("UserId")
+  EmotionStatus   Int     @map("EmotionalStatus")
+  image       String?     @map("image")
+  content     String      @map("content")
+  isPublic    Boolean     @default(false) @map("isPublic")
+  viewCount   Int         @default(0) @map("viewCount")
+  likeCount   Int         @default(0) @map("likeCount")
+  sentence    String?     @map("sentence")
+  weather     String      @map("weather")
 
-  createdAt   DateTime  @default(now()) @map("createdAt")
-  updatedAt   DateTime  @updatedAt  @map("updatedAt")
-  deletedAt   DateTime? @map("deletedAt")
+  createdAt   DateTime    @default(now()) @map("createdAt")
+  updatedAt   DateTime    @updatedAt  @map("updatedAt")
+  deletedAt   DateTime?   @map("deletedAt")
   
   diarylike DiaryLikes[]
   comment     comments[]
