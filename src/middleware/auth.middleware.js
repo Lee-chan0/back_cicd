@@ -8,7 +8,7 @@ dotenv.config();
 export default async (req, res, next) => {
   try {
     console.log('======미들웨어 IN=======');
-    const {authorization} = req.headers;
+    const {authorization, refreshtoken} = req.headers;
 
     const key = process.env.SECRET_KEY;
 
@@ -20,6 +20,15 @@ export default async (req, res, next) => {
     const verifyToken = jwt.verify(token, key);
 
     const userId = verifyToken.userId;
+
+    const storedRefreshToken = await client.get(`RefreshToken:${userId}`);
+
+    if(storedRefreshToken !== refreshtoken){
+      await client.del(`RefreshToken:${userId}`);
+      res.setHeader('Authorization', '');
+      res.setHeader('Refreshtoken', '');
+      return res.status(400).json({message : "비정상적인 요청입니다. 자동으로 로그아웃 됩니다."})
+    }
 
     const userInfo = await prisma.users.findFirst({
       where: { userId: userId },

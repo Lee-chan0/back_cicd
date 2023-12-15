@@ -5,10 +5,14 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import authMiddleware from "../middleware/auth.middleware.js";
 import {client} from '../redis/redis.js';
+import path from 'path';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
 const router = express.Router();
+
+const userVerificationCodes = {};
 
 // 회원가입
 router.post("/signup", async (req, res, next) => {
@@ -46,6 +50,84 @@ router.post("/signup", async (req, res, next) => {
     return res.status(500).json({ msg: "server Error" });
   }
 });
+
+// // 이메일 인증 회원가입
+// router.post("/signup", async(req, res, next) => {
+//   const {email, password, username} = req.body;
+//   try{
+//     const isExitsEmail = await prisma.users.findFirst({where : {email : email}});
+//     if(isExitsEmail){return res.status(400).json({message : "이미 가입된 이메일 입니다."})};
+
+//     const Authenticationcode = Math.random().toString(36).substring(2, 8);
+    
+
+//     const mailer = nodemailer.createTransport({
+//       service : "gmail",
+//       auth : {
+//         user : "yab0403777@gmail.com",
+//         pass : "atun uixk yiit gcmt",
+//       }
+//     });
+//     const htmlContent = `
+//     <div style="font-family: 'Arial', sans-serif; max-width: 400px; margin: 20px auto; background-color: #fdfdfd; padding: 20px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); border: 3px solid papayawhip; color: #000; text-align: center;">
+//       <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #000; font-weight: normal;">감정일기에 오신 것을 환영합니다.</h2>
+//       <p style="font-size: 14px; margin-bottom: 15px;">이메일 인증을 위한 코드가 도착했습니다.</p>
+//       <p style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">😄 인증코드: ${Authenticationcode} 😄</p>
+//       <div style="font-size: 12px; color: #000;">- 감정일기를 즐겨보세요 -</div>
+//     </div>
+//   `;
+  
+
+//   const mailOptions = {
+//     from : "yab0403777@gmail.com",
+//     to : email,
+//     subject : "[감정일기에서 보낸 인증코드]",
+//     html : htmlContent,
+//     text : `인증 코드 : ${Authenticationcode}를 입력해주세요.`,
+//   };
+
+//   mailer.sendMail(mailOptions, (error, info) => {
+//     if(error){
+//       console.error(error);
+//       return res.status(500).json({message : "메일 전송도중 Error가 발생했습니다."})
+//     }
+//     console.log(`이메일 전송 정보 : ${info.response}`);
+
+//     userVerificationCodes[email] = Authenticationcode;
+
+//     return res.status(201).json({message : "이메일 전송 완료"});
+//   })
+//   }catch(err){
+//     console.error(err);
+//     return res.status(500).json({message : "Server Error"})
+//   }
+// })
+
+// 이메일 인증 후, 회원가입 완료 로직
+// router.post("/complete-signup", async(req, res) => {
+//   const {email, Authenticationcode, password, username} = req.body;
+//   try{
+//     const serverAuthenticationCode = userVerificationCodes[email];
+
+//     if(Authenticationcode === serverAuthenticationCode){
+//       const encryptionPassword = await bcrypt.hash(password, 10);
+
+//       const createUser = await prisma.users.create({
+//         data : {
+//           email : email,
+//           password : encryptionPassword,
+//           username : username
+//         }
+//       });
+//       return res.status(201).json({message : `${createUser.username}님, 회원가입이 완료되었습니다.`, data : createUser});
+//     }else {
+//       return res.status(400).json({message : "인증 코드가 올바르지 않습니다."});
+//     }
+//   }catch(err){
+//     console.error(err);
+//     return res.status(500).json({message : "Server Error"});
+//   }
+// })
 
 // 일반 로그인
 router.post("/signin", async (req, res, next) => {
@@ -136,12 +218,10 @@ router.get('/token', authMiddleware, async(req, res, next) => {
   const token = authorization.split(' ')[1];
   const key = process.env.SECRET_KEY;
 
-  console.log('헤더에서 받은 accesstoken : ', token);
-  console.log(refreshtoken);
-
   const storedRefreshToken = await client.get(`RefreshToken:${userId}`);
 
   if(refreshtoken !== storedRefreshToken){
+    await client.del(`RefreshToken:${userId}`);
     res.setHeader('Authorization', '');
     res.setHeader('Refreshtoken', '');
     return res.status(401).json({message : "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."})
@@ -153,7 +233,7 @@ router.get('/token', authMiddleware, async(req, res, next) => {
 
     await client.set(`RefreshToken:${userId}`, newRefreshToken, "EX", 7 * 24 * 60 * 60 );
 
-    res.setHeader('Authorization', newAceessToken);
+    res.setHeader('Authorization', `Bearer ${newAceessToken}`);
     res.setHeader('Refreshtoken', newRefreshToken);
     res.setHeader('Expiredtime', newAccessToken_time.exp);
 
@@ -161,19 +241,17 @@ router.get('/token', authMiddleware, async(req, res, next) => {
   }
 })
 
-// 내 정보 수정 API (Oauth를 사용해서 만든 password는 어떻게 할지 고민하기) 
-// 이메일 인증번호 구현도 넣어볼까 // 휴대폰 인증번호는 예민할수도있으니까 ㄴㄴ
-// Oauth같은 경우엔 애초에 카카오 아이디 비밀번호로 가입하는 구조이기 때문에 회원정보 수정이 필요없다고 생각
+// 내 정보 수정 API 
 router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
   try{
     const {userId} = req.user;
-    const {email, password, username, profileImg} = req.body;
+    const {email, username, profileImg} = req.body;
+
 
     const editmyInfo = await prisma.users.update({
       where : {userId : +userId},
       data : {
         email : email,
-        password : password,
         username : username,
         profileImg : profileImg
       }
@@ -186,11 +264,34 @@ router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
   }
 });
 
+// 비밀번호 변경 API
+router.patch('/myInfo/editpw', authMiddleware, async(req, res, next) => {
+  try{
+    const {password, newPassword} = req.body;
+    const {userId} = req.user;
 
+    const userPWinfo = await prisma.users.findFirst({where : {userId : +userId}});
+    const encryptPW = await bcrypt.hash(password, 10);
+    if(userPWinfo.password !== encryptPW)
+    {return res.status(400).json({message : "비밀번호가 틀립니다."})};
 
+    const encryptionPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.users.update({where : {userId : +userId},
+    data : {
+      password : encryptionPassword,
+    }})
+
+    return res.status(201).json({message : "비밀번호가 변경되었습니다."});
+
+  }catch(err){
+    console.error(err);
+    return res.status(500).json({message : "Server Error"});
+  }
+});
 
 // 회원 탈퇴 API (탈퇴에 필요한 보류시간 ex.15일뒤에 삭제되는 로직 생각)
-router.delete('/myInfo/deleteInfo', authMiddleware, async(req, res, next) => {
+router.delete('/signoff', authMiddleware, async(req, res, next) => {
   try{
     const {userId} = req.user;
 
