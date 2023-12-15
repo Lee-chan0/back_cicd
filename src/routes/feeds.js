@@ -44,6 +44,34 @@ router.get("/feeds", authMiddleware, async (req, res, next) => {
   }
 });
 
+/* 내 diary글 피드 글 조회 */
+router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
+  try {
+    const { userId } = req.user
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = 10;
+
+    // 이전 페이지에서 마지막 데이터의 createdAt 값 가져오기 (데이터의 마지막 index값에 해당하는 value의 createdAt 값을 전달받는다)
+    const lastCreatedAt = req.query.lastCreatedAt; // 클라이언트에서 전달된 마지막 데이터의 createdAt 값
+
+      const diaryEntries = await prisma.diaries.findMany({
+          where: {
+              UserId : userId,
+              createdAt: {
+                  gt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
+              }
+          },
+          take: pageSize,
+          skip: page > 1 ? (page - 1) * pageSize : 0,
+          orderBy: { createdAt: 'desc' }
+      });
+
+      res.status(200).json({ data: diaryEntries });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // 피드에 좋아요 기능
 router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
   try {
