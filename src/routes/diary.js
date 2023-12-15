@@ -27,7 +27,13 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
       const { userId } = req.user
 
       const diaryDetail = await prisma.diaries.findFirst({
-          where: { diaryId: +diaryId }
+          where: { 
+            diaryId: +diaryId,  
+            OR : {
+              UserId : userId,
+              isPublic : true
+            }
+          }
       });
 
       if (!diaryDetail) {
@@ -66,7 +72,7 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
     const { userId } = req.user;
     const { EmotionStatus, content, isPublic, weather, sentence } = req.body;
 
-    // const  imageUrl = req.file.location
+    const  imageUrl = req.file.location
 
     const today = new Date();
     const timeZone = 'Asia/Seoul';
@@ -90,7 +96,6 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
 
     const savedDiary = await prisma.diaries.create({
       data: {
-        // UserId: userId,
         EmotionStatus : +EmotionStatus,
         content,
         image: imageUrl,
@@ -115,12 +120,6 @@ router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
     const { userId } = req.user;
     const { diaryId } = req.params
     const { content, isPublic } = req.body;
-
-    const today = new Date();
-    const timeZone = 'Asia/Seoul';
-    const todaySeoulTime = utcToZonedTime(today, timeZone);
-    const startOfToday = startOfDay(todaySeoulTime);
-    const endOfToday = endOfDay(todaySeoulTime);
 
     const diaryExists = await prisma.diaries.findFirst({
       where: {
