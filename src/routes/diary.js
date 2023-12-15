@@ -9,6 +9,18 @@ import { upload } from '../middleware/S3.upload/multer.js'
 
 const router = express.Router();
 /* 일기 상세 조회 */
+
+let lastViewTime = {};
+
+setInterval(() => {
+  const currentTime = new Date().getTime();
+  for (const userId in lastViewTime) {
+    if (currentTime - lastViewTime[userId] >= 600000) {
+      delete lastViewTime[userId];
+    }
+  }
+}, 600000);
+
 router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
   try {
       const { diaryId } = req.params;
@@ -22,20 +34,32 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
         return res.status(400).json({ message : "존재하지 않는 일기입니다."})
       }
 
+      if (userId in lastViewTime) {
+        const lastTime = lastViewTime[userId]
+        const currentTime = new Date().getTime()
+
+        if (currentTime - lastTime < 600000) {
+          return res.status(200).json({ data: diaryDetail})
+        }
+      }
+      /* 조회수 기능 추가 */
       if (diaryDetail.UserId !== +userId) {
-        return res.status(200).json({ data: diaryDetail });
-      } else {
-        const diaryDetailViewCount = await prisma.diaries.update({
+
+        lastViewTime[userId] = new Date().getTime()
+
+        const updatedDiary = await prisma.diaries.update({
           where: { diaryId: +diaryId },
-          data: { viewCount : viewCount ++ }
+          data: { viewCount : diaryDetail.viewCount + 1 }
         })
-        return res.status(200).json({ data: diaryDetailViewCount})
+        return res.status(200).json({ data: updatedDiary})
+      } else {
+        return res.status(200).json({ data: diaryDetail})
       }
   } catch (error) {
       return res.status(400).json({ error: error.message });
   }
-
 });
+
 /* 일기 등록 */
 router.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
   try {
