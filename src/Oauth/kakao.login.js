@@ -72,9 +72,9 @@ router.post("/kakao/callback", async function (req, res) {
       const createUser = await prisma.users.create({
         data: {
           email: userResponse.data.kakao_account.email,
-          username: userResponse.data.kakao_account.profile.nickname,
+          username: userResponse.data.properties.nickname,
           password: encryptionPassword,
-          profileImg: userResponse.data.kakao_account.profile.profile_image_url,
+          profileImg: userResponse.data.properties.profile_image,
           userType : 'K'
         },
       });
