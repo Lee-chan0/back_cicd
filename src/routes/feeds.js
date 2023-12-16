@@ -75,34 +75,42 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
 
 /**
  * @swagger
- * /feeds/{diaryId}/like:
- *   post:
- *     summary: Like or unlike a diary entry
+ * /feeds/:diaryId/like:
+ *    post:
+ *     summary: 좋아요 및 좋아요 취소 기능
  *     tags:
  *       - Feed
  *     parameters:
  *       - in: path
  *         name: diaryId
  *         schema:
- *           type: integer
+ *           type: Integer
  *         required: true
- *         description: ID of the diary entry to like or unlike
- *     responses:
+ *         description: diaryId를 넣어주세요
+ *     response:
  *       '201':
- *         description: Diary liked successfully
+ *         description: 좋아요 추가 및 삭제
  *         content:
  *           application/json:
  *             example:
- *               message: "좋아요가 추가되었습니다."
- *               data: 10
+ *              added:
+ *                summary: 좋아요 추가
+ *                value:
+ *                  message: "좋아요가 추가되었습니다."
+ *                  data: 1
+ *              removed:
+ *                 summary: 좋아요 취소
+ *                 value:
+ *                   message: "좋아요가 취소되었습니다."
+ *                   data: 0
  *       '400':
- *         description: Bad request or diary not found
- *         content:
- *           application/json:
- *             example:
- *               message: "해당하는 일기가 없습니다."
+ *          description: diaryId가 잘못됐을때
+ *          content:
+ *            application/json:
+ *              example:
+ *                message: "해당하는 일기가 없습니다."  
+ * 
  */
-
 // 피드에 좋아요 기능
 router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
   try {
