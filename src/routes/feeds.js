@@ -72,11 +72,10 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
     res.status(400).json({ error: error.message });
   }
 });
-
 /**
  * @swagger
  * /feeds/:diaryId/like:
- *    post:
+ *   post:
  *     summary: 좋아요 및 좋아요 취소 기능
  *     tags:
  *       - Feed
@@ -87,7 +86,7 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
  *           type: Integer
  *         required: true
  *         description: diaryId를 넣어주세요
-  *      - in: header
+ *       - in: header
  *         name: Authorization
  *         schema:
  *           type: string
@@ -105,23 +104,22 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
  *         content:
  *           application/json:
  *             examples:
- *              added:
- *                summary: 좋아요 추가
- *                value:
- *                  message: "좋아요가 추가되었습니다."
- *                  data: 1
- *              removed:
+ *               added:
+ *                 summary: 좋아요 추가
+ *                 value:
+ *                   message: "좋아요가 추가되었습니다."
+ *                   data: 1
+ *               removed:
  *                 summary: 좋아요 취소
  *                 value:
  *                   message: "좋아요가 취소되었습니다."
  *                   data: 0
  *       '400':
- *          description: diaryId가 잘못됐을때
- *          content:
- *            application/json:
- *              example:
- *                message: "해당하는 일기가 없습니다."  
- * 
+ *         description: diaryId가 잘못됐을때
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "해당하는 일기가 없습니다."  
  */
 // 피드에 좋아요 기능
 router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {

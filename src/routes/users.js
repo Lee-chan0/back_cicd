@@ -92,6 +92,28 @@ router.post("/signup", async(req, res, next) => {
   }
 })
 
+
+/**
+ * @swagger
+ * /complete-signup:
+ *   post:
+ *     summary: 이메일 인증 후, 회원가입 완료 로직
+ *     tags:
+ *       - Login
+ *     responses:
+ *       '201':
+ *         description: 회원가입 완료
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "username님, 회원가입이 완료되었습니다."
+ *       '400':
+ *         description: 인증코드 불일치
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "인증 코드가 올바르지 않습니다."
+ */
 // 이메일 인증 후, 회원가입 완료 로직
 router.post("/complete-signup", async(req, res) => {
   const {email, Authenticationcode, password, username} = req.body;
@@ -128,6 +150,54 @@ router.post("/complete-signup", async(req, res) => {
   }
 })
 
+/**
+ * @swagger
+ * /signin:
+ *   post:
+ *     summary: 로그인
+ *     tags:
+ *       - Login
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: 유저의 email
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 description: 유저의 password
+ *                 example: password1234
+ *     responses:
+ *       '200':
+ *         description: 로그인 성공시
+ *         headers:
+ *           Authorization:
+ *             description: Bearer accesstoken
+ *             schema:
+ *               type: string 
+ *             example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *           Refreshtoken:
+ *             description: Refreshtoken
+ *             schema:
+ *               type: string
+ *             example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *         content:
+ *           application/json:
+ *             example:
+ *               msg: "username님, 환영합니다."
+ *               profileImage: "userprofileIMG.jpg"
+ *       '400':
+ *         description: 패스워드 불일치
+ *         content:
+ *           application/json:
+ *             example:
+ *               msg: "존재하지 않는 email입니다. or 비밀번호가 일치하지 않습니다."
+ */
 // 일반 로그인
 router.post("/signin", async (req, res, next) => {
   try {

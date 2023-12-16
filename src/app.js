@@ -38,7 +38,7 @@ app.use(express.urlencoded({extended : true}))
 app.use(cors(corsOptions));
 app.use(express.json());
 
-app.use("/api", swaggerUi.serve, swaggerUi.setup(specs));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 app.use("/", [
   UserRouter,
