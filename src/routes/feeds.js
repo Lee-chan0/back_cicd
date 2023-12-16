@@ -105,7 +105,7 @@ router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
             },
           },
         });
-        return res.status(400).json({message: "좋아요가 취소되었습니다.",data: islike.likeCount});
+        return res.status(200).json({message: "좋아요가 취소되었습니다.",data: islike.likeCount});
       }
       await prisma.diaryLikes.create({
         data: {
