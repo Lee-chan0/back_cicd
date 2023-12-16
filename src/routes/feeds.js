@@ -26,8 +26,9 @@ router.get("/feeds", authMiddleware, async (req, res, next) => {
 
       const diaryEntries = await prisma.diaries.findMany({
           where: {
+              isPublic : true,
               createdAt: {
-                  gte: twoMonthsAgo,
+                  gte: twoMonthsAgo, 
                   lte: todaySeoulTime,
                   // lastCreatedAt 값보다 큰 데이터만 가져오기 (중복 제거)
                   gt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
