@@ -97,22 +97,56 @@ router.post("/signup", async(req, res, next) => {
  * @swagger
  * /complete-signup:
  *   post:
- *     summary: 이메일 인증 후, 회원가입 완료 로직
+ *     summary: 이메일 인증 후, 회원가입 완료
  *     tags:
- *       - Login
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: 유저의 이메일
+ *                 example: user@example.com
+ *               Authenticationcode:
+ *                 type: string
+ *                 description: 이메일로 전송된 인증 코드
+ *                 example: abcd1234
+ *               password:
+ *                 type: string
+ *                 description: 유저의 비밀번호
+ *                 example: password1234
+ *               username:
+ *                 type: string
+ *                 description: 유저의 닉네임
+ *                 example: myusername
  *     responses:
  *       '201':
- *         description: 회원가입 완료
+ *         description: 회원가입 성공시
  *         content:
  *           application/json:
  *             example:
- *               message: "username님, 회원가입이 완료되었습니다."
+ *               message: "myusername님, 회원가입이 완료되었습니다."
+ *               data:
+ *                 userId: 1
+ *                 username: "myusername"
+ *                 userType: "Common or K or N or G"
+ *                 email: "user@example.com"
  *       '400':
- *         description: 인증코드 불일치
+ *         description: 인증 코드 오류시
  *         content:
  *           application/json:
  *             example:
  *               message: "인증 코드가 올바르지 않습니다."
+ *       '500':
+ *         description: 서버 오류시
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Server Error"
  */
 // 이메일 인증 후, 회원가입 완료 로직
 router.post("/complete-signup", async(req, res) => {
@@ -248,6 +282,19 @@ router.post("/signin", async (req, res, next) => {
  *     summary: 로그아웃
  *     tags:
  *       - Login
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bearer 토큰
+ *       - in: header
+ *         name: Refreshtoken
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Refresh 토큰
  *     responses:
  *       '200':
  *         description: 로그아웃 성공시
@@ -292,6 +339,19 @@ router.post("/logout", authMiddleware, async (req, res, next) => {
  *     summary: 내 정보 조회
  *     tags:
  *       - User
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bearer 토큰
+ *       - in: header
+ *         name: Refreshtoken
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Refresh 토큰
  *     responses:
  *       '200':
  *         description: 해당 유저 정보 조회
@@ -335,6 +395,19 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
  *    summary: accesstoken만료시 refreshtoken을 이용한 재발급
  *    tags:
  *      - Token
+ *    parameters:
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bearer 토큰
+ *       - in: header
+ *         name: Refreshtoken
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Refresh 토큰
  *    responses:
  *      '201':
  *         description: 토큰 발급 완료
@@ -386,9 +459,19 @@ router.get('/token', authMiddleware, async(req, res, next) => {
  *      summary: 내 정보 수정 기능
  *      tags:
  *        - User
- *      security:
- *        - BearerAuth: []
- *        - RefreshAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bearer 토큰
+ *       - in: header
+ *         name: Refreshtoken
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Refresh 토큰
  *      requestBody:
  *         required: true
  *         content:
@@ -470,9 +553,19 @@ router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
  *     summary: 내 계정 삭제
  *     tags:
  *       - User
- *     security:
- *       - BearerAuth: []
- *       - RefreshAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bearer 토큰
+ *       - in: header
+ *         name: Refreshtoken
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Refresh 토큰
  *     responses:
  *       '201':
  *         description: 탈퇴 처리 OK
