@@ -180,12 +180,12 @@ router.post("/complete-signup", async(req, res) => {
  *             description: Bearer accesstoken
  *             schema:
  *               type: string 
- *             example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *               example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
  *           Refreshtoken:
  *             description: Refreshtoken
  *             schema:
  *               type: string
- *             example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *               example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
  *         content:
  *           application/json:
  *             example:
@@ -198,6 +198,7 @@ router.post("/complete-signup", async(req, res) => {
  *             example:
  *               msg: "존재하지 않는 email입니다. or 비밀번호가 일치하지 않습니다."
  */
+
 // 일반 로그인
 router.post("/signin", async (req, res, next) => {
   try {
@@ -240,7 +241,32 @@ router.post("/signin", async (req, res, next) => {
   }
 });
 
-
+/**
+ * @swagger
+ * /logout:
+ *   post:
+ *     summary: 로그아웃
+ *     tags:
+ *       - Login
+ *     responses:
+ *       '200':
+ *         description: 로그아웃 성공시
+ *         headers:
+ *           Authorization:
+ *             description: 토큰 비우기
+ *             schema:
+ *               type: string
+ *               example: ""
+ *            Refreshtoken:
+ *              description: 토큰 비우기
+ *              schema:
+ *                type: string
+ *                example: ""
+ *       content:
+ *         application/json:
+ *           example:
+ *             msg: "로그아웃 되었습니다."
+ */
 // 로그아웃
 router.post("/logout", authMiddleware, async (req, res, next) => {
   try {
@@ -260,6 +286,34 @@ router.post("/logout", authMiddleware, async (req, res, next) => {
 });
 
 
+/**
+ * @swagger
+ * /myInfo:
+ *    get:
+ *     summary: 내 정보 조회
+ *     tags:
+ *       - User
+ *     responses:
+ *       '200':
+ *         description: 해당 유저 정보 조회
+ *         content:
+ *           application/json:
+ *             example:
+ *               msg: "{
+ *                  "data" : {
+ *                     "userId" : 1,
+ *                     "username" : "홍길동",
+ *                     "email" : "example@naver.com",
+ *                     "profileImg" : "image.jpg"
+ * }
+ * }"
+ *       '400':
+ *         description: 해당 유저가 없을때
+ *         content:
+ *            application/json:
+ *              example:
+ *                msg: "존재하지 않는 유저입니다."
+ */
 
 // 내 정보 조회
 router.get("/myInfo", authMiddleware, async (req, res, next) => {
@@ -272,6 +326,7 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
       username: true,
       email: true,
       profileImg: true,
+      userType : true,
     },
   });
   if (!user) {
@@ -281,7 +336,27 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
   return res.status(200).json({ data: user })
 });
 
-
+/**
+ * @swagger
+ * /token:
+ *   get:
+ *    summary: accesstoken만료시 refreshtoken을 이용한 재발급
+ *    tags:
+ *      - Token
+ *    responses:
+ *      '201':
+ *         description: 토큰 발급 완료
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "AccessToken 발급 완료"
+ *      '401':
+ *         description: 토큰 발급 실패 (RefreshToken 불일치)
+ *         content:
+ *            application/json:
+ *              example:
+ *                message: "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."
+ */
 
 // AccessToken 재발급 로직
 router.get('/token', authMiddleware, async(req, res, next) => {
@@ -311,6 +386,52 @@ router.get('/token', authMiddleware, async(req, res, next) => {
     return res.status(201).json({message : "AccessToken 발급 완료"});
   }
 });
+
+/**
+ * @swagger
+ * /myInfo/editmyInfo:
+ *    patch:
+ *      summary: 내 정보 수정 기능
+ *      tags:
+ *        - User
+ *      security:
+ *        - BearerAuth: []
+ *        - RefreshAuth: []
+ *      requestBody:
+ *         required: true
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                   username:
+ *                      type: string
+ *                      description: 변경할 사용자 이름
+ *                   progileImg:
+ *                      type: string
+ *                      description: 변경할 프로필 이미지 URL
+ *                   password:
+ *                      type: string
+ *                      description: 현재 비밀번호
+ *                   newPassword:
+ *                      type: string
+ *                      description: 새로운 비밀번호
+ *      responses:
+ *        '201':
+ *          description: 수정 완료
+ *          content:
+ *            application/json:
+ *              example:
+ *                message : "수정이 완료되었습니다."
+ *        '400':
+ *           description: 소셜 로그인 사용자
+ *           content:
+ *             application/json:
+ *                example:
+ *                  message: "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다. or 비밀번호가 틀립니다."
+ * 
+ *         
+ */
 
 // 내 정보 수정 API 
 router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
@@ -344,12 +465,31 @@ router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
       }
     })
 
-    return res.status(201).json({message : "수정이 완료 되었습니다."});
+    return res.status(201).json({message : "수정이 완료되었습니다."});
   }catch(err) {
     console.error(err);
     return res.status(500).json({message : "Server Error"});
   }
 });
+
+/**
+ * @swagger
+ * /signoff
+ *   delete:
+ *      summary: 내 계정 삭제
+ *   tags:
+ *     - User
+ *   security:
+ *      - BearerAuth: []
+ *      - RefreshAuth: []
+ *   responses:
+ *     '201':
+ *       description: 탈퇴 처리 OK
+ *       content:
+ *          application/json:
+ *            example:
+ *              message: "탈퇴처리 되었습니다."
+ */
 
 // 회원 탈퇴 API (탈퇴에 필요한 보류시간 ex.15일뒤에 삭제되는 로직 생각)
 router.delete('/signoff', authMiddleware, async(req, res, next) => {
