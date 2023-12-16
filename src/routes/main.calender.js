@@ -10,11 +10,10 @@ const router = express.Router();
 
 /* 메인페이지 조회 ( 캘린더, 회원정보(회원프로필 이미지) ) */
 
-router.get("/diary/calendar", authMiddleware, async (req, res, next) => {
+router.get("/diary/calendar/:year/:month", authMiddleware, async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const year = req.query.year; // 프론트에서 전달된 년도 값
-    const month = req.query.month; // 프론트에서 전달된 월 값
+    const { year, month } = req.params; // 파라미터로부터 년도와 월 값 가져오기
 
     // year와 month를 기반으로 날짜 범위 계산
     const startDate = new Date(year, month - 1, 1); // month는 0부터 시작하기 때문에 -1
@@ -33,7 +32,6 @@ router.get("/diary/calendar", authMiddleware, async (req, res, next) => {
       },
     });
 
-    // 기존 코드와 동일한 방식으로 데이터 처리
     const modifiedDiaries = diaries.map((diary) => {
       const year = diary.createdAt.getFullYear();
       const month = diary.createdAt.getMonth() + 1;
@@ -68,6 +66,7 @@ router.get("/diary/calendar", authMiddleware, async (req, res, next) => {
     return res.status(400).json({ error: error.message });
   }
 });
+
 
 // router.get("/diary/calendar", authMiddleware, async (req, res, next) => {
 //   try {
