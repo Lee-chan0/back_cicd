@@ -87,12 +87,12 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
  *           type: Integer
  *         required: true
  *         description: diaryId를 넣어주세요
- *     response:
+ *     responses:
  *       '201':
  *         description: 좋아요 추가 및 삭제
  *         content:
  *           application/json:
- *             example:
+ *             examples:
  *              added:
  *                summary: 좋아요 추가
  *                value:

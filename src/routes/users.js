@@ -5,7 +5,6 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import authMiddleware from "../middleware/auth.middleware.js";
 import {client} from '../redis/redis.js';
-import path from 'path';
 import nodemailer from 'nodemailer';
 
 dotenv.config();
@@ -14,43 +13,36 @@ const router = express.Router();
 
 const userVerificationCodes = {};
 
+/**
+ * @swagger
+ * /signup:
+ *    post:
+ *      summary: 회원가입시 회원정보 받기 및 인증코드 받기
+ *      tage:
+ *       - Login
+ *      responses:
+ *      '201':
+ *        description: 이메일 전송
+ *        content:
+ *          application/json:
+ *            examples:
+ *              message: "이메일 전송 완료"
+ *      '400':
+ *        description: 이메일 중복
+ *        content:
+ *          application/json:
+ *            examples:
+ *              message: "이미 가입된 이메일 입니다."
+ *       '500':
+ *         description: 이메일 전송 실패
+ *         content:
+ *           application/json:
+ *             examples:
+ *               message: "메일 전송 도중 Error가 발생했습니다."
+ * 
+ */
+
 // 회원가입
-// router.post("/signup", async (req, res, next) => {
-//   try {
-//     const { email, password, username } = req.body;
-
-//     const ExistsEmail = await prisma.users.findFirst({
-//       where: { email: email },
-//     });
-//     if (ExistsEmail) {
-//       return res.status(400).json({ msg: "이미 가입된 email 입니다." });
-//     }
-
-//     const encryptionPassword = await bcrypt.hash(password, 10);
-
-//     await prisma.users.create({
-//       data: {
-//         email: email,
-//         password: encryptionPassword,
-//         username: username,
-//       },
-//     });
-
-//     const userdata = await prisma.users.findFirst({
-//       where : {email : email},
-//       select: {
-//         userId: true,
-//         username: true,
-//       },
-//     });
-//     return res.status(201).json({ data: userdata }); // 보안적으로 괜찮은지 마지막에 한번 검토할것
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ msg: "server Error" });
-//   }
-// });
-
-// 이메일 인증 회원가입
 router.post("/signup", async(req, res, next) => {
   const {email, password, username} = req.body;
   try{
@@ -117,7 +109,17 @@ router.post("/complete-signup", async(req, res) => {
           username : username
         }
       });
-      return res.status(201).json({message : `${createUser.username}님, 회원가입이 완료되었습니다.`, data : createUser});
+
+      const userInfo = await prisma.users.findFirst({
+        where : {email : email},
+        select : {
+          userId : true,
+          username : true,
+          userType : true,
+          email : true,
+        }
+      });
+      return res.status(201).json({message : `${createUser.username}님, 회원가입이 완료되었습니다.`, data : userInfo});
     }else {
       return res.status(400).json({message : "인증 코드가 올바르지 않습니다."});
     }
