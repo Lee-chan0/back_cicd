@@ -99,7 +99,7 @@ router.post("/signup", async(req, res, next) => {
  *   post:
  *     summary: 이메일 인증 후, 회원가입 완료
  *     tags:
- *       - Authentication
+ *       - Login
  *     requestBody:
  *       required: true
  *       content:
@@ -274,7 +274,6 @@ router.post("/signin", async (req, res, next) => {
     return res.status(500).json({ msg: `server Error` });
   }
 });
-
 /**
  * @swagger
  * /logout:
@@ -304,11 +303,11 @@ router.post("/signin", async (req, res, next) => {
  *             schema:
  *               type: string
  *               example: ""
- *            Refreshtoken:
- *              description: 토큰 비우기
- *              schema:
- *                type: string
- *                example: ""
+ *           Refreshtoken:
+ *             description: 토큰 비우기
+ *             schema:
+ *               type: string
+ *               example: ""
  *       content:
  *         application/json:
  *           example:
@@ -455,10 +454,10 @@ router.get('/token', authMiddleware, async(req, res, next) => {
 /**
  * @swagger
  * /myInfo/editmyInfo:
- *    patch:
- *      summary: 내 정보 수정 기능
- *      tags:
- *        - User
+ *   patch:
+ *     summary: 내 정보 수정 기능
+ *     tags:
+ *       - User
  *     parameters:
  *       - in: header
  *         name: Authorization
@@ -472,40 +471,38 @@ router.get('/token', authMiddleware, async(req, res, next) => {
  *           type: string
  *         required: true
  *         description: Refresh 토큰
- *      requestBody:
- *         required: true
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: 변경할 사용자 이름
+ *               profileImg:
+ *                 type: string
+ *                 description: 변경할 프로필 이미지 URL
+ *               password:
+ *                 type: string
+ *                 description: 현재 비밀번호
+ *               newPassword:
+ *                 type: string
+ *                 description: 새로운 비밀번호
+ *     responses:
+ *       '201':
+ *         description: 수정 완료
  *         content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                   username:
- *                      type: string
- *                      description: 변경할 사용자 이름
- *                   progileImg:
- *                      type: string
- *                      description: 변경할 프로필 이미지 URL
- *                   password:
- *                      type: string
- *                      description: 현재 비밀번호
- *                   newPassword:
- *                      type: string
- *                      description: 새로운 비밀번호
- *      responses:
- *        '201':
- *          description: 수정 완료
- *          content:
- *            application/json:
- *              example:
- *                message : "수정이 완료되었습니다."
- *        '400':
- *           description: 소셜 로그인 사용자
- *           content:
- *             application/json:
- *                example:
- *                  message: "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다. or 비밀번호가 틀립니다."
- * 
- *         
+ *           application/json:
+ *             example:
+ *               message: "수정이 완료되었습니다."
+ *       '400':
+ *         description: 소셜 로그인 사용자
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다. or 비밀번호가 틀립니다."
  */
 
 // 내 정보 수정 API 
