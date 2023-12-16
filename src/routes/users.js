@@ -285,11 +285,10 @@ router.post("/logout", authMiddleware, async (req, res, next) => {
   }
 });
 
-
 /**
  * @swagger
  * /myInfo:
- *    get:
+ *   get:
  *     summary: 내 정보 조회
  *     tags:
  *       - User
@@ -299,20 +298,13 @@ router.post("/logout", authMiddleware, async (req, res, next) => {
  *         content:
  *           application/json:
  *             example:
- *               msg: "{
- *                  "data" : {
- *                     "userId" : 1,
- *                     "username" : "홍길동",
- *                     "email" : "example@naver.com",
- *                     "profileImg" : "image.jpg"
- * }
- * }"
+ *               msg: '{"data":{"userId":1,"username":"홍길동","email":"example@naver.com","profileImg":"image.jpg"}}'
  *       '400':
  *         description: 해당 유저가 없을때
  *         content:
- *            application/json:
- *              example:
- *                msg: "존재하지 않는 유저입니다."
+ *           application/json:
+ *             example:
+ *               msg: "존재하지 않는 유저입니다."
  */
 
 // 내 정보 조회
@@ -471,26 +463,24 @@ router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
     return res.status(500).json({message : "Server Error"});
   }
 });
-
 /**
  * @swagger
- * /signoff
+ * /signoff:
  *   delete:
- *      summary: 내 계정 삭제
- *   tags:
- *     - User
- *   security:
- *      - BearerAuth: []
- *      - RefreshAuth: []
- *   responses:
- *     '201':
- *       description: 탈퇴 처리 OK
- *       content:
- *          application/json:
- *            example:
- *              message: "탈퇴처리 되었습니다."
+ *     summary: 내 계정 삭제
+ *     tags:
+ *       - User
+ *     security:
+ *       - BearerAuth: []
+ *       - RefreshAuth: []
+ *     responses:
+ *       '201':
+ *         description: 탈퇴 처리 OK
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "탈퇴처리 되었습니다."
  */
-
 // 회원 탈퇴 API (탈퇴에 필요한 보류시간 ex.15일뒤에 삭제되는 로직 생각)
 router.delete('/signoff', authMiddleware, async(req, res, next) => {
   try{

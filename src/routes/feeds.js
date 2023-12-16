@@ -91,13 +91,13 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
  *         schema:
  *           type: string
  *         required: true
- *         description: Bearer 토큰 (예: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c)
+ *         description: Bearer 토큰
  *       - in: header
  *         name: Refreshtoken
  *         schema:
  *           type: string
  *         required: true
- *         description: Refresh 토큰 (예: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c)
+ *         description: Refresh 토큰
  *     responses:
  *       '201':
  *         description: 좋아요 추가 및 삭제
