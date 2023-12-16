@@ -14,18 +14,18 @@ import swaggerUi from 'swagger-ui-express';
 const app = express();
 const PORT = 3000;
 
-// const options = {
-//   definition : {
-//     openapi: "3.0.0",
-//     info : {
-//       title : "감정일기",
-//       version : "1.0.0"
-//     }
-//   },
-//   apis : 
-// }
+const options = {
+  definition : {
+    openapi: "3.0.0",
+    info : {
+      title : "감정일기",
+      version : "1.0.0"
+    }
+  },
+  apis : ["./routes/*.js"]
+}
 
-// const specs = swaggerJSDoc(options);
+const specs = swaggerJSDoc(options);
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -38,7 +38,8 @@ app.use(express.urlencoded({extended : true}))
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// app.use("/api", swaggerUi.serve, swaggerUi.setup(specs));
+app.use("/api", swaggerUi.serve, swaggerUi.setup(specs));
+
 app.use("/", [
   UserRouter,
   MainCalender,

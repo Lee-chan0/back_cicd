@@ -73,6 +73,36 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /feeds/{diaryId}/like:
+ *   post:
+ *     summary: Like or unlike a diary entry
+ *     tags:
+ *       - Feed
+ *     parameters:
+ *       - in: path
+ *         name: diaryId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the diary entry to like or unlike
+ *     responses:
+ *       '201':
+ *         description: Diary liked successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "좋아요가 추가되었습니다."
+ *               data: 10
+ *       '400':
+ *         description: Bad request or diary not found
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "해당하는 일기가 없습니다."
+ */
+
 // 피드에 좋아요 기능
 router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
   try {
