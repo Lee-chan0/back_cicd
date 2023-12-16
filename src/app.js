@@ -15,15 +15,16 @@ const app = express();
 const PORT = 3000;
 
 const options = {
-  definition : {
+  definition: {
     openapi: "3.0.0",
-    info : {
-      title : "감정일기",
-      version : "1.0.0"
-    }
+    info: {
+      title: "감정일기",
+      version: "1.0.0",
+      description: "일반 로그인, OAuth로그인, 토큰 재발급 API에선 모두 A/T와 R/T를 응답 헤더에 담아서 전송합니다.",
+    },
   },
-  apis : ["./src/routes/*.js"]
-}
+  apis: ["./src/routes/*.js"],
+};
 
 const specs = swaggerJSDoc(options);
 
