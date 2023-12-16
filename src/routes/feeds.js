@@ -147,5 +147,4 @@ router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
 // })
 // // 피드를 새롭게 조회중에 db에 새로운 diary가 추가 될 경우 새롭게 호출하는 db의 순번이 바뀌어 중복된 feed가 출력될 수 있다
 // // 이를 해결할 방법을 고민해봐야함. 일단은 프론트와 논의되기 전까지의 뼈대코드
-
 export default router;

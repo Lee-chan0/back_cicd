@@ -15,117 +15,117 @@ const router = express.Router();
 const userVerificationCodes = {};
 
 // 회원가입
-router.post("/signup", async (req, res, next) => {
-  try {
-    const { email, password, username } = req.body;
+// router.post("/signup", async (req, res, next) => {
+//   try {
+//     const { email, password, username } = req.body;
 
-    const ExistsEmail = await prisma.users.findFirst({
-      where: { email: email },
-    });
-    if (ExistsEmail) {
-      return res.status(400).json({ msg: "이미 가입된 email 입니다." });
-    }
-
-    const encryptionPassword = await bcrypt.hash(password, 10);
-
-    await prisma.users.create({
-      data: {
-        email: email,
-        password: encryptionPassword,
-        username: username,
-      },
-    });
-
-    const userdata = await prisma.users.findFirst({
-      where : {email : email},
-      select: {
-        userId: true,
-        username: true,
-      },
-    });
-    return res.status(201).json({ data: userdata }); // 보안적으로 괜찮은지 마지막에 한번 검토할것
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "server Error" });
-  }
-});
-
-// // 이메일 인증 회원가입
-// router.post("/signup", async(req, res, next) => {
-//   const {email, password, username} = req.body;
-//   try{
-//     const isExitsEmail = await prisma.users.findFirst({where : {email : email}});
-//     if(isExitsEmail){return res.status(400).json({message : "이미 가입된 이메일 입니다."})};
-
-//     const Authenticationcode = Math.random().toString(36).substring(2, 8);
-
-//     const mailer = nodemailer.createTransport({
-//       service : "gmail",
-//       auth : {
-//         user : "yab0403777@gmail.com",
-//         pass : "atun uixk yiit gcmt",
-//       }
+//     const ExistsEmail = await prisma.users.findFirst({
+//       where: { email: email },
 //     });
-//     const htmlContent = `
-//     <div style="font-family: 'Arial', sans-serif; max-width: 400px; margin: 20px auto; background-color: #fdfdfd; padding: 20px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); border: 3px solid papayawhip; color: #000; text-align: center;">
-//       <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #000; font-weight: normal;">감정일기에 오신 것을 환영합니다.</h2>
-//       <p style="font-size: 14px; margin-bottom: 15px;">이메일 인증을 위한 코드가 도착했습니다.</p>
-//       <p style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">😄 인증코드: ${Authenticationcode} 😄</p>
-//       <div style="font-size: 12px; color: #000;">- 감정일기를 즐겨보세요 -</div>
-//     </div>
-//   `;
+//     if (ExistsEmail) {
+//       return res.status(400).json({ msg: "이미 가입된 email 입니다." });
+//     }
+
+//     const encryptionPassword = await bcrypt.hash(password, 10);
+
+//     await prisma.users.create({
+//       data: {
+//         email: email,
+//         password: encryptionPassword,
+//         username: username,
+//       },
+//     });
+
+//     const userdata = await prisma.users.findFirst({
+//       where : {email : email},
+//       select: {
+//         userId: true,
+//         username: true,
+//       },
+//     });
+//     return res.status(201).json({ data: userdata }); // 보안적으로 괜찮은지 마지막에 한번 검토할것
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ msg: "server Error" });
+//   }
+// });
+
+// 이메일 인증 회원가입
+router.post("/signup", async(req, res, next) => {
+  const {email, password, username} = req.body;
+  try{
+    const isExitsEmail = await prisma.users.findFirst({where : {email : email}});
+    if(isExitsEmail){return res.status(400).json({message : "이미 가입된 이메일 입니다."})};
+
+    const Authenticationcode = Math.random().toString(36).substring(2, 8);
+
+    const mailer = nodemailer.createTransport({
+      service : "gmail",
+      auth : {
+        user : "yab0403777@gmail.com",
+        pass : "atun uixk yiit gcmt",
+      }
+    });
+    const htmlContent = `
+    <div style="font-family: 'Arial', sans-serif; max-width: 400px; margin: 20px auto; background-color: #fdfdfd; padding: 20px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); border: 3px solid papayawhip; color: #000; text-align: center;">
+      <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #000; font-weight: normal;">감정일기에 오신 것을 환영합니다.</h2>
+      <p style="font-size: 14px; margin-bottom: 15px;">이메일 인증을 위한 코드가 도착했습니다.</p>
+      <p style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">😄 인증코드: ${Authenticationcode} 😄</p>
+      <div style="font-size: 12px; color: #000;">- 감정일기를 즐겨보세요 -</div>
+    </div>
+  `;
   
 
-//   const mailOptions = {
-//     from : "yab0403777@gmail.com",
-//     to : email,
-//     subject : "[감정일기에서 보낸 인증코드]",
-//     html : htmlContent,
-//     text : `인증 코드 : ${Authenticationcode}를 입력해주세요.`,
-//   };
+  const mailOptions = {
+    from : "yab0403777@gmail.com",
+    to : email,
+    subject : "[감정일기에서 보낸 인증코드]",
+    html : htmlContent,
+    text : `인증 코드 : ${Authenticationcode}를 입력해주세요.`,
+  };
 
-//   mailer.sendMail(mailOptions, (error, info) => {
-//     if(error){
-//       console.error(error);
-//       return res.status(500).json({message : "메일 전송도중 Error가 발생했습니다."})
-//     }
-//     console.log(`이메일 전송 정보 : ${info.response}`);
+  mailer.sendMail(mailOptions, (error, info) => {
+    if(error){
+      console.error(error);
+      return res.status(500).json({message : "메일 전송도중 Error가 발생했습니다."})
+    }
+    console.log(`이메일 전송 정보 : ${info.response}`);
 
-//     userVerificationCodes[email] = Authenticationcode;
+    userVerificationCodes[email] = Authenticationcode;
 
-//     return res.status(201).json({message : "이메일 전송 완료"});
-//   })
-//   }catch(err){
-//     console.error(err);
-//     return res.status(500).json({message : "Server Error"})
-//   }
-// })
+    return res.status(201).json({message : "이메일 전송 완료"});
+  })
+  }catch(err){
+    console.error(err);
+    return res.status(500).json({message : "Server Error"})
+  }
+})
 
-// // 이메일 인증 후, 회원가입 완료 로직
-// router.post("/complete-signup", async(req, res) => {
-//   const {email, Authenticationcode, password, username} = req.body;
-//   try{
-//     const serverAuthenticationCode = userVerificationCodes[email];
+// 이메일 인증 후, 회원가입 완료 로직
+router.post("/complete-signup", async(req, res) => {
+  const {email, Authenticationcode, password, username} = req.body;
+  try{
+    const serverAuthenticationCode = userVerificationCodes[email];
 
-//     if(Authenticationcode === serverAuthenticationCode){
-//       const encryptionPassword = await bcrypt.hash(password, 10);
+    if(Authenticationcode === serverAuthenticationCode){
+      const encryptionPassword = await bcrypt.hash(password, 10);
 
-//       const createUser = await prisma.users.create({
-//         data : {
-//           email : email,
-//           password : encryptionPassword,
-//           username : username
-//         }
-//       });
-//       return res.status(201).json({message : `${createUser.username}님, 회원가입이 완료되었습니다.`, data : createUser});
-//     }else {
-//       return res.status(400).json({message : "인증 코드가 올바르지 않습니다."});
-//     }
-//   }catch(err){
-//     console.error(err);
-//     return res.status(500).json({message : "Server Error"});
-//   }
-// })
+      const createUser = await prisma.users.create({
+        data : {
+          email : email,
+          password : encryptionPassword,
+          username : username
+        }
+      });
+      return res.status(201).json({message : `${createUser.username}님, 회원가입이 완료되었습니다.`, data : createUser});
+    }else {
+      return res.status(400).json({message : "인증 코드가 올바르지 않습니다."});
+    }
+  }catch(err){
+    console.error(err);
+    return res.status(500).json({message : "Server Error"});
+  }
+})
 // 일반 로그인
 router.post("/signin", async (req, res, next) => {
   try {

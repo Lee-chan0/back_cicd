@@ -64,7 +64,7 @@ router.post("/kakao/callback", async function (req, res) {
 
       return res.json({ message: `${findUser.username}님 환영합니다.` });
     } else {
-      var userResponseIdString = userResponse.data.id.toString(); 
+      var userResponseIdString = userResponse.data.id.toString();
       var kakaoIdsubString = userResponseIdString.substring(0, 8);
 
       const encryptionPassword = await bcrypt.hash(kakaoIdsubString, 10);
@@ -78,12 +78,8 @@ router.post("/kakao/callback", async function (req, res) {
           userType : 'K'
         },
       });
-      const accesstoken = jwt.sign({ userId: createUser.userId }, key, {
-        expiresIn: "30m",
-      });
-      const refreshtoken = jwt.sign({ userId: createUser.userId }, key, {
-        expiresIn: "7d",
-      });
+      const accesstoken = jwt.sign({ userId: createUser.userId }, key, {expiresIn: "30m"});
+      const refreshtoken = jwt.sign({ userId: createUser.userId }, key, {expiresIn: "7d"});
 
       await client.set(`RefreshToken:${createUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60 );
 

@@ -8,9 +8,24 @@ import naverLogin from './Oauth/naver.login.js'
 import kakaoLogin from './Oauth/kakao.login.js'
 import googleLogin from './Oauth/google.login.js'
 import cors from "cors";
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUi from 'swagger-ui-express';
 
 const app = express();
 const PORT = 3000;
+
+// const options = {
+//   definition : {
+//     openapi: "3.0.0",
+//     info : {
+//       title : "감정일기",
+//       version : "1.0.0"
+//     }
+//   },
+//   apis : 
+// }
+
+// const specs = swaggerJSDoc(options);
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -18,11 +33,12 @@ const corsOptions = {
     exposedHeaders: ["Authorization", "Refreshtoken", "Expiredtime"]
 }
 
+
 app.use(express.urlencoded({extended : true}))
 app.use(cors(corsOptions));
-
 app.use(express.json());
 
+// app.use("/api", swaggerUi.serve, swaggerUi.setup(specs));
 app.use("/", [
   UserRouter,
   MainCalender,
