@@ -1,24 +1,24 @@
 import express from "express";
 import { prisma } from "../utils/prisma/index.js";
 import authMiddleware from "../middleware/auth.middleware.js";
-import { startOfMonth, endOfMonth, getDate, addHours, subMonths, addMonths } from "date-fns";
+import { getDate, addHours } from "date-fns";
 
 const router = express.Router();
 
-let currentReferenceDate = new Date(); // 기본적으로 현재 날짜를 사용
-let currentDate = addHours(currentReferenceDate, 9); // 한국 시간 기준으로 설정
+// let currentReferenceDate = new Date(); // 기본적으로 현재 날짜를 사용
+// let currentDate = addHours(currentReferenceDate, 9); // 한국 시간 기준으로 설정
 
 /* 메인페이지 조회 ( 캘린더, 회원정보(회원프로필 이미지) ) */
 
-/* 기본 페이지 조회일 뿐, 좌우 버튼으로 몇월달을 선택하느냐에 따라 startDate, endDate 값이 변화할 수 있어야 함
-    왼쪽 버튼을 누르면 startOfMonth(currentdate) - 1, 오른쪽을 누르면 + 1 이 되는 로직 필요. 프론트와 상의 */
 router.get("/diary/calendar", authMiddleware, async (req, res, next) => {
   try {
     const { userId } = req.user;
-    currentReferenceDate = new Date()
-    currentDate = addHours(new Date(), 9);
-    const startDate = startOfMonth(currentDate);
-    const endDate = endOfMonth(currentDate);
+    const year = req.query.year; // 프론트에서 전달된 년도 값
+    const month = req.query.month; // 프론트에서 전달된 월 값
+
+    // year와 month를 기반으로 날짜 범위 계산
+    const startDate = new Date(year, month - 1, 1); // month는 0부터 시작하기 때문에 -1
+    const endDate = new Date(year, month, 0);
 
     const diaries = await prisma.diaries.findMany({
       where: {
@@ -33,11 +33,8 @@ router.get("/diary/calendar", authMiddleware, async (req, res, next) => {
       },
     });
 
-    // 각 월에 맞는 빈 배열을 생성하고
-    // date을 1부터 차례대로 조회하여 값이 없으면 null을 push, 있다면 obj자체를 push
-    // 반환된 배열을 data로 res에 담아 보낸다
-
-    const modifiedDiaries = diaries.map((diary) => {            //timezone 추가해서 한국시간에 맞출것 ( 맞추지않으면 9시간 이전의 날자가 나올것 > 월말 월초에 영향이 있을 수 있음)
+    // 기존 코드와 동일한 방식으로 데이터 처리
+    const modifiedDiaries = diaries.map((diary) => {
       const year = diary.createdAt.getFullYear();
       const month = diary.createdAt.getMonth() + 1;
       const date = diary.createdAt.getDate();
@@ -55,122 +52,182 @@ router.get("/diary/calendar", authMiddleware, async (req, res, next) => {
     });
 
     if (!userProfileImg) {
-      userProfileImg = null
+      userProfileImg = null;
     }
 
-    const arrayedDiaries = new Array(getDate(endDate)).fill(null); // 입력값이 없는 날의 경우 null값을 기본값으로 가지도록 배열을 만든다.
+    const arrayedDiaries = new Array(getDate(endDate)).fill(null);
 
     modifiedDiaries.map((diary) => {
-      let index = diary.createdAt.split(".")[2].trim(); // diary.createdAt = "2023. 1. 1." 형태의 값을 가지기에, 'day'에 해당하는 값을 가져오기 위한 코드
+      let index = diary.createdAt.split(".")[2].trim();
       arrayedDiaries[index - 1] = diary;
       return arrayedDiaries;
     });
 
-    res.status(200).json({ data: arrayedDiaries, userProfileImg, });
+    res.status(200).json({ data: arrayedDiaries, userProfileImg });
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
 });
 
-router.get("/diary/calendar/previousMonth", authMiddleware, async (req, res, next) => {
-  try {
-    const { userId } = req.user;
+// router.get("/diary/calendar", authMiddleware, async (req, res, next) => {
+//   try {
+//     const { userId } = req.user;
+//     currentReferenceDate = new Date()
+//     currentDate = addHours(new Date(), 9);
+//     const startDate = startOfMonth(currentDate);
+//     const endDate = endOfMonth(currentDate);
 
-    currentReferenceDate = subMonths(currentReferenceDate, 1); // 이전 달로 이동
-    currentDate = addHours(currentReferenceDate, 9); // 한국 시간 기준으로 설정
+//     const diaries = await prisma.diaries.findMany({
+//       where: {
+//         UserId: userId,
+//         createdAt: {
+//           gte: startDate,
+//           lte: endDate,
+//         },
+//       },
+//       orderBy: {
+//         createdAt: "asc",
+//       },
+//     });
 
-    const startDate = startOfMonth(currentDate);
-    const endDate = endOfMonth(currentDate);
+//     // 각 월에 맞는 빈 배열을 생성하고
+//     // date을 1부터 차례대로 조회하여 값이 없으면 null을 push, 있다면 obj자체를 push
+//     // 반환된 배열을 data로 res에 담아 보낸다
 
-    const diaries = await prisma.diaries.findMany({
-      where: {
-        UserId: userId,
-        createdAt: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
-    });
+//     const modifiedDiaries = diaries.map((diary) => {            //timezone 추가해서 한국시간에 맞출것 ( 맞추지않으면 9시간 이전의 날자가 나올것 > 월말 월초에 영향이 있을 수 있음)
+//       const year = diary.createdAt.getFullYear();
+//       const month = diary.createdAt.getMonth() + 1;
+//       const date = diary.createdAt.getDate();
 
-    // 데이터 가공 등 필요한 처리 수행
-    const modifiedDiaries = diaries.map((diary) => {
-      const year = diary.createdAt.getFullYear();
-      const month = diary.createdAt.getMonth() + 1;
-      const date = diary.createdAt.getDate();
-      diary.createdAt = `${year}. ${month}. ${date}.`;
-      return diary;
-    });
+//       diary.createdAt = `${year}. ${month}. ${date}.`; // 프론트에서 원하는 형식으로 데이터를 정리해서 보내주기 위한 코드
+//       return diary;
+//     });
 
-    let userProfileImg = await prisma.users.findFirst({
-      where: { userId },
-      select: {
-        userId: true,
-        profileImg: true,
-      },
-    });
+//     let userProfileImg = await prisma.users.findFirst({
+//       where: { userId },
+//       select: {
+//         userId: true,
+//         profileImg: true,
+//       },
+//     });
 
-    if (!userProfileImg) {
-      userProfileImg = null;
-    }
+//     if (!userProfileImg) {
+//       userProfileImg = null
+//     }
 
-    res.status(200).json({ data: modifiedDiaries, userProfileImg });
-  } catch (error) {
-    return res.status(400).json({ error: error.message });
-  }
-});
+//     const arrayedDiaries = new Array(getDate(endDate)).fill(null); // 입력값이 없는 날의 경우 null값을 기본값으로 가지도록 배열을 만든다.
 
-router.get("/diary/calendar/nextMonth", authMiddleware, async (req, res, next) => {
-  try {
-    const { userId } = req.user;
+//     modifiedDiaries.map((diary) => {
+//       let index = diary.createdAt.split(".")[2].trim(); // diary.createdAt = "2023. 1. 1." 형태의 값을 가지기에, 'day'에 해당하는 값을 가져오기 위한 코드
+//       arrayedDiaries[index - 1] = diary;
+//       return arrayedDiaries;
+//     });
 
-    currentReferenceDate = addMonths(currentReferenceDate, 1); // 다음 달로 이동
-    currentDate = addHours(currentReferenceDate, 9); // 한국 시간 기준으로 설정
+//     res.status(200).json({ data: arrayedDiaries, userProfileImg, });
+//   } catch (error) {
+//     return res.status(400).json({ error: error.message });
+//   }
+// });
 
-    const startDate = startOfMonth(currentDate);
-    const endDate = endOfMonth(currentDate);
+// router.get("/diary/calendar/previousMonth", authMiddleware, async (req, res, next) => {
+//   try {
+//     const { userId } = req.user;
 
-    const diaries = await prisma.diaries.findMany({
-      where: {
-        UserId: userId,
-        createdAt: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
-    });
+//     currentReferenceDate = subMonths(currentReferenceDate, 1); // 이전 달로 이동
+//     currentDate = addHours(currentReferenceDate, 9); // 한국 시간 기준으로 설정
 
-    // 데이터 가공 등 필요한 처리 수행
-    const modifiedDiaries = diaries.map((diary) => {
-      const year = diary.createdAt.getFullYear();
-      const month = diary.createdAt.getMonth() + 1;
-      const date = diary.createdAt.getDate();
-      diary.createdAt = `${year}. ${month}. ${date}.`;
-      return diary;
-    });
+//     const startDate = startOfMonth(currentDate);
+//     const endDate = endOfMonth(currentDate);
 
-    let userProfileImg = await prisma.users.findFirst({
-      where: { userId },
-      select: {
-        userId: true,
-        profileImg: true,
-      },
-    });
+//     const diaries = await prisma.diaries.findMany({
+//       where: {
+//         UserId: userId,
+//         createdAt: {
+//           gte: startDate,
+//           lte: endDate,
+//         },
+//       },
+//       orderBy: {
+//         createdAt: "asc",
+//       },
+//     });
 
-    if (!userProfileImg) {
-      userProfileImg = null;
-    }
+//     // 데이터 가공 등 필요한 처리 수행
+//     const modifiedDiaries = diaries.map((diary) => {
+//       const year = diary.createdAt.getFullYear();
+//       const month = diary.createdAt.getMonth() + 1;
+//       const date = diary.createdAt.getDate();
+//       diary.createdAt = `${year}. ${month}. ${date}.`;
+//       return diary;
+//     });
 
-    res.status(200).json({ data: modifiedDiaries, userProfileImg });
-  } catch (error) {
-    return res.status(400).json({ error: error.message });
-  }
-});
+//     let userProfileImg = await prisma.users.findFirst({
+//       where: { userId },
+//       select: {
+//         userId: true,
+//         profileImg: true,
+//       },
+//     });
+
+//     if (!userProfileImg) {
+//       userProfileImg = null;
+//     }
+
+//     res.status(200).json({ data: modifiedDiaries, userProfileImg });
+//   } catch (error) {
+//     return res.status(400).json({ error: error.message });
+//   }
+// });
+
+// router.get("/diary/calendar/nextMonth", authMiddleware, async (req, res, next) => {
+//   try {
+//     const { userId } = req.user;
+
+//     currentReferenceDate = addMonths(currentReferenceDate, 1); // 다음 달로 이동
+//     currentDate = addHours(currentReferenceDate, 9); // 한국 시간 기준으로 설정
+
+//     const startDate = startOfMonth(currentDate);
+//     const endDate = endOfMonth(currentDate);
+
+//     const diaries = await prisma.diaries.findMany({
+//       where: {
+//         UserId: userId,
+//         createdAt: {
+//           gte: startDate,
+//           lte: endDate,
+//         },
+//       },
+//       orderBy: {
+//         createdAt: "asc",
+//       },
+//     });
+
+//     // 데이터 가공 등 필요한 처리 수행
+//     const modifiedDiaries = diaries.map((diary) => {
+//       const year = diary.createdAt.getFullYear();
+//       const month = diary.createdAt.getMonth() + 1;
+//       const date = diary.createdAt.getDate();
+//       diary.createdAt = `${year}. ${month}. ${date}.`;
+//       return diary;
+//     });
+
+//     let userProfileImg = await prisma.users.findFirst({
+//       where: { userId },
+//       select: {
+//         userId: true,
+//         profileImg: true,
+//       },
+//     });
+
+//     if (!userProfileImg) {
+//       userProfileImg = null;
+//     }
+
+//     res.status(200).json({ data: modifiedDiaries, userProfileImg });
+//   } catch (error) {
+//     return res.status(400).json({ error: error.message });
+//   }
+// });
 
 
 export default router;
