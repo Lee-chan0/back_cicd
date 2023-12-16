@@ -18,27 +18,27 @@ const userVerificationCodes = {};
  * /signup:
  *    post:
  *      summary: 회원가입시 회원정보 받기 및 인증코드 받기
- *      tage:
+ *      tags:
  *       - Login
  *      responses:
- *      '201':
- *        description: 이메일 전송
- *        content:
- *          application/json:
- *            examples:
- *              message: "이메일 전송 완료"
- *      '400':
- *        description: 이메일 중복
- *        content:
- *          application/json:
- *            examples:
- *              message: "이미 가입된 이메일 입니다."
- *       '500':
- *         description: 이메일 전송 실패
- *         content:
- *           application/json:
- *             examples:
- *               message: "메일 전송 도중 Error가 발생했습니다."
+ *        '201':
+ *          description: 이메일 전송
+ *          content:
+ *            application/json:
+ *              examples:
+ *                message: "이메일 전송 완료"
+ *        '400':
+ *          description: 이메일 중복
+ *          content:
+ *            application/json:
+ *              examples:
+ *                message: "이미 가입된 이메일 입니다."
+ *        '500':
+ *           description: 이메일 전송 실패
+ *          content:
+ *             application/json:
+ *               examples:
+ *                 message: "메일 전송 도중 Error가 발생했습니다."
  * 
  */
 
