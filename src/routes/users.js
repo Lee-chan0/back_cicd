@@ -187,6 +187,8 @@ router.post("/logout", authMiddleware, async (req, res, next) => {
   }
 });
 
+
+
 // 내 정보 조회
 router.get("/myInfo", authMiddleware, async (req, res, next) => {
   const { userId } = req.user;
@@ -207,6 +209,8 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
   return res.status(200).json({ data: user })
 });
 
+
+
 // AccessToken 재발급 로직
 router.get('/token', authMiddleware, async(req, res, next) => {
   const {userId} = req.user;
@@ -219,7 +223,7 @@ router.get('/token', authMiddleware, async(req, res, next) => {
     await client.del(`RefreshToken:${userId}`);
     res.setHeader('Authorization', '');
     res.setHeader('Refreshtoken', '');
-    return res.status(401).json({message : "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."})
+    return res.status(401).json({message : "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."}); 
   }else {
     const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '30m'});
     const newRefreshToken = jwt.sign({userId : +userId}, key, {expiresIn : '7d'});
@@ -234,7 +238,7 @@ router.get('/token', authMiddleware, async(req, res, next) => {
 
     return res.status(201).json({message : "AccessToken 발급 완료"});
   }
-})
+});
 
 // 내 정보 수정 API 
 router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
@@ -248,7 +252,7 @@ router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
         return res.status(400).json({message : "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다."})
       }
       const decodedPW = await bcrypt.compare(password, userPWinfo.password);
-  
+
       if(!decodedPW)
       {return res.status(400).json({message : "비밀번호가 틀립니다."})};
 
@@ -287,6 +291,6 @@ router.delete('/signoff', authMiddleware, async(req, res, next) => {
     console.error(err);
     return res.status(500).json({message : "Server Error"});
   }
-})
+});
 
 export default router;
