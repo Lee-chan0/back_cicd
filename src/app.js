@@ -8,14 +8,23 @@ import naverLogin from './Oauth/naver.login.js'
 import kakaoLogin from './Oauth/kakao.login.js'
 import googleLogin from './Oauth/google.login.js'
 import cors from "cors";
-
-import swaggerJsdoc from 'swagger-jsdoc'
-import swaggerUi from 'swagger-ui-express'
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUi from 'swagger-ui-express';
 import bodyparser from 'body-parser'
 import { options  } from '../src/utils/swagger.js'
 
 const app = express();
 const PORT = 3000;
+
+/* swagger */
+const specs = swaggerJSDoc(options);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }))
+
+app.use(express.urlencoded({ extended: true }))
+
+
+app.use("/api-swagger", swaggerUi.serve, swaggerUi.setup(specs));
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -23,10 +32,12 @@ const corsOptions = {
     exposedHeaders: ["Authorization", "Refreshtoken", "Expiredtime"]
 }
 
+
 app.use(express.urlencoded({extended : true}))
 app.use(cors(corsOptions));
-
 app.use(express.json());
+
+
 
 app.use("/", [
   UserRouter,
@@ -43,15 +54,9 @@ app.get("/", (req, res) => {
   res.send(`<h1>Success</h1>`);
 });
 
-/* swagger */
-const specs = swaggerJsdoc(options)
-
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }))
-
-app.use(express.urlencoded({ extended: true }))
-
 app.listen(PORT, () => {
   console.log(`${PORT}번 SERVER OPEN`);
 });
  
+
 export default app;

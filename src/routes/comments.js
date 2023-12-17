@@ -4,6 +4,193 @@ import authMiddleware from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *    - name: comments
+ * 
+ * /diaries/detail/comment/{diaryId}:
+ *   get:
+ *     tags:
+ *       - comments
+ *     summary: 댓글 조회
+ *     parameters:
+ *       - in: path
+ *         name: diaryId
+ *         description: 조회하고자 하는 댓글이 포함된 diary의 id값
+ *         required: true
+ *         type: string
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bearer 토큰
+ *       - in: header
+ *         name: Refreshtoken
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Refresh 토큰
+ *     responses:
+ *        200:
+ *          description: 댓글 조회 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                 data:
+ *                   type: array
+ *        400: 
+ *          description: 일기혹은 댓글조회 실패 및 서버에러
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  error:
+ *                    type: string 
+ *   post:
+ *     tags:
+ *       - comments
+ *     summary: 댓글 등록
+ *     parameters:
+ *       - in: path
+ *         name: diaryId
+ *         description: 댓글을 등록하고자 하는 diary의 Id값
+ *         required: true
+ *         type: string
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bearer 토큰
+ *       - in: header
+ *         name: Refreshtoken
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Refresh 토큰
+ *     responses:
+ *        200:
+ *          description: 댓글 등록 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  message:
+ *                      type: string
+ *                      description: 성공메세지
+ *        400: 
+ *          description: 일기조회/댓글등록 실패 및 서버 에러
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  error:
+ *                    type: string
+ * 
+ *
+ * 
+ * /diary/detail/comment/{commentId}:
+ *   patch:
+ *     tags:
+ *       - comments
+ *     summary: 댓글 수정
+ *     parameters:
+ *       - in: path
+ *         name: diaryId
+ *         description: 수정하고자 하는 comment의 Id값
+ *         required: true
+ *         type: string
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bearer 토큰
+ *       - in: header
+ *         name: Refreshtoken
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Refresh 토큰
+ *       - in: body
+ *         name: content
+ *         description: 수정할 일기 내용
+ *         required: true
+ *         type: string
+ *     responses:
+ *        200:
+ *          description: 댓글 등록 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  message:
+ *                      type: string
+ *                      description: 성공메세지
+ *        400: 
+ *          description: 일기조회/댓글등록 실패 및 서버 에러
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  error:
+ *                    type: string 
+  *   delete:
+ *     tags:
+ *       - comments
+ *     summary: 댓글 삭제
+ *     parameters:
+ *       - in: path
+ *         name: commentId
+ *         description: 삭제하고자 하는 comment의 Id값
+ *         required: true
+ *         type: string
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bearer 토큰
+ *       - in: header
+ *         name: Refreshtoken
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Refresh 토큰
+ *     responses:
+ *        200:
+ *          description: 댓글 삭제 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  message:
+ *                      type: string
+ *                      description: 성공메세지
+ *        400: 
+ *          description: 일기조회/댓글등록 실패 및 서버 에러
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  error:
+ *                    type: string 
+ */
+
+
+
+
 /* 댓글 등록 */
 router.post('/diary/detail/comment/:diaryId', authMiddleware, async(req, res, next) => {
   try{

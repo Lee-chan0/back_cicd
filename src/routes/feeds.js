@@ -6,8 +6,141 @@ import { utcToZonedTime } from "date-fns-tz";
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *    - name: Feeds
+ *      description: 피드글 조회 API
+ *    - name: Likes
+ *      description: 좋아요 기능 API
+ * 
+ * @swagger
+ * /feeds:
+ *   get:
+ *     tags:
+ *       - Feeds
+ *     summary: isPublic이 true인 피드 조회
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         description: 표시하고자 하는 페이지 번호
+ *         required: false
+ *         type: integer
+ *     responses:
+ *        200:
+ *          description: 피드 조회 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  data:
+ *                    type: array
+ *        400: 
+ *          description: 피드 조회 실패 및 서버 에러
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  error:
+ *                    type: string
+ * 
+ * @swagger
+ * /feeds/mydiaries:
+ *   get:
+ *     tags:
+ *       - Feeds
+ *     summary: userId 기반 내 피드 조회
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         description: 표시하고자 하는 페이지 번호
+ *         required: false
+ *         type: integer
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bearer 토큰
+ *       - in: header
+ *         name: Refreshtoken
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Refresh 토큰
+ *     responses:
+ *        200:
+ *          description: 피드 조회 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  data:
+ *                    type: array
+ *        400: 
+ *          description: 피드 조회 실패 및 서버 에러
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  error:
+ *                    type: string
+ *              
+ * @swagger
+ * /feeds/:diaryId/like:
+ *   post:
+ *     tags:
+ *       - Likes
+ *     summary: 좋아요 및 좋아요 취소 기능
+ *     parameters:
+ *       - in: path
+ *         name: diaryId
+ *         schema:
+ *           type: Integer
+ *         required: true
+ *         description: diaryId를 넣어주세요
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bearer 토큰
+ *       - in: header
+ *         name: Refreshtoken
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Refresh 토큰
+ *     responses:
+ *       '201':
+ *         description: 좋아요 추가 및 삭제
+ *         content:
+ *           application/json:
+ *             examples:
+ *               added:
+ *                 summary: 좋아요 추가
+ *                 value:
+ *                   message: "좋아요가 추가되었습니다."
+ *                   data: 1
+ *               removed:
+ *                 summary: 좋아요 취소
+ *                 value:
+ *                   message: "좋아요가 취소되었습니다."
+ *                   data: 0
+ *       '400':
+ *         description: diaryId가 잘못됐을때
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "해당하는 일기가 없습니다."  
+ */
+
 /* 피드 글 조회 */
-router.get("/feeds", authMiddleware, async (req, res, next) => {
+router.get("/feeds", async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const pageSize = 10;
@@ -72,55 +205,11 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
     res.status(400).json({ error: error.message });
   }
 });
-/**
- * @swagger
- * /feeds/:diaryId/like:
- *   post:
- *     summary: 좋아요 및 좋아요 취소 기능
- *     tags:
- *       - Feed
- *     parameters:
- *       - in: path
- *         name: diaryId
- *         schema:
- *           type: Integer
- *         required: true
- *         description: diaryId를 넣어주세요
- *       - in: header
- *         name: Authorization
- *         schema:
- *           type: string
- *         required: true
- *         description: Bearer 토큰
- *       - in: header
- *         name: Refreshtoken
- *         schema:
- *           type: string
- *         required: true
- *         description: Refresh 토큰
- *     responses:
- *       '201':
- *         description: 좋아요 추가 및 삭제
- *         content:
- *           application/json:
- *             examples:
- *               added:
- *                 summary: 좋아요 추가
- *                 value:
- *                   message: "좋아요가 추가되었습니다."
- *                   data: 1
- *               removed:
- *                 summary: 좋아요 취소
- *                 value:
- *                   message: "좋아요가 취소되었습니다."
- *                   data: 0
- *       '400':
- *         description: diaryId가 잘못됐을때
- *         content:
- *           application/json:
- *             example:
- *               message: "해당하는 일기가 없습니다."  
- */
+
+
+
+
+
 // 피드에 좋아요 기능
 router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
   try {

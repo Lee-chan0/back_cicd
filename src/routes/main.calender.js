@@ -8,6 +8,61 @@ const router = express.Router();
 // let currentReferenceDate = new Date(); // 기본적으로 현재 날짜를 사용
 // let currentDate = addHours(currentReferenceDate, 9); // 한국 시간 기준으로 설정
 
+/**
+ * @swagger
+ * tags:
+ *    - name: main-calendar
+ * 
+ * /diary/calendar/{year}/{month}:
+ *   get:
+ *     tags:
+ *       - main-calendar
+ *     summary: 메인화면 캘린더 데이터 조회
+ *     parameters:
+ *       - in: path
+ *         name: year
+ *         description: 조회하고자 하는 캘린더의 year데이터
+ *         required: true
+ *         type: string
+ *       - in: header
+ *       - in: path
+ *         name: month
+ *         description: 조회하고자 하는 캘린더의month 데이터
+ *         required: true
+ *         type: string
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bearer 토큰
+ *       - in: header
+ *         name: Refreshtoken
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Refresh 토큰
+ *     responses:
+ *        200:
+ *          description: 댓글 조회 성공
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                 data:
+ *                   type: array
+ *        400: 
+ *          description: 일기혹은 댓글조회 실패 및 서버에러
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  error:
+ *                    type: string 
+ */ 
+
 /* 메인페이지 조회 ( 캘린더, 회원정보(회원프로필 이미지) ) */
 
 router.get("/diary/calendar/:year/:month", authMiddleware, async (req, res, next) => {
