@@ -18,6 +18,8 @@
   "dependencies": {
     "@aws-sdk/lib-storage": "^3.470.0",
     "@prisma/client": "^5.7.0",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.6",
     "aws-sdk": "^2.1515.0",
     "axios": "^1.6.2",
     "bcrypt": "^5.1.1",
@@ -38,6 +40,8 @@
     "prisma": "^5.7.0",
     "qs": "^6.11.2",
     "redis": "^4.6.11",
-    "request-promise": "^4.2.6"
+    "request-promise": "^4.2.6",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   }
 }

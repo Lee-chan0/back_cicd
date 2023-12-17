@@ -9,6 +9,11 @@ import kakaoLogin from './Oauth/kakao.login.js'
 import googleLogin from './Oauth/google.login.js'
 import cors from "cors";
 
+import swaggerJsdoc from 'swagger-jsdoc'
+import swaggerUi from 'swagger-ui-express'
+import bodyparser from 'body-parser'
+import { options  } from '../src/utils/swagger.js'
+
 const app = express();
 const PORT = 3000;
 
@@ -37,7 +42,14 @@ app.use("/", [
 app.get("/", (req, res) => {
   res.send(`<h1>Success</h1>`);
 });
- 
+
+/* swagger */
+const specs = swaggerJsdoc(options)
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }))
+
+app.use(express.urlencoded({ extended: true }))
+
 app.listen(PORT, () => {
   console.log(`${PORT}번 SERVER OPEN`);
 });
