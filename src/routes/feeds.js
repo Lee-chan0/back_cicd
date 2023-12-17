@@ -72,7 +72,55 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
     res.status(400).json({ error: error.message });
   }
 });
-
+/**
+ * @swagger
+ * /feeds/:diaryId/like:
+ *   post:
+ *     summary: 좋아요 및 좋아요 취소 기능
+ *     tags:
+ *       - Feed
+ *     parameters:
+ *       - in: path
+ *         name: diaryId
+ *         schema:
+ *           type: Integer
+ *         required: true
+ *         description: diaryId를 넣어주세요
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Bearer 토큰
+ *       - in: header
+ *         name: Refreshtoken
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Refresh 토큰
+ *     responses:
+ *       '201':
+ *         description: 좋아요 추가 및 삭제
+ *         content:
+ *           application/json:
+ *             examples:
+ *               added:
+ *                 summary: 좋아요 추가
+ *                 value:
+ *                   message: "좋아요가 추가되었습니다."
+ *                   data: 1
+ *               removed:
+ *                 summary: 좋아요 취소
+ *                 value:
+ *                   message: "좋아요가 취소되었습니다."
+ *                   data: 0
+ *       '400':
+ *         description: diaryId가 잘못됐을때
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "해당하는 일기가 없습니다."  
+ */
 // 피드에 좋아요 기능
 router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
   try {
@@ -105,7 +153,7 @@ router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
             },
           },
         });
-        return res.status(400).json({message: "좋아요가 취소되었습니다.",data: islike.likeCount});
+        return res.status(200).json({message: "좋아요가 취소되었습니다.",data: islike.likeCount});
       }
       await prisma.diaryLikes.create({
         data: {
@@ -147,5 +195,4 @@ router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
 // })
 // // 피드를 새롭게 조회중에 db에 새로운 diary가 추가 될 경우 새롭게 호출하는 db의 순번이 바뀌어 중복된 feed가 출력될 수 있다
 // // 이를 해결할 방법을 고민해봐야함. 일단은 프론트와 논의되기 전까지의 뼈대코드
-
 export default router;
