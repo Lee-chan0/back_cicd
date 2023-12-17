@@ -103,7 +103,7 @@ const router = express.Router();
  *     summary: 댓글 수정
  *     parameters:
  *       - in: path
- *         name: diaryId
+ *         name: commentId
  *         description: 수정하고자 하는 comment의 Id값
  *         required: true
  *         type: string
@@ -252,7 +252,7 @@ router.patch('/diary/detail/comment/:commentId', authMiddleware, async(req, res,
       where : {commentId : +commentId},
       data : {
           content,
-          isUpdated : true
+          isEdited : true
       }
   })
   return res.status(201).json({ message: "댓글 수정 완료"})
