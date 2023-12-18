@@ -27,7 +27,7 @@ const imageUpload = multer({
       if (!allowedExtensions.includes(extension)) {
         return callback(new Error("wrong extension"));
       }
-      callback(null, `${uploadDirectory}/${Date.now()}_${file.originalname}`);
+      callback(null, `${uploadDirectory}/${Date.now()}.png`);
     },
     acl: "public-read-write",
     contentType: multerS3.AUTO_CONTENT_TYPE

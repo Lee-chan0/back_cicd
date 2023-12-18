@@ -265,27 +265,9 @@ router.get('/token', authMiddleware, async(req, res, next) => {
 router.patch('/myInfo/editmyInfo', authMiddleware ,imageUpload.single('image'), async(req, res, next) => {
   try{
     const {userId} = req.user;
-    const {username, password, newPassword} = req.body;
+    const {username} = req.body;
 
     const imageUrl = req.file.location
-
-    if(password){
-      const userPWinfo = await prisma.users.findFirst({where : {userId : +userId}});
-      if(userPWinfo.userType === 'K' || userPWinfo.userType === 'G' || userPWinfo.userType === 'N'){
-        return res.status(400).json({message : "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다."})
-      }
-      const decodedPW = await bcrypt.compare(password, userPWinfo.password);
-
-      if(!decodedPW)
-      {return res.status(400).json({message : "비밀번호가 틀립니다."})};
-
-      const encryptionPassword = await bcrypt.hash(newPassword, 10);
-
-      await prisma.users.update({where : {userId : +userId},
-        data : {
-          password : encryptionPassword,
-        }})
-    }
 
     const editmyInfo = await prisma.users.update({
       where : {userId : +userId},
@@ -301,6 +283,36 @@ router.patch('/myInfo/editmyInfo', authMiddleware ,imageUpload.single('image'), 
     return res.status(500).json({message : "Server Error"});
   }
 });
+
+// 비밀번호 변경 API
+router.patch('/myInfo/edit-pw', authMiddleware, async(req, res, next) => {
+  try{
+      const {password, newPassword} = req.body;
+      const {userId} = req.user;
+
+      const findUser = await prisma.users.findFirst({where : {userId : +userId}});
+
+      if(findUser.userType !== 'Common'){
+        return res.status(400).json({message : "소셜로그인 사용자는 비밀번호를 변경할 수 없습니다."})
+      }
+      const decodedPW = await bcrypt.compare(password, findUser.password);
+
+      if(!decodedPW)
+      {return res.status(400).json({message : "비밀번호가 틀립니다."})};
+
+      const encryptionPassword = await bcrypt.hash(newPassword, 10);
+
+      await prisma.users.update({where : {userId : +userId},
+        data : {
+          password : encryptionPassword,
+        }})
+
+
+  }catch(err){
+    console.error(err);
+    return res.status(500).json({message : "Server Error"})
+  }
+})
 
 
 

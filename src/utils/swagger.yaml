@@ -1121,3 +1121,34 @@ paths:
                 error:
                   value:
                     message: Server Error
+
+
+  
+  /myInfo/edit-pw:
+    patch:
+      summary: 비밀번호 변경 API
+      tags: User
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  description: 현재 비밀번호
+                newPassword:
+                  type: string
+                  description: 새로운 비밀번호
+      responses:
+        200:
+          description: 비밀번호 변경 성공
+        400:
+          description: 잘못된 요청 또는 소셜 로그인 사용자의 경우
+        401:
+          description: 인증 실패 (토큰이 유효하지 않음)
+        500:
+          description: 서버 오류
