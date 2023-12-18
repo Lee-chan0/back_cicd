@@ -8,23 +8,18 @@ import naverLogin from './Oauth/naver.login.js'
 import kakaoLogin from './Oauth/kakao.login.js'
 import googleLogin from './Oauth/google.login.js'
 import cors from "cors";
-import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from 'swagger-ui-express';
-import bodyparser from 'body-parser'
-import { options  } from '../src/utils/swagger.js'
+import YAML from 'yamljs';
 
 const app = express();
 const PORT = 3000;
 
-/* swagger */
-const specs = swaggerJSDoc(options);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }))
+const swaggerDocument = YAML.load(('./src/utils/swagger.yaml'));
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }))
 
 app.use(express.urlencoded({ extended: true }))
-
-
-app.use("/api-swagger", swaggerUi.serve, swaggerUi.setup(specs));
 
 const corsOptions = {
     origin: 'http://localhost:3000',

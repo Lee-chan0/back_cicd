@@ -16,6 +16,7 @@ model Users {
 
   createdAt   DateTime  @default(now()) @map("createdAt")
   updatedAt   DateTime  @updatedAt  @map("updatedAt")
+  deletedAt   DateTime? @map("deletedAt")  
 
   diarylike DiaryLikes[]
   diary     diaries[]

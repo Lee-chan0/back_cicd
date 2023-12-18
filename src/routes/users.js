@@ -6,40 +6,51 @@ import dotenv from "dotenv";
 import authMiddleware from "../middleware/auth.middleware.js";
 import {client} from '../redis/redis.js';
 import nodemailer from 'nodemailer';
+import cron, { schedule } from 'node-cron';
+import imageUpload from '../middleware/S3.upload/usereditS3.js'
+
 
 dotenv.config();
 
 const router = express.Router();
 
-const userVerificationCodes = {};
+cron.schedule('0 * * * *', async() => {
+  await deleteUser();
+}, {
+  scheduled : true,
+  timezone : "Asia/Seoul"
+})
 
-/**
- * @swagger
- * /signup:
- *   post:
- *     summary: 회원가입시 회원정보 받기 및 인증코드 받기
- *     tags:
- *       - Login
- *     responses:
- *       '201':
- *         description: 이메일 전송
- *         content:
- *           application/json:
- *             example:
- *               message: "이메일 전송 완료"
- *       '400':
- *         description: 이메일 중복
- *         content:
- *           application/json:
- *             example:
- *               message: "이미 가입된 이메일 입니다."
- *       '500':
- *         description: 이메일 전송 실패
- *         content:
- *           application/json:
- *             example:
- *               message: "메일 전송 도중 Error가 발생했습니다."
- */
+async function deleteUser () {
+  try{
+    const currentDate = new Date();
+    console.log(currentDate);
+
+    const deletedAtUser = await prisma.users.findMany({
+      where : {
+        deletedAt : {
+          lte : currentDate
+        }
+      }
+    });
+
+    for (const user of deletedAtUser) {
+      await prisma.users.delete({
+        where : {
+          userId : user.userId
+        }
+      })
+    }
+
+    console.log(`${deletedAtUser.length}명의 데이터가 삭제되었습니다.`)
+  }catch(err){
+    console.error(err);
+    return res.status(500)
+  }
+}
+
+
+const userVerificationCodes = {};
 
 // 회원가입
 router.post("/signup", async(req, res, next) => {
@@ -61,7 +72,7 @@ router.post("/signup", async(req, res, next) => {
     <div style="font-family: 'Arial', sans-serif; max-width: 400px; margin: 20px auto; background-color: #fdfdfd; padding: 20px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); border: 3px solid papayawhip; color: #000; text-align: center;">
       <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #000; font-weight: normal;">감정일기에 오신 것을 환영합니다.</h2>
       <p style="font-size: 14px; margin-bottom: 15px;">이메일 인증을 위한 코드가 도착했습니다.</p>
-      <p style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">😄 인증코드: ${Authenticationcode} 😄</p>
+      <p style="font-size: 24px; font-weight: bold; margin-bottom: 20px;"> 인증코드: ${Authenticationcode} </p>
       <div style="font-size: 12px; color: #000;">- 감정일기를 즐겨보세요 -</div>
     </div>
   `;
@@ -93,61 +104,6 @@ router.post("/signup", async(req, res, next) => {
 })
 
 
-/**
- * @swagger
- * /complete-signup:
- *   post:
- *     summary: 이메일 인증 후, 회원가입 완료
- *     tags:
- *       - Login
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 description: 유저의 이메일
- *                 example: user@example.com
- *               Authenticationcode:
- *                 type: string
- *                 description: 이메일로 전송된 인증 코드
- *                 example: abcd1234
- *               password:
- *                 type: string
- *                 description: 유저의 비밀번호
- *                 example: password1234
- *               username:
- *                 type: string
- *                 description: 유저의 닉네임
- *                 example: myusername
- *     responses:
- *       '201':
- *         description: 회원가입 성공시
- *         content:
- *           application/json:
- *             example:
- *               message: "myusername님, 회원가입이 완료되었습니다."
- *               data:
- *                 userId: 1
- *                 username: "myusername"
- *                 userType: "Common or K or N or G"
- *                 email: "user@example.com"
- *       '400':
- *         description: 인증 코드 오류시
- *         content:
- *           application/json:
- *             example:
- *               message: "인증 코드가 올바르지 않습니다."
- *       '500':
- *         description: 서버 오류시
- *         content:
- *           application/json:
- *             example:
- *               message: "Server Error"
- */
 // 이메일 인증 후, 회원가입 완료 로직
 router.post("/complete-signup", async(req, res) => {
   const {email, Authenticationcode, password, username} = req.body;
@@ -184,54 +140,6 @@ router.post("/complete-signup", async(req, res) => {
   }
 })
 
-/**
- * @swagger
- * /signin:
- *   post:
- *     summary: 로그인
- *     tags:
- *       - Login
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 description: 유저의 email
- *                 example: user@example.com
- *               password:
- *                 type: string
- *                 description: 유저의 password
- *                 example: password1234
- *     responses:
- *       '200':
- *         description: 로그인 성공시
- *         headers:
- *           Authorization:
- *             description: Bearer accesstoken
- *             schema:
- *               type: string 
- *               example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
- *           Refreshtoken:
- *             description: Refreshtoken
- *             schema:
- *               type: string
- *               example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
- *         content:
- *           application/json:
- *             example:
- *               msg: "username님, 환영합니다."
- *               profileImage: "userprofileIMG.jpg"
- *       '400':
- *         description: 패스워드 불일치
- *         content:
- *           application/json:
- *             example:
- *               msg: "존재하지 않는 email입니다. or 비밀번호가 일치하지 않습니다."
- */
 
 // 일반 로그인
 router.post("/signin", async (req, res, next) => {
@@ -250,6 +158,10 @@ router.post("/signin", async (req, res, next) => {
       return res.status(400).json({ msg: "비밀번호가 일치하지 않습니다." });
     }
 
+    if(findUser.deletedAt){
+      return res.status(201).json({message : "이미 탈퇴처리된 계정입니다. 복구 하시겠습니까?"})
+    }
+
     let profileImage = findUser.profileImg;
 
     const accessToken = jwt.sign({ userId: findUser.userId }, key, {
@@ -266,7 +178,7 @@ router.post("/signin", async (req, res, next) => {
     
     res.set("Expiredtime", access_token_time.exp);
     res.set("Authorization", `Bearer ${accessToken}`);
-    res.set("Refreshtoken", `${refreshToken}`);
+    res.set("Refreshtoken", `Bearer ${refreshToken}`);
 
     return res.status(200).json({msg: `${findUser.username}님 환영합니다.`, profileImage: profileImage,});
   } catch (err) {
@@ -274,45 +186,8 @@ router.post("/signin", async (req, res, next) => {
     return res.status(500).json({ msg: `server Error` });
   }
 });
-/**
- * @swagger
- * /logout:
- *   post:
- *     summary: 로그아웃
- *     tags:
- *       - Login
- *     parameters:
- *       - in: header
- *         name: Authorization
- *         schema:
- *           type: string
- *         required: true
- *         description: Bearer 토큰
- *       - in: header
- *         name: Refreshtoken
- *         schema:
- *           type: string
- *         required: true
- *         description: Refresh 토큰
- *     responses:
- *       '200':
- *         description: 로그아웃 성공시
- *         headers:
- *           Authorization:
- *             description: 토큰 비우기
- *             schema:
- *               type: string
- *               example: ""
- *           Refreshtoken:
- *             description: 토큰 비우기
- *             schema:
- *               type: string
- *               example: ""
- *       content:
- *         application/json:
- *           example:
- *             msg: "로그아웃 되었습니다."
- */
+
+
 // 로그아웃
 router.post("/logout", authMiddleware, async (req, res, next) => {
   try {
@@ -331,40 +206,7 @@ router.post("/logout", authMiddleware, async (req, res, next) => {
   }
 });
 
-/**
- * @swagger
- * /myInfo:
- *   get:
- *     summary: 내 정보 조회
- *     tags:
- *       - User
- *     parameters:
- *       - in: header
- *         name: Authorization
- *         schema:
- *           type: string
- *         required: true
- *         description: Bearer 토큰
- *       - in: header
- *         name: Refreshtoken
- *         schema:
- *           type: string
- *         required: true
- *         description: Refresh 토큰
- *     responses:
- *       '200':
- *         description: 해당 유저 정보 조회
- *         content:
- *           application/json:
- *             example:
- *               msg: '{"data":{"userId":1,"username":"홍길동","email":"example@naver.com","profileImg":"image.jpg"}}'
- *       '400':
- *         description: 해당 유저가 없을때
- *         content:
- *           application/json:
- *             example:
- *               msg: "존재하지 않는 유저입니다."
- */
+
 
 // 내 정보 조회
 router.get("/myInfo", authMiddleware, async (req, res, next) => {
@@ -387,40 +229,6 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
   return res.status(200).json({ data: user })
 });
 
-/**
- * @swagger
- * /token:
- *   get:
- *    summary: accesstoken만료시 refreshtoken을 이용한 재발급
- *    tags:
- *      - Token
- *    parameters:
- *       - in: header
- *         name: Authorization
- *         schema:
- *           type: string
- *         required: true
- *         description: Bearer 토큰
- *       - in: header
- *         name: Refreshtoken
- *         schema:
- *           type: string
- *         required: true
- *         description: Refresh 토큰
- *    responses:
- *      '201':
- *         description: 토큰 발급 완료
- *         content:
- *           application/json:
- *             example:
- *               message: "AccessToken 발급 완료"
- *      '401':
- *         description: 토큰 발급 실패 (RefreshToken 불일치)
- *         content:
- *            application/json:
- *              example:
- *                message: "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."
- */
 
 // AccessToken 재발급 로직
 router.get('/token', authMiddleware, async(req, res, next) => {
@@ -451,65 +259,15 @@ router.get('/token', authMiddleware, async(req, res, next) => {
   }
 });
 
-/**
- * @swagger
- * /myInfo/editmyInfo:
- *   patch:
- *     summary: 내 정보 수정 기능
- *     tags:
- *       - User
- *     parameters:
- *       - in: header
- *         name: Authorization
- *         schema:
- *           type: string
- *         required: true
- *         description: Bearer 토큰
- *       - in: header
- *         name: Refreshtoken
- *         schema:
- *           type: string
- *         required: true
- *         description: Refresh 토큰
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *                 description: 변경할 사용자 이름
- *               profileImg:
- *                 type: string
- *                 description: 변경할 프로필 이미지 URL
- *               password:
- *                 type: string
- *                 description: 현재 비밀번호
- *               newPassword:
- *                 type: string
- *                 description: 새로운 비밀번호
- *     responses:
- *       '201':
- *         description: 수정 완료
- *         content:
- *           application/json:
- *             example:
- *               message: "수정이 완료되었습니다."
- *       '400':
- *         description: 소셜 로그인 사용자
- *         content:
- *           application/json:
- *             example:
- *               message: "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다. or 비밀번호가 틀립니다."
- */
 
-// 내 정보 수정 API 
-router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
+
+// 내 정보 수정 API
+router.patch('/myInfo/editmyInfo', authMiddleware ,imageUpload.single('image'), async(req, res, next) => {
   try{
     const {userId} = req.user;
-    const {username, profileImg, password, newPassword} = req.body;
+    const {username, password, newPassword} = req.body;
+
+    const imageUrl = req.file.location
 
     if(password){
       const userPWinfo = await prisma.users.findFirst({where : {userId : +userId}});
@@ -533,7 +291,7 @@ router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
       where : {userId : +userId},
       data : {
         username : username,
-        profileImg : profileImg
+        profileImg : imageUrl
       }
     })
 
@@ -543,46 +301,72 @@ router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
     return res.status(500).json({message : "Server Error"});
   }
 });
-/**
- * @swagger
- * /signoff:
- *   delete:
- *     summary: 내 계정 삭제
- *     tags:
- *       - User
- *     parameters:
- *       - in: header
- *         name: Authorization
- *         schema:
- *           type: string
- *         required: true
- *         description: Bearer 토큰
- *       - in: header
- *         name: Refreshtoken
- *         schema:
- *           type: string
- *         required: true
- *         description: Refresh 토큰
- *     responses:
- *       '201':
- *         description: 탈퇴 처리 OK
- *         content:
- *           application/json:
- *             example:
- *               message: "탈퇴처리 되었습니다."
- */
-// 회원 탈퇴 API (탈퇴에 필요한 보류시간 ex.15일뒤에 삭제되는 로직 생각)
+
+
+
+// 회원 탈퇴 API
 router.delete('/signoff', authMiddleware, async(req, res, next) => {
   try{
     const {userId} = req.user;
 
-    const deleteUser = await prisma.users.delete({where : {userId : +userId}});
+    // 현재 시간 기준으로 15일뒤의 날짜 계산
+    const currentDate = new Date();
+    const deleteDate = new Date(currentDate);
 
-    return res.status(201).json({message : "탈퇴처리 되었습니다."});
+    deleteDate.setDate(deleteDate.getDate() + 1);
+
+    deleteDate.setUTCHours(deleteDate.getUTCHours() + 9);
+
+    const softDelete = await prisma.users.update({
+      where : {userId : +userId},
+      data : {
+        deletedAt : deleteDate
+      }
+    })
+
+    return res.status(201).json({message : "탈퇴처리가 완료되었습니다. 15일 동안 회원정보가 보류됩니다."});
   }catch(err){
     console.error(err);
     return res.status(500).json({message : "Server Error"});
   }
 });
+
+// 탈퇴 요청 취소 API
+router.post('/cancel-signoff', async(req, res, next) => {
+  try{
+    const {email} = req.body;
+    const currentDate = new Date();
+    const deleteDate = new Date(currentDate);
+
+    deleteDate.setUTCHours(deleteDate.getUTCHours() + 9);
+
+    const findUser = await prisma.users.findFirst({where : {email : email}});
+
+    if(!findUser){return res.status(400).json({message : "사용자가 없습니다."})};
+
+    const subTime = findUser.deletedAt - deleteDate
+
+    const Day = 24 * 60 * 60 * 1000;
+    const Hour = 60 * 60 * 1000;
+
+    const days = Math.floor(subTime / Day);
+    const hours = Math.floor((subTime % Day) / Hour);
+
+    const Cancel_SignOff = await prisma.users.update({
+      where : {email : email},
+      data : {
+        deletedAt : null,
+      }
+    });
+
+    return res.status(201).json({message : "탈퇴 요청이 취소되었습니다.", msg : `탈퇴까지 ${days}일, ${hours}시간 남았습니다.`});
+  }catch(err){
+    console.error(err);
+    return res.status(500).json({message : "Server Error"});
+  }
+});
+
+
+
 
 export default router;

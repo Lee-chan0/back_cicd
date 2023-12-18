@@ -51,9 +51,9 @@ jobs:
         echo NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }} >> .env
         echo NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} >> .env
         echo NAVER_REDIRECT_URI=${{ secrets.NAVER_REDIRECT_URI }} >> .env
+        echo S3_ACCESS_KEY2=${{ secrets.S3_ACCESS_KEY2 }} >> .env
+        echo S3_SECRET_ACCESS_KEY2=${{ secrets.S3_SECRET_ACCESS_KEY2 }} >> .env
         cat .env
-   
-
 
 
     - name: zip file
