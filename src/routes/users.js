@@ -7,7 +7,7 @@ import authMiddleware from "../middleware/auth.middleware.js";
 import {client} from '../redis/redis.js';
 import nodemailer from 'nodemailer';
 import cron, { schedule } from 'node-cron';
-//import imageUpload from '../middleware/S3.upload/usereditS3.js'
+import imageUpload from '../middleware/S3.upload/usereditS3.js'
 
 
 dotenv.config();
@@ -261,46 +261,46 @@ router.get('/token', authMiddleware, async(req, res, next) => {
 
 
 
-// // 내 정보 수정 API
-// router.patch('/myInfo/editmyInfo', authMiddleware ,imageUpload.single('image'), async(req, res, next) => {
-//   try{
-//     const {userId} = req.user;
-//     const {username, password, newPassword} = req.body;
+// 내 정보 수정 API
+router.patch('/myInfo/editmyInfo', authMiddleware ,imageUpload.single('image'), async(req, res, next) => {
+  try{
+    const {userId} = req.user;
+    const {username, password, newPassword} = req.body;
 
-//     const imageUrl = req.file.location
+    const imageUrl = req.file.location
 
-//     if(password){
-//       const userPWinfo = await prisma.users.findFirst({where : {userId : +userId}});
-//       if(userPWinfo.userType === 'K' || userPWinfo.userType === 'G' || userPWinfo.userType === 'N'){
-//         return res.status(400).json({message : "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다."})
-//       }
-//       const decodedPW = await bcrypt.compare(password, userPWinfo.password);
+    if(password){
+      const userPWinfo = await prisma.users.findFirst({where : {userId : +userId}});
+      if(userPWinfo.userType === 'K' || userPWinfo.userType === 'G' || userPWinfo.userType === 'N'){
+        return res.status(400).json({message : "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다."})
+      }
+      const decodedPW = await bcrypt.compare(password, userPWinfo.password);
 
-//       if(!decodedPW)
-//       {return res.status(400).json({message : "비밀번호가 틀립니다."})};
+      if(!decodedPW)
+      {return res.status(400).json({message : "비밀번호가 틀립니다."})};
 
-//       const encryptionPassword = await bcrypt.hash(newPassword, 10);
+      const encryptionPassword = await bcrypt.hash(newPassword, 10);
 
-//       await prisma.users.update({where : {userId : +userId},
-//         data : {
-//           password : encryptionPassword,
-//         }})
-//     }
+      await prisma.users.update({where : {userId : +userId},
+        data : {
+          password : encryptionPassword,
+        }})
+    }
 
-//     const editmyInfo = await prisma.users.update({
-//       where : {userId : +userId},
-//       data : {
-//         username : username,
-//         profileImg : imageUrl
-//       }
-//     })
+    const editmyInfo = await prisma.users.update({
+      where : {userId : +userId},
+      data : {
+        username : username,
+        profileImg : imageUrl
+      }
+    })
 
-//     return res.status(201).json({message : "수정이 완료되었습니다."});
-//   }catch(err) {
-//     console.error(err);
-//     return res.status(500).json({message : "Server Error"});
-//   }
-// });
+    return res.status(201).json({message : "수정이 완료되었습니다."});
+  }catch(err) {
+    console.error(err);
+    return res.status(500).json({message : "Server Error"});
+  }
+});
 
 
 
