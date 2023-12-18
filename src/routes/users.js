@@ -7,6 +7,7 @@ import authMiddleware from "../middleware/auth.middleware.js";
 import {client} from '../redis/redis.js';
 import nodemailer from 'nodemailer';
 import cron, { schedule } from 'node-cron';
+import imageUpload from '../middleware/S3.upload/usereditS3.js'
 
 
 dotenv.config();
@@ -185,6 +186,8 @@ router.post("/signin", async (req, res, next) => {
     return res.status(500).json({ msg: `server Error` });
   }
 });
+
+
 // 로그아웃
 router.post("/logout", authMiddleware, async (req, res, next) => {
   try {
@@ -226,6 +229,7 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
   return res.status(200).json({ data: user })
 });
 
+
 // AccessToken 재발급 로직
 router.get('/token', authMiddleware, async(req, res, next) => {
   const {userId} = req.user;
@@ -257,11 +261,13 @@ router.get('/token', authMiddleware, async(req, res, next) => {
 
 
 
-// 내 정보 수정 API 
-router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
+// 내 정보 수정 API
+router.patch('/myInfo/editmyInfo', authMiddleware ,imageUpload.single('image'), async(req, res, next) => {
   try{
     const {userId} = req.user;
-    const {username, profileImg, password, newPassword} = req.body;
+    const {username, password, newPassword} = req.body;
+
+    const imageUrl = req.file.location
 
     if(password){
       const userPWinfo = await prisma.users.findFirst({where : {userId : +userId}});
@@ -285,7 +291,7 @@ router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
       where : {userId : +userId},
       data : {
         username : username,
-        profileImg : profileImg
+        profileImg : imageUrl
       }
     })
 
@@ -298,7 +304,7 @@ router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
 
 
 
-// 회원 탈퇴 API (탈퇴에 필요한 보류시간 ex.15일뒤에 삭제되는 로직 생각)
+// 회원 탈퇴 API
 router.delete('/signoff', authMiddleware, async(req, res, next) => {
   try{
     const {userId} = req.user;
