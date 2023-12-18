@@ -21,7 +21,7 @@ export const upload = multer({
         bucket: 'finaldrawings',
         key(req, file, cb) {
             cb(null, uuidv4() + '-' + file.originalname); // Generate a unique key for the file
-        },
+        },                              
         contentType: multerS3.AUTO_CONTENT_TYPE
     }),
 });
