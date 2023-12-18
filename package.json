@@ -42,7 +42,8 @@
     "redis": "^4.6.11",
     "request-promise": "^4.2.6",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.0"
+    "swagger-ui-express": "^5.0.0",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
