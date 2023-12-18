@@ -103,8 +103,9 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
         isPublic: Boolean(isPublic),
         weather,
         sentence,
+        createdAt: todaySeoulTime,
         User: {
-          connect : {userId}
+          connect : {userId},
       },  
       }
     });
