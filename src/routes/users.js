@@ -157,6 +157,10 @@ router.post("/signin", async (req, res, next) => {
       return res.status(400).json({ msg: "비밀번호가 일치하지 않습니다." });
     }
 
+    if(findUser.deletedAt){
+      return res.status(201).json({message : "이미 탈퇴처리된 계정입니다. 복구 하시겠습니까?"})
+    }
+
     let profileImage = findUser.profileImg;
 
     const accessToken = jwt.sign({ userId: findUser.userId }, key, {
@@ -320,5 +324,43 @@ router.delete('/signoff', authMiddleware, async(req, res, next) => {
     return res.status(500).json({message : "Server Error"});
   }
 });
+
+// 탈퇴 요청 취소 API
+router.post('/cancel-signoff', async(req, res, next) => {
+  try{
+    const {email} = req.body;
+    const currentDate = new Date();
+    const deleteDate = new Date(currentDate);
+
+    deleteDate.setUTCHours(deleteDate.getUTCHours() + 9);
+
+    const findUser = await prisma.users.findFirst({where : {email : email}});
+
+    if(!findUser){return res.status(400).json({message : "사용자가 없습니다."})};
+
+    const subTime = findUser.deletedAt - deleteDate
+
+    const Day = 24 * 60 * 60 * 1000;
+    const Hour = 60 * 60 * 1000;
+
+    const days = Math.floor(subTime / Day);
+    const hours = Math.floor((subTime % Day) / Hour);
+
+    const Cancel_SignOff = await prisma.users.update({
+      where : {email : email},
+      data : {
+        deletedAt : null,
+      }
+    });
+
+    return res.status(201).json({message : "탈퇴 요청이 취소되었습니다.", msg : `탈퇴까지 ${days}일, ${hours}시간 남았습니다.`});
+  }catch(err){
+    console.error(err);
+    return res.status(500).json({message : "Server Error"});
+  }
+});
+
+
+
 
 export default router;

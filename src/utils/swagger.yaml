@@ -1059,3 +1059,65 @@ paths:
                   properties:
                     error:
                       type: string 
+
+
+  /cancel-signoff:
+    post:
+      summary: 탈퇴 요청 취소
+      description: 사용자가 요청한 탈퇴를 취소
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 탈퇴 요청을 취소할 사용자의 이메일
+                  example: user@example.com
+      tags:
+        - Login
+      responses:
+        '201':
+          description: 탈퇴 요청이 성공적으로 취소되었습니다.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  msg:
+                    type: string
+              examples:
+                success:
+                  value:
+                    message: 탈퇴 요청이 취소되었습니다.
+                    msg: 탈퇴까지 2일, 5시간 남았습니다.
+        '400':
+          description: 잘못된 요청 또는 요청된 리소스가 존재하지 않음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                error:
+                  value:
+                    message: Bad Request
+        '500':
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                error:
+                  value:
+                    message: Server Error
