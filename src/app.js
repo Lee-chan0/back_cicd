@@ -12,6 +12,7 @@ import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from 'swagger-ui-express';
 import bodyparser from 'body-parser'
 import { options  } from '../src/utils/swagger.js'
+import swaggerDocument from ''
 
 const app = express();
 const PORT = 3000;
@@ -22,9 +23,6 @@ const specs = swaggerJSDoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }))
 
 app.use(express.urlencoded({ extended: true }))
-
-
-app.use("/api-swagger", swaggerUi.serve, swaggerUi.setup(specs));
 
 const corsOptions = {
     origin: 'http://localhost:3000',

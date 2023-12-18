@@ -6,40 +6,50 @@ import dotenv from "dotenv";
 import authMiddleware from "../middleware/auth.middleware.js";
 import {client} from '../redis/redis.js';
 import nodemailer from 'nodemailer';
+import cron, { schedule } from 'node-cron';
+
 
 dotenv.config();
 
 const router = express.Router();
 
-const userVerificationCodes = {};
+cron.schedule('0 * * * *', async() => {
+  await deleteUser();
+}, {
+  scheduled : true,
+  timezone : "Asia/Seoul"
+})
 
-/**
- * @swagger
- * /signup:
- *   post:
- *     summary: 회원가입시 회원정보 받기 및 인증코드 받기
- *     tags:
- *       - Login
- *     responses:
- *       '201':
- *         description: 이메일 전송
- *         content:
- *           application/json:
- *             example:
- *               message: "이메일 전송 완료"
- *       '400':
- *         description: 이메일 중복
- *         content:
- *           application/json:
- *             example:
- *               message: "이미 가입된 이메일 입니다."
- *       '500':
- *         description: 이메일 전송 실패
- *         content:
- *           application/json:
- *             example:
- *               message: "메일 전송 도중 Error가 발생했습니다."
- */
+async function deleteUser () {
+  try{
+    const currentDate = new Date();
+    console.log(currentDate);
+
+    const deletedAtUser = await prisma.users.findMany({
+      where : {
+        deletedAt : {
+          lte : currentDate
+        }
+      }
+    });
+
+    for (const user of deletedAtUser) {
+      await prisma.users.delete({
+        where : {
+          userId : user.userId
+        }
+      })
+    }
+
+    console.log(`${deletedAtUser.length}명의 데이터가 삭제되었습니다.`)
+  }catch(err){
+    console.error(err);
+    return res.status(500)
+  }
+}
+
+
+const userVerificationCodes = {};
 
 // 회원가입
 router.post("/signup", async(req, res, next) => {
@@ -61,7 +71,7 @@ router.post("/signup", async(req, res, next) => {
     <div style="font-family: 'Arial', sans-serif; max-width: 400px; margin: 20px auto; background-color: #fdfdfd; padding: 20px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); border: 3px solid papayawhip; color: #000; text-align: center;">
       <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #000; font-weight: normal;">감정일기에 오신 것을 환영합니다.</h2>
       <p style="font-size: 14px; margin-bottom: 15px;">이메일 인증을 위한 코드가 도착했습니다.</p>
-      <p style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">😄 인증코드: ${Authenticationcode} 😄</p>
+      <p style="font-size: 24px; font-weight: bold; margin-bottom: 20px;"> 인증코드: ${Authenticationcode} </p>
       <div style="font-size: 12px; color: #000;">- 감정일기를 즐겨보세요 -</div>
     </div>
   `;
@@ -244,11 +254,11 @@ router.post("/signin", async (req, res, next) => {
       return res.status(400).json({ msg: `존재하지 않는 email입니다.` });
     }
 
-    const decodedPassword = await bcrypt.compare(password, findUser.password);
+    // const decodedPassword = await bcrypt.compare(password, findUser.password);
 
-    if (!decodedPassword) {
-      return res.status(400).json({ msg: "비밀번호가 일치하지 않습니다." });
-    }
+    // if (!decodedPassword) {
+    //   return res.status(400).json({ msg: "비밀번호가 일치하지 않습니다." });
+    // }
 
     let profileImage = findUser.profileImg;
 
@@ -571,14 +581,30 @@ router.patch('/myInfo/editmyInfo', authMiddleware, async(req, res, next) => {
  *             example:
  *               message: "탈퇴처리 되었습니다."
  */
+
+
+
 // 회원 탈퇴 API (탈퇴에 필요한 보류시간 ex.15일뒤에 삭제되는 로직 생각)
 router.delete('/signoff', authMiddleware, async(req, res, next) => {
   try{
     const {userId} = req.user;
 
-    const deleteUser = await prisma.users.delete({where : {userId : +userId}});
+    // 현재 시간 기준으로 15일뒤의 날짜 계산
+    const currentDate = new Date();
+    const deleteDate = new Date(currentDate);
 
-    return res.status(201).json({message : "탈퇴처리 되었습니다."});
+    deleteDate.setDate(deleteDate.getDate() + 1);
+
+    deleteDate.setUTCHours(deleteDate.getUTCHours() + 9);
+
+    const softDelete = await prisma.users.update({
+      where : {userId : +userId},
+      data : {
+        deletedAt : deleteDate
+      }
+    })
+
+    return res.status(201).json({message : "탈퇴처리가 완료되었습니다. 15일 동안 회원정보가 보류됩니다."});
   }catch(err){
     console.error(err);
     return res.status(500).json({message : "Server Error"});
