@@ -12,7 +12,7 @@ import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 
 const app = express();
-const PORT = 3000;
+const PORT = 3000
 
 
 const swaggerDocument = YAML.load(('./src/utils/swagger.yaml'));
