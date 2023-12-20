@@ -18,12 +18,12 @@ import initializeSocketIO from './utils/io.js';
 
 const app = express();
 const PORT = 3000;
-const SOCKET_PORT = 5001;
 
 dotenv.config();
 
 const corsOptions = {
   origin: ['http://localhost:3000', 'http://localhost:3001'],
+  methods: [ 'GET, HEAD, PUT, PATCH, POST, DELETE'],
   credentials: true,
   exposedHeaders: ['Authorization', 'Refreshtoken', 'Expiredtime'],
 };
@@ -39,6 +39,7 @@ mongoose.connect(atlasURI, {
 const swaggerDocument = YAML.load('./src/utils/swagger.yaml');
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -60,22 +61,14 @@ app.get('/', (req, res) => {
   res.send('<h1>Success</h1>');
 });
 
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
-  },
+const server = app.listen(PORT, () => {
+  console.log(`Express server listening on port ${PORT}`, 'server', server.address());
 });
-
+const io =  new Server(server, {
+  path: '/community/chat',
+  cors: corsOptions
+})
 initializeSocketIO(io);
-
-httpServer.listen(SOCKET_PORT, () => {
-  console.log(`Socket.IO server listening on port ${SOCKET_PORT}`);
-});
-
-app.listen(PORT, () => {
-  console.log(`Express server listening on port ${PORT}`);
-});
 
 // import express from "express";
 // import UserRouter from "./routes/users.js";
