@@ -159,7 +159,7 @@ router.post("/signin", async (req, res, next) => {
       /* original code */
     // const decodedPassword = await bcrypt.compare(password, findUser.password);
       /* original code */
-      
+
     if (!decodedPassword) {
       return res.status(400).json({ msg: "비밀번호가 일치하지 않습니다." });
     }
@@ -184,7 +184,7 @@ router.post("/signin", async (req, res, next) => {
     
     res.set("Expiredtime", access_token_time.exp);
     res.set("Authorization", `Bearer ${accessToken}`);
-    res.set("Refreshtoken", `Bearer ${refreshToken}`);
+    res.set("Refreshtoken", `${refreshToken}`);
 
     return res.status(200).json({msg: `${findUser.username}님 환영합니다.`, profileImage: profileImage,});
   } catch (err) {
