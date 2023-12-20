@@ -152,13 +152,12 @@ router.post("/signin", async (req, res, next) => {
       return res.status(400).json({ msg: `존재하지 않는 email입니다.` });
     }
 
-    let decodedPassword = false // 테스트를 위해 수정한 부분, 수정이 끝나면 아래 original code 와 교체할것
-    if (password == findUser.password) {
-      decodedPassword = true}
+    // let decodedPassword = false // 테스트를 위해 수정한 부분, 수정이 끝나면 아래 original code 와 교체할것
+    // if (password == findUser.password) {
+    //   decodedPassword = true}
 
-      /* original code */
-    // const decodedPassword = await bcrypt.compare(password, findUser.password);
-      /* original code */
+
+    const decodedPassword = await bcrypt.compare(password, findUser.password);
 
     if (!decodedPassword) {
       return res.status(400).json({ msg: "비밀번호가 일치하지 않습니다." });
