@@ -116,7 +116,7 @@ router.post("/complete-signup", async(req, res) => {
       const createUser = await prisma.users.create({
         data : {
           email : email,
-          password : encryptionPassword,
+          password : password, // encryptionPassword
           username : username
         }
       });
