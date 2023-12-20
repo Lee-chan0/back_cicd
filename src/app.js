@@ -22,8 +22,7 @@ const PORT = 3000;
 dotenv.config();
 
 const corsOptions = {
-  origin: ['http://localhost:3000', 'http://localhost:3001'],
-  methods: [ 'GET, HEAD, PUT, PATCH, POST, DELETE'],
+  origin: 'http://localhost:3000',
   credentials: true,
   exposedHeaders: ['Authorization', 'Refreshtoken', 'Expiredtime'],
 };
