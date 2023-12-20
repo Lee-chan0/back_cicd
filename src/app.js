@@ -93,10 +93,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explore
 app.use(express.urlencoded({ extended: true }))
 
 const corsOptions = {
-    origin: 'http://localhost:3000',
-    credentials: true,
-    exposedHeaders: ["Authorization", "Refreshtoken", "Expiredtime"]
-}
+  origin: ['https://first-deploy-xi.vercel.app', 'http://localhost:3000'],
+  credentials: true,
+  exposedHeaders: ["Authorization", "Refreshtoken", "Expiredtime"]
+};
 
 
 app.use(express.urlencoded({extended : true}))
