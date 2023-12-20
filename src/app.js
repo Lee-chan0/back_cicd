@@ -22,7 +22,7 @@ const PORT = 3000;
 dotenv.config();
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'https://first-deploy-xi.vercel.app'],
   credentials: true,
   exposedHeaders: ['Authorization', 'Refreshtoken', 'Expiredtime'],
 };
