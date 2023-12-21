@@ -170,7 +170,7 @@ router.post("/signin", async (req, res, next) => {
     let profileImage = findUser.profileImg;
 
     const accessToken = jwt.sign({ userId: findUser.userId }, key, {
-      expiresIn: "30s",
+      expiresIn: "5s",
     });
 
     const refreshToken = jwt.sign({ userId: findUser.userId }, key, {
@@ -236,8 +236,7 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
 
 
 // AccessToken 재발급 로직
-router.get('/token', authMiddleware, async(req, res, next) => {
-  const {userId} = req.user;
+router.get('/token', async(req, res, next) => {
   const {refreshtoken} = req.headers;
   const key = process.env.SECRET_KEY;
 
@@ -249,6 +248,8 @@ router.get('/token', authMiddleware, async(req, res, next) => {
     res.setHeader('Refreshtoken', '');
     return res.status(401).json({message : "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."}); 
   }else {
+    const userInfo = jwt.verify(refreshtoken, key);
+    const userId = userInfo.userId;
     const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '30m'});
     const newRefreshToken = jwt.sign({userId : +userId}, key, {expiresIn : '7d'});
 
