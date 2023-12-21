@@ -116,7 +116,7 @@ router.post("/complete-signup", async(req, res) => {
       const createUser = await prisma.users.create({
         data : {
           email : email,
-          password : encryptionPassword,
+          password : encryptionPassword, // encryptionPassword
           username : username
         }
       });
@@ -151,6 +151,11 @@ router.post("/signin", async (req, res, next) => {
     if (!findUser) {
       return res.status(400).json({ msg: `존재하지 않는 email입니다.` });
     }
+
+    // let decodedPassword = false // 테스트를 위해 수정한 부분, 수정이 끝나면 아래 original code 와 교체할것
+    // if (password == findUser.password) {
+    //   decodedPassword = true}
+
 
     const decodedPassword = await bcrypt.compare(password, findUser.password);
 
