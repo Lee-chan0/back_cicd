@@ -20,8 +20,9 @@ export default async (req, res, next) => {
     const verifyToken = jwt.verify(token, key);
 
     const userId = verifyToken.userId;
-
     const storedRefreshToken = await client.get(`RefreshToken:${userId}`);
+    console.log('authmiddleware의 REFRESH TOKEN : ', refreshtoken);
+    console.log('authmiddleware의 REDIS STORED REFRESH TOKEN : ', storedRefreshToken);
 
     if(storedRefreshToken !== refreshtoken){
       await client.del(`RefreshToken:${userId}`);

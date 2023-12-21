@@ -170,7 +170,7 @@ router.post("/signin", async (req, res, next) => {
     let profileImage = findUser.profileImg;
 
     const accessToken = jwt.sign({ userId: findUser.userId }, key, {
-      expiresIn: "5s",
+      expiresIn: "6h",
     });
 
     const refreshToken = jwt.sign({ userId: findUser.userId }, key, {
@@ -237,31 +237,37 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
 
 // AccessToken 재발급 로직
 router.post('/token', async(req, res, next) => {
-  const {refreshtoken} = req.headers;
-  const key = process.env.SECRET_KEY;
-  const userInfo = jwt.verify(refreshtoken, key);
-  const userId = userInfo.userId;
-
-  const storedRefreshToken = await client.get(`RefreshToken:${userId}`);
-  if(refreshtoken !== storedRefreshToken){
-    await client.del(`RefreshToken:${userId}`);
-    res.setHeader('Authorization', '');
-    res.setHeader('Refreshtoken', '');
-    return res.status(401).json({message : "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."}); 
-  }else {
-    const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '30m'});
-    const newRefreshToken = jwt.sign({userId : +userId}, key, {expiresIn : '7d'});
-
-    const newAccessToken_time = jwt.verify(newAceessToken, key);
-
-    await client.set(`RefreshToken:${userId}`, newRefreshToken, "EX", 7 * 24 * 60 * 60 );
-
-    res.setHeader('Authorization', `Bearer ${newAceessToken}`);
-    res.setHeader('Refreshtoken', newRefreshToken);
-    res.setHeader('Expiredtime', newAccessToken_time.exp);
-
-    return res.status(201).json({message : "AccessToken 발급 완료"});
+  try{
+    const {refreshtoken} = req.headers;
+    const key = process.env.SECRET_KEY;
+    const userInfo = jwt.verify(refreshtoken, key);
+    const userId = userInfo.userId;
+  
+    const storedRefreshToken = await client.get(`RefreshToken:${userId}`);
+    if(refreshtoken !== storedRefreshToken){
+      await client.del(`RefreshToken:${userId}`);
+      res.setHeader('Authorization', '');
+      res.setHeader('Refreshtoken', '');
+      return res.status(401).json({message : "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."}); 
+    }else {
+      const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '30m'});
+      const newRefreshToken = jwt.sign({userId : +userId}, key, {expiresIn : '7d'});
+  
+      const newAccessToken_time = jwt.verify(newAceessToken, key);
+  
+      await client.set(`RefreshToken:${userId}`, newRefreshToken, "EX", 7 * 24 * 60 * 60 );
+  
+      res.setHeader('Authorization', `Bearer ${newAceessToken}`);
+      res.setHeader('Refreshtoken', newRefreshToken);
+      res.setHeader('Expiredtime', newAccessToken_time.exp);
+  
+      return res.status(201).json({message : "AccessToken 발급 완료"});
+    }
+  }catch(err){
+    console.error(err);
+    return res.status(500).json({message : "Server Error"});
   }
+
 });
 
 
