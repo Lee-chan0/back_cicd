@@ -71,7 +71,7 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
 router.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { EmotionStatus, content, isPublic, weather, sentence } = req.body;
+    const { EmotionStatus, content, isPublic, weather, sentence, temperature, humid, sleep } = req.body;
 
     const  imageUrl = req.file.location
 
@@ -104,6 +104,9 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
         weather,
         sentence,
         createdAt: todaySeoulTime,
+        temperature,
+        humid,
+        sleep,
         User: {
           connect : {userId},
       },  

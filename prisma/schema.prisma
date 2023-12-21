@@ -36,6 +36,9 @@ model diaries {
   likeCount   Int         @default(0) @map("likeCount")
   sentence    String?     @map("sentence")
   weather     String      @map("weather")
+  temperature String?        @map("temperature")
+  humid       String?        @map("humid")
+  sleep       String?        @map("sleep")
 
   createdAt   DateTime    @default(now()) @map("createdAt")
   updatedAt   DateTime    @updatedAt  @map("updatedAt")
