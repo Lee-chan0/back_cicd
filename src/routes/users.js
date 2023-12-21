@@ -165,7 +165,7 @@ router.post("/signin", async (req, res, next) => {
     let profileImage = findUser.profileImg;
 
     const accessToken = jwt.sign({ userId: findUser.userId }, key, {
-      expiresIn: "30m",
+      expiresIn: "30s",
     });
 
     const refreshToken = jwt.sign({ userId: findUser.userId }, key, {
@@ -178,7 +178,7 @@ router.post("/signin", async (req, res, next) => {
     
     res.set("Expiredtime", access_token_time.exp);
     res.set("Authorization", `Bearer ${accessToken}`);
-    res.set("Refreshtoken", `Bearer ${refreshToken}`);
+    res.set("Refreshtoken", `${refreshToken}`);
 
     return res.status(200).json({msg: `${findUser.username}님 환영합니다.`, profileImage: profileImage,});
   } catch (err) {
