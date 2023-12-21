@@ -236,12 +236,13 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
 
 
 // AccessToken 재발급 로직
-router.get('/token', async(req, res, next) => {
+router.post('/token', async(req, res, next) => {
   const {refreshtoken} = req.headers;
   const key = process.env.SECRET_KEY;
+  console.log('refreshtoken : ', refreshtoken);
 
   const storedRefreshToken = await client.get(`RefreshToken:${userId}`);
-
+  console.log('storedRefreshToken : ', storedRefreshToken);
   if(refreshtoken !== storedRefreshToken){
     await client.del(`RefreshToken:${userId}`);
     res.setHeader('Authorization', '');
@@ -249,6 +250,7 @@ router.get('/token', async(req, res, next) => {
     return res.status(401).json({message : "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."}); 
   }else {
     const userInfo = jwt.verify(refreshtoken, key);
+    console.log(userInfo);
     const userId = userInfo.userId;
     const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '30m'});
     const newRefreshToken = jwt.sign({userId : +userId}, key, {expiresIn : '7d'});
