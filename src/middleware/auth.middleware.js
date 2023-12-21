@@ -20,8 +20,9 @@ export default async (req, res, next) => {
     const verifyToken = jwt.verify(token, key);
 
     const userId = verifyToken.userId;
-
     const storedRefreshToken = await client.get(`RefreshToken:${userId}`);
+    console.log('authmiddleware의 REFRESH TOKEN : ', refreshtoken);
+    console.log('authmiddleware의 REDIS STORED REFRESH TOKEN : ', storedRefreshToken);
 
     if(storedRefreshToken !== refreshtoken){
       await client.del(`RefreshToken:${userId}`);
@@ -42,7 +43,7 @@ export default async (req, res, next) => {
     console.log('catch로 error 발생');
     console.error(err);
     if(err.name === "TokenExpiredError")
-    {return res.status(400).json({message : "토큰이 만료되었습니다."})}
+    {return res.status(401).json({message : "토큰이 만료되었습니다."})}
     else{
       res.setHeader('Authorization', '');
       res.setHeader('Refreshtoken', '');
