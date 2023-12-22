@@ -70,10 +70,10 @@ router.post("/signup", async(req, res, next) => {
     });
     const htmlContent = `
     <div style="font-family: 'Arial', sans-serif; max-width: 400px; margin: 20px auto; background-color: #fdfdfd; padding: 20px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); border: 3px solid papayawhip; color: #000; text-align: center;">
-      <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #000; font-weight: normal;">감정일기에 오신 것을 환영합니다.</h2>
+      <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #000; font-weight: normal;">NINE Cloud에 오신 것을 환영합니다.</h2>
       <p style="font-size: 14px; margin-bottom: 15px;">이메일 인증을 위한 코드가 도착했습니다.</p>
       <p style="font-size: 24px; font-weight: bold; margin-bottom: 20px;"> 인증코드: ${Authenticationcode} </p>
-      <div style="font-size: 12px; color: #000;">- 감정일기를 즐겨보세요 -</div>
+      <div style="font-size: 12px; color: #000;">- NINE Cloud를 즐겨보세요 -</div>
     </div>
   `;
   
@@ -81,7 +81,7 @@ router.post("/signup", async(req, res, next) => {
   const mailOptions = {
     from : "yab0403777@gmail.com",
     to : email,
-    subject : "[감정일기에서 보낸 인증코드]",
+    subject : "[NINE Cloud에서 보낸 인증코드]",
     html : htmlContent,
     text : `인증 코드 : ${Authenticationcode}를 입력해주세요.`,
   };
@@ -198,7 +198,7 @@ router.post("/logout", authMiddleware, async (req, res, next) => {
   try {
     const { userId } = req.user;
 
-    const result = await client.del(`RefreshToken:${userId}`);
+    const result = await client.del(`RefreshToken:${userId}`)
     console.log(`키 삭제 결과: ${result}`);
 
     res.setHeader(`Authorization`, "");
@@ -234,7 +234,6 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
   return res.status(200).json({ data: user })
 });
 
-
 // AccessToken 재발급 로직
 router.post('/token', async(req, res, next) => {
   try{
@@ -242,33 +241,35 @@ router.post('/token', async(req, res, next) => {
     const key = process.env.SECRET_KEY;
     const userInfo = jwt.verify(refreshtoken, key);
     const userId = userInfo.userId;
-  
+
     const storedRefreshToken = await client.get(`RefreshToken:${userId}`);
     if(refreshtoken !== storedRefreshToken){
       await client.del(`RefreshToken:${userId}`);
       res.setHeader('Authorization', '');
       res.setHeader('Refreshtoken', '');
-      return res.status(401).json({message : "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."}); 
+      return res.status(401).json({message : "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."});
     }else {
       const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '30m'});
       const newRefreshToken = jwt.sign({userId : +userId}, key, {expiresIn : '7d'});
-  
+
       const newAccessToken_time = jwt.verify(newAceessToken, key);
-  
+      await client.del(`RefreshToken:${userId}`);
       await client.set(`RefreshToken:${userId}`, newRefreshToken, "EX", 7 * 24 * 60 * 60 );
-  
+      const re = await client.get(`RefreshToken:${userId}`);
+      console.log('===========redis에 제대로 담겼는지 체크 =============== : ', re);
+
       res.setHeader('Authorization', `Bearer ${newAceessToken}`);
       res.setHeader('Refreshtoken', newRefreshToken);
       res.setHeader('Expiredtime', newAccessToken_time.exp);
-  
+
       return res.status(201).json({message : "AccessToken 발급 완료"});
     }
   }catch(err){
     console.error(err);
     return res.status(500).json({message : "Server Error"});
   }
-
 });
+
 
 
 
