@@ -31,7 +31,7 @@ router.get("/feeds", async (req, res, next) => {
                   gte: twoMonthsAgo, 
                   lte: todaySeoulTime,
                   // lastCreatedAt 값보다 큰 데이터만 가져오기 (중복 제거)
-                  gt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
+                  lt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
               }
           },
           take: pageSize,
@@ -59,7 +59,7 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
           where: {
               UserId : userId,
               createdAt: {
-                  gt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
+                  lt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
               }
           },
           take: pageSize,
