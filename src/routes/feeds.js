@@ -107,9 +107,10 @@ router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
             likeCount: {
               decrement: 1,
             },
+            likeExist: false
           },
         });
-        return res.status(200).json({message: "좋아요가 취소되었습니다.",data: islike.likeCount});
+        return res.status(200).json({message: "좋아요가 취소되었습니다.",data: islike});
       }
       await prisma.diaryLikes.create({
         data: {
@@ -123,9 +124,10 @@ router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
           likeCount: {
             increment: 1,
           },
+          likeExist : true
         },
       });
-      return res.status(201).json({message: "좋아요가 추가되었습니다.",data: likeClick.likeCount});
+      return res.status(201).json({message: "좋아요가 추가되었습니다.",data: likeClick});
     }
   } catch (err) {
     console.error(err);

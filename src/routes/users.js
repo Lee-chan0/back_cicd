@@ -270,9 +270,6 @@ router.post('/token', async(req, res, next) => {
   }
 });
 
-
-
-
 // 내 정보 수정 API
 router.patch('/myInfo/editmyInfo', authMiddleware ,imageUpload.single('image'), async(req, res, next) => {
   try{
