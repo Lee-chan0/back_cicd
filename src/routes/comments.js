@@ -38,6 +38,14 @@ router.get("/diary/detail/comment/:diaryId", async (req, res, next) => {
       where: {
         DiaryId: +diaryId,
       },
+      include: {
+        User: {
+          select: {
+            username: true,
+            profileImg: true,
+          }
+        }
+      }
     });
 
     return res.status(200).json({ data: comments });
