@@ -41,8 +41,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explore
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 
 app.use('/', [
@@ -60,15 +58,18 @@ app.get('/', (req, res) => {
   res.send('<h1>Success</h1>');
 });
 
-const server = app.listen(PORT, () => {
-  console.log(`Express server listening on port ${PORT}`, 'server', server.address());
-});
-const io =  new Server(server, {
+const server = http.createServer(app)
+const io = new Server(server, {
   path: '/community/chat',
-  cors: corsOptions
+  cors: corsOptions,
 })
+
 initializeSocketIO(io);
 
+
+server.listen(PORT, () => {
+  console.log(`Express server listening on port ${PORT}`, 'server', server.address());
+});
 // import express from "express";
 // import UserRouter from "./routes/users.js";
 // import MainCalender from "./routes/main.calender.js";
@@ -125,4 +126,4 @@ initializeSocketIO(io);
 // });
  
 
-// export default app;
+export default app;
