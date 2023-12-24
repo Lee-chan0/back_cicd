@@ -26,6 +26,16 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
       const { diaryId } = req.params;
       const { userId } = req.user
 
+
+      const isliked = await prisma.diaryLikes.findFirst({
+        where : {
+          diaryId : +diaryId,
+          userId : userId
+        }
+      })
+      let heart = false
+      heart = isliked ? true : false
+
       const diaryDetail = await prisma.diaries.findFirst({
           where: { 
             diaryId: +diaryId,  
@@ -58,9 +68,9 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
           where: { diaryId: +diaryId },
           data: { viewCount : diaryDetail.viewCount + 1 }
         })
-        return res.status(200).json({ data: updatedDiary})
+        return res.status(200).json({ data: updatedDiary, data : heart})
       } else {
-        return res.status(200).json({ data: diaryDetail})
+        return res.status(200).json({ data: diaryDetail, data : heart })
       }
   } catch (error) {
       return res.status(400).json({ error: error.message });

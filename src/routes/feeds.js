@@ -130,13 +130,13 @@ router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
       });
 
       /* 유저가 diarylike를 찍었는지 확인하는로직 */
-      const isliked = await prisma.diaryLikes.findFirst({
-        where : {
-          diaryId : +diaryId,
-          userId : userId
-        }
-      })
-      return res.status(201).json({message: "좋아요가 추가되었습니다.",data: likeClick, data: isliked});
+      // const isliked = await prisma.diaryLikes.findFirst({
+      //   where : {
+      //     diaryId : +diaryId,
+      //     userId : userId
+      //   }
+      // })
+      return res.status(201).json({message: "좋아요가 추가되었습니다.",data: likeClick});
     }
   } catch (err) {
     console.error(err);
