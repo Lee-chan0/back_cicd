@@ -16,10 +16,10 @@ import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import initializeSocketIO from './utils/io.js';
 
-const app = express()
+const app = express();
 const PORT = 3000;
 
-dotenv.config()
+dotenv.config();
 
 const corsOptions = {
   origin: ['http://localhost:3000', 'https://clound-nine-4x2j.vercel.app'],

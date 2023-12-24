@@ -34,6 +34,7 @@ model diaries {
   isPublic    Boolean     @default(false) @map("isPublic")
   viewCount   Int         @default(0) @map("viewCount")
   likeCount   Int         @default(0) @map("likeCount")
+  likeExist   Boolean     @default(false) @map("likeExist")
   sentence    String?     @map("sentence")
   weather     String      @map("weather")
   temperature String?        @map("temperature")
