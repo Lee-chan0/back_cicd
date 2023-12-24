@@ -67,9 +67,9 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
           where: { diaryId: +diaryId },
           data: { viewCount : diaryDetail.viewCount + 1 }
         })
-        return res.status(200).json({ data: updatedDiary, heart})
+        return res.status(200).json({ data: [updatedDiary, heart]})
       } else {
-        return res.status(200).json({ data: diaryDetail, heart})
+        return res.status(200).json({ data: [diaryDetail, heart]})
       }
   } catch (error) {
       return res.status(400).json({ error: error.message });
