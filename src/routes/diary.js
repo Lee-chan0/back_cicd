@@ -33,8 +33,7 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
           userId : userId
         }
       })
-      let heart = false
-      heart = isliked ? true : false
+      let heart = isliked ? true : false
 
       const diaryDetail = await prisma.diaries.findFirst({
           where: { 
