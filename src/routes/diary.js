@@ -29,7 +29,7 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
 
       const isliked = await prisma.diaryLikes.findFirst({
         where : {
-          diaryId : +diaryId,
+          DiaryId : +diaryId,
           userId : userId
         }
       })
