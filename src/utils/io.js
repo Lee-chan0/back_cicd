@@ -1,6 +1,6 @@
 import { Server } from 'socket.io'
-import userController from '../controllers/user.controller.js';
-import chatController from '../controllers/chat.controller.js';
+import userController from '../Controllers/user.controller.js';
+import chatController from '../Controllers/chat.controller.js';
 
 const initializeSocketIO = function (server) {
   const io = new Server(server, {
