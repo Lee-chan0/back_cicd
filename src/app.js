@@ -14,8 +14,8 @@ import kakaoLogin from './Oauth/kakao.login.js';
 import googleLogin from './Oauth/google.login.js';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
-import initializeSocketIO from './utils/io.js';
 import http from 'http'
+import initializeSocketIO from '../src/utils/io.js'
 
 const app = express();
 const PORT = 3000;
@@ -23,7 +23,7 @@ const PORT = 3000;
 dotenv.config();
 
 const corsOptions = {
-  origin: ['http://localhost:3000', 'https://clound-nine-4x2j.vercel.app'],
+  origin: ['http://localhost:3001', 'http://localhost:3000', 'https://clound-nine-4x2j.vercel.app'],
   credentials: true,
   exposedHeaders: ['Authorization', 'Refreshtoken', 'Expiredtime'],
 };
