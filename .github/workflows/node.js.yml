@@ -53,6 +53,7 @@ jobs:
         echo NAVER_REDIRECT_URI=${{ secrets.NAVER_REDIRECT_URI }} >> .env
         echo S3_ACCESS_KEY2=${{ secrets.S3_ACCESS_KEY2 }} >> .env
         echo S3_SECRET_ACCESS_KEY2=${{ secrets.S3_SECRET_ACCESS_KEY2 }} >> .env
+        echo DB=${{ secrets.DB }} >> .env
         cat .env
 
 

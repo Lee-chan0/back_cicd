@@ -40,6 +40,7 @@ services:
       - NAVER_CLIENT_ID=${NAVER_CLIENT_ID}
       - NAVER_CLIENT_SECRET=${NAVER_CLIENT_SECRET}
       - NAVER_REDIRECT_URI=${NAVER_REDIRECT_URI}
+      - DB=${DB}
     networks:
       - webnet
 
@@ -69,6 +70,7 @@ services:
       - NAVER_CLIENT_ID=${NAVER_CLIENT_ID}
       - NAVER_CLIENT_SECRET=${NAVER_CLIENT_SECRET}
       - NAVER_REDIRECT_URI=${NAVER_REDIRECT_URI}
+      - DB=${DB}
     networks:
       - webnet
 
