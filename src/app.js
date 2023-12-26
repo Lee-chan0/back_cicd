@@ -16,6 +16,7 @@ import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import http from 'http'
 import initializeSocketIO from '../src/utils/io.js'
+import os from 'os';
 
 const app = express();
 const PORT = 3000;
@@ -56,7 +57,38 @@ app.use('/', [
 ]);
 
 app.get('/', (req, res) => {
-  res.send('<h1>Success</h1>');
+  res.send('<h1>Success2</h1>');
+});
+
+// health체크 엔드포인트
+app.get("/health", (req, res) => {
+  const isServerOnline = true; 
+
+  const serverStartTime = new Date().toISOString();
+
+  const cpuUsage = os.loadavg()[0]; 
+  const totalMemory = os.totalmem();
+  const freeMemory = os.freemem();
+  const usedMemory = totalMemory - freeMemory;
+
+  const diskInfo = os.cpus(); 
+
+  const healthStatus = {
+    serverStatus: isServerOnline ? "Online" : "Offline",
+    serverStartTime: serverStartTime,
+    cpuUsage: cpuUsage,
+    memoryUsage: {
+      total: totalMemory,
+      used: usedMemory,
+      free: freeMemory,
+    },
+    diskSpace: diskInfo,
+  };
+  if (isServerOnline) {
+    res.status(200).json(healthStatus);
+  } else {
+    res.status(503).json({ serverStatus: "Offline" });
+  }
 });
 
 const server = http.createServer(app)

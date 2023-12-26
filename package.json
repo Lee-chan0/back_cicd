@@ -8,8 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "run": "nodemon src/app.js",
-    "start": "pm2 start src/app.js",
+    "start": "nodemon src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -38,6 +37,7 @@
     "multer-s3": "^3.0.1",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.7",
+    "os": "^0.1.2",
     "path": "^0.12.7",
     "prettier": "^3.1.0",
     "prisma": "^5.7.0",
