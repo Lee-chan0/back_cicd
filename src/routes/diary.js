@@ -30,7 +30,7 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
       const isliked = await prisma.diaryLikes.findFirst({
         where : {
           DiaryId : +diaryId,
-          UserId : userId
+          UserId : +userId
         }
       })
 
@@ -54,7 +54,7 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
         const currentTime = new Date().getTime()
 
         if (currentTime - lastTime < 600000) {
-          return res.status(200).json({ data: diaryDetail})
+          return res.status(200).json({ data: diaryDetail, like: isliked})
         }
       }
       /* 조회수 기능 추가 */
@@ -66,9 +66,9 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
           where: { diaryId: +diaryId },
           data: { viewCount : diaryDetail.viewCount + 1 }
         })
-        return res.status(200).json({ data: updatedDiary})
+        return res.status(200).json({ data: updatedDiary, like: isliked})
       } else {
-        return res.status(200).json({ data: diaryDetail})
+        return res.status(200).json({ data: diaryDetail, like: isliked})
       }
   } catch (error) {
       return res.status(400).json({ error: error.message });

@@ -100,11 +100,6 @@ router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
             UserId: +userId,
           },
         });
-        const userCheck = await prisma.users.update({where : {userId : +userId},
-          data : {
-            likeExist : false
-          }
-        })
         const islike = await prisma.diaries.update({
           where: { diaryId: +diaryId },
           data: {
@@ -113,20 +108,16 @@ router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
             },
           },
         });
-        return res.status(200).json({message: "좋아요가 취소되었습니다.",data: islike, likeExist: userCheck.likeExist});
+        return res.status(200).json({message: "좋아요가 취소되었습니다.",data: islike});
       }
 
       await prisma.diaryLikes.create({
         data: {
           UserId: +userId,
           DiaryId: +diaryId,
+          likeExist: true
         },
       });
-      const UserCheck = await prisma.users.update({where : {userId : +userId},
-        data : {
-          likeExist : true
-        }
-      })
       const likeClick = await prisma.diaries.update({
         where: { diaryId: +diaryId },
         data: {
@@ -135,7 +126,7 @@ router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
           },
         },
       });
-      return res.status(201).json({message: "좋아요가 추가되었습니다.",data: likeClick, likeExist: UserCheck.likeExist});
+      return res.status(201).json({message: "좋아요가 추가되었습니다.",data: likeClick});
     }
   } catch (err) {
     console.error(err);

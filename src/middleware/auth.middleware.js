@@ -24,13 +24,6 @@ export default async (req, res, next) => {
     console.log('authmiddleware의 REFRESH TOKEN : ', refreshtoken);
     console.log('authmiddleware의 REDIS STORED REFRESH TOKEN : ', storedRefreshToken);
 
-    // if(storedRefreshToken !== refreshtoken){
-    //   // await client.del(`RefreshToken:${userId}`);
-    //   // res.setHeader('Authorization', '');
-    //   // res.setHeader('Refreshtoken', '');
-    //   return res.status(400).json({message : "비정상적인 요청입니다. 자동으로 로그아웃 됩니다."})
-    // }
-
     const userInfo = await prisma.users.findFirst({
       where: { userId: userId },
     });
@@ -44,11 +37,5 @@ export default async (req, res, next) => {
     console.error(err);
     if(err.name === "TokenExpiredError")
     {return res.status(401).json({message : "토큰이 만료되었습니다."})}
-    // else{
-    //   res.setHeader('Authorization', '');
-    //   res.setHeader('Refreshtoken', '');
-    //   await client.del(`RefreshToken:${userId}`);
-
-    //   return res.status(400).json({message : "비정상적인 요청입니다. 자동으로 로그아웃 됩니다."})}
   }
 };
