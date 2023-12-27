@@ -57,7 +57,7 @@ app.use('/', [
 ]);
 
 app.get('/', (req, res) => {
-  res.send('<h1>SUCCESS</h1>');
+  res.send('<h1>SUCCESS2</h1>');
 });
 
 // health체크 엔드포인트
