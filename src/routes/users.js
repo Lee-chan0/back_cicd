@@ -252,8 +252,6 @@ router.post('/token', async(req, res, next) => {
     const storedRefreshToken = await client.get(`RefreshToken:${userId}`);
     if(refreshtoken !== storedRefreshToken){
       await client.del(`RefreshToken:${userId}`);
-      res.setHeader('Authorization', '');
-      res.setHeader('Refreshtoken', '');
       return res.status(401).json({message : "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."});
     }else {
       const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '1h'});
@@ -313,8 +311,7 @@ router.patch('/myInfo/edit-pw', authMiddleware, async(req, res, next) => {
         data : {
           password : encryptionPassword,
         }})
-
-
+      return res.status(201).json({message : "비밀번호가 변경 되었습니다."});
   }catch(err){
     console.error(err);
     return res.status(500).json({message : "Server Error"})
