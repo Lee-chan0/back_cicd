@@ -1122,7 +1122,6 @@ paths:
                   value:
                     message: Server Error
 
-
   
   /myInfo/edit-pw:
     patch:
