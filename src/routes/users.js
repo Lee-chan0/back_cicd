@@ -215,24 +215,31 @@ router.post("/logout", authMiddleware, async (req, res, next) => {
 
 // 내 정보 조회
 router.get("/myInfo", authMiddleware, async (req, res, next) => {
-  const { userId } = req.user;
+  try {
+    const { userId } = req.user;
 
-  const user = await prisma.users.findFirst({
-    where: { userId: +userId },
-    select: {
-      userId: true,
-      username: true,
-      email: true,
-      profileImg: true,
-      userType : true,
-    },
-  });
-  if (!user) {
-    return res.status(400).json({ msg: `존재하지 않는 유저입니다.` });
+    const user = await prisma.users.findFirst({
+      where: { userId: +userId },
+      select: {
+        userId: true,
+        username: true,
+        email: true,
+        profileImg: true,
+        userType: true,
+      },
+    });
+    
+    if (!user) {
+      return res.status(400).json({ msg: `존재하지 않는 유저입니다.` });
+    }
+
+    return res.status(200).json({ data: user });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: '내부 서버 오류' });
   }
-
-  return res.status(200).json({ data: user })
 });
+
 
 // AccessToken 재발급 로직
 router.post('/token', async(req, res, next) => {
