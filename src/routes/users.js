@@ -170,7 +170,7 @@ router.post("/signin", async (req, res, next) => {
     let profileImage = findUser.profileImg;
 
     const accessToken = jwt.sign({ userId: findUser.userId }, key, {
-      expiresIn: "6h",
+      expiresIn: "10s",
     });
 
     const refreshToken = jwt.sign({ userId: findUser.userId }, key, {
@@ -256,18 +256,9 @@ router.post('/token', async(req, res, next) => {
       res.setHeader('Refreshtoken', '');
       return res.status(401).json({message : "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."});
     }else {
-      const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '30m'});
-      const newRefreshToken = jwt.sign({userId : +userId}, key, {expiresIn : '7d'});
-
-      const newAccessToken_time = jwt.verify(newAceessToken, key);
-      await client.del(`RefreshToken:${userId}`);
-      await client.set(`RefreshToken:${userId}`, newRefreshToken, "EX", 7 * 24 * 60 * 60 );
-      const re = await client.get(`RefreshToken:${userId}`);
-      console.log('===========redis에 제대로 담겼는지 체크 =============== : ', re);
+      const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '10s'});
 
       res.setHeader('Authorization', `Bearer ${newAceessToken}`);
-      res.setHeader('Refreshtoken', newRefreshToken);
-      res.setHeader('Expiredtime', newAccessToken_time.exp);
 
       return res.status(201).json({message : "AccessToken 발급 완료"});
     }
