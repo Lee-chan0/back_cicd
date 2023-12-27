@@ -32,7 +32,7 @@ router.post('/google/callback', async (req, res, next) => {
       const findUser = await prisma.users.findFirst({ where: { email: resp2.data.email } });
   
       if (findUser) {
-        const accesstoken = jwt.sign({ userId: findUser.userId }, key, { expiresIn: '30m' });
+        const accesstoken = jwt.sign({ userId: findUser.userId }, key, { expiresIn: '1h' });
         const refreshtoken = jwt.sign({ userId: findUser.userId }, key, { expiresIn: '7d' });
   
         const access_token_time = jwt.verify(accesstoken, key);
@@ -57,7 +57,7 @@ router.post('/google/callback', async (req, res, next) => {
             userType: 'G',
           },
         });
-        const accesstoken = jwt.sign({ userId: createUser.userId }, key, { expiresIn: '30m' });
+        const accesstoken = jwt.sign({ userId: createUser.userId }, key, { expiresIn: '1h' });
         const refreshtoken = jwt.sign({ userId: createUser.userId }, key, { expiresIn: '7d' });
   
         const access_token_time = jwt.verify(accesstoken, key);

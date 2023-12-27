@@ -170,7 +170,7 @@ router.post("/signin", async (req, res, next) => {
     let profileImage = findUser.profileImg;
 
     const accessToken = jwt.sign({ userId: findUser.userId }, key, {
-      expiresIn: "3s",
+      expiresIn: "1h",
     });
 
     const refreshToken = jwt.sign({ userId: findUser.userId }, key, {
@@ -256,7 +256,7 @@ router.post('/token', async(req, res, next) => {
       res.setHeader('Refreshtoken', '');
       return res.status(401).json({message : "비정상적인 접근입니다. 자동으로 로그아웃 됩니다."});
     }else {
-      const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '3s'});
+      const newAceessToken = jwt.sign({userId : +userId}, key, {expiresIn : '1h'});
 
       res.setHeader('Authorization', `Bearer ${newAceessToken}`);
 

@@ -45,7 +45,7 @@ router.post("/kakao/callback", async function (req, res) {
 
     if (findUser) {
       const accesstoken = jwt.sign({ userId: findUser.userId }, key, {
-        expiresIn: "30m",
+        expiresIn: "1h",
       });
       const refreshtoken = jwt.sign({ userId: findUser.userId }, key, {
         expiresIn: "7d",
@@ -78,7 +78,7 @@ router.post("/kakao/callback", async function (req, res) {
           userType : 'K'
         },
       });
-      const accesstoken = jwt.sign({ userId: createUser.userId }, key, {expiresIn: "30m"});
+      const accesstoken = jwt.sign({ userId: createUser.userId }, key, {expiresIn: "1h"});
       const refreshtoken = jwt.sign({ userId: createUser.userId }, key, {expiresIn: "7d"});
 
       await client.set(`RefreshToken:${createUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60 );

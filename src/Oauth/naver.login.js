@@ -57,7 +57,7 @@ router.post("/naver/callback", async (req, res) => {
     const findUser = await prisma.users.findFirst({ where: { email: userInfo.email } });
 
     if (findUser) {
-      const accesstoken = jwt.sign({ userId: findUser.userId }, key, { expiresIn: "30m" });
+      const accesstoken = jwt.sign({ userId: findUser.userId }, key, { expiresIn: "1h" });
       const refreshtoken = jwt.sign({ userId: findUser.userId }, key, { expiresIn: "7d" });
 
       await client.set(`RefreshToken:${findUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60);
@@ -81,7 +81,7 @@ router.post("/naver/callback", async (req, res) => {
           userType: 'N'
         }
       })
-      const accesstoken = jwt.sign({ userId: createUser.userId }, key, { expiresIn: "30m" });
+      const accesstoken = jwt.sign({ userId: createUser.userId }, key, { expiresIn: "1h" });
       const refreshtoken = jwt.sign({ userId: createUser.userId }, key, { expiresIn: "7d" });
 
       await client.set(`RefreshToken:${createUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60);
