@@ -11,7 +11,7 @@ model Users {
   username    String   @map("username")
   password    String  @map("password")
   email       String  @unique @map("email")
-  profileImg  String?  @map("profileImg")
+  profileImg  String?  @default("https://finaldrawings.s3.ap-northeast-2.amazonaws.com/default-profile.avif") @map("profileImg")
   userType    String  @default("Common") @map("userType")
 
   createdAt   DateTime  @default(now()) @map("createdAt")
