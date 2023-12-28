@@ -62,7 +62,7 @@ app.get('/', (req, res) => {
 
 // health체크 엔드포인트
 app.get("/health", (req, res) => {
-  const isServerOnline = true; 
+  const isServerOnline = true;
 
   const serverStartTime = new Date().toISOString();
 

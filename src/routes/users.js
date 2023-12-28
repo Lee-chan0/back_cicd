@@ -266,36 +266,7 @@ router.post('/token', async(req, res, next) => {
   }
 });
 
-// 내 정보 수정 API
-router.patch('/myInfo/editmyInfo', authMiddleware ,imageUpload.single('image'), async(req, res, next) => {
-  try{
-    const {userId} = req.user;
-    const {username} = req.body;
 
-    const imageUrl = req.file.location
-    if (!imageUrl) {
-      const editmyInfo = await prisma.users.update({
-        where : {userId : +userId},
-        data : {
-          username : username,
-        }
-      })
-    } else {
-      const editmyInfo = await prisma.users.update({
-        where : {userId : +userId},
-        data : {
-          username : username,
-          profileImg : imageUrl,
-        }
-      })
-    }
-
-    return res.status(201).json({message : "수정이 완료되었습니다."});
-  }catch(err) {
-    console.error(err);
-    return res.status(500).json({message : "Server Error"});
-  }
-});
 
 // 비밀번호 변경 API
 router.patch('/myInfo/edit-pw', authMiddleware, async(req, res, next) => {
