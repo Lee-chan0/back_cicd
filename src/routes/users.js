@@ -271,8 +271,13 @@ router.patch('/myInfo/editmyInfo', authMiddleware ,imageUpload.single('image'), 
   try{
     const {userId} = req.user;
     const {username} = req.body;
-
-    const imageUrl = req.file.location
+    
+    if (!req.file.location) {
+      var imageUrl = null
+    } else {
+      var imageUrl = req.file.location
+    }
+    
     if (!imageUrl) {
       const editmyInfo = await prisma.users.update({
         where : {userId : +userId},
