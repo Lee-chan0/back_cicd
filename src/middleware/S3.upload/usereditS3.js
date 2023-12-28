@@ -34,4 +34,16 @@ const imageUpload = multer({
   }),
 });
 
-export default imageUpload;
+// export default imageUpload;
+
+export default function (req, res, next) {
+  // imageUpload 미들웨어 실행
+  imageUpload(req, res, function (err) {
+    if (err) {
+      // 에러가 있을 경우, next 함수에 에러 전달하여 다음 미들웨어로 전달
+      return next(err);
+    }
+    // 에러가 없으면 다음 미들웨어로 진행
+    next();
+  });
+}
