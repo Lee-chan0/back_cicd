@@ -26,14 +26,7 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
       const { diaryId } = req.params;
       const { userId } = req.user
 
-
-      const isliked = await prisma.diaryLikes.findFirst({
-        where : {
-          DiaryId : +diaryId,
-          UserId : +userId
-        }
-      })
-
+      
       const diaryDetail = await prisma.diaries.findFirst({
           where: { 
             diaryId: +diaryId,  
@@ -48,6 +41,13 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
       if (!diaryDetail) {
         return res.status(400).json({ message : "존재하지 않는 일기입니다."})
       }
+
+      const isliked = await prisma.diaryLikes.findFirst({
+        where : {
+          DiaryId : +diaryId,
+          UserId : +userId
+        }
+      })
 
       if (userId in lastViewTime) {
         const lastTime = lastViewTime[userId]

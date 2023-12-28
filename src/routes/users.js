@@ -65,7 +65,14 @@ router.post("/signup", async (req, res, next) => {
       return res.status(400).json({ message: "이미 가입된 이메일 입니다." });
     }
 
-    const Authenticationcode = Math.random().toString(36).substring(2, 8);
+    let Authenticationcode = Math.random().toString(36).substring(2, 8);
+
+    console.log("settimeout이전" , Authenticationcode)
+
+    setTimeout(() => {
+      Authenticationcode = null
+      console.log("settimeout이후", Authenticationcode)
+    }, 180000);
 
     const mailer = nodemailer.createTransport({
       service: "gmail",
