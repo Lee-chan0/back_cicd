@@ -8,6 +8,8 @@ import { client } from "../redis/redis.js";
 import nodemailer from "nodemailer";
 import cron from "node-cron";
 import imageUpload from "../middleware/S3.upload/usereditS3.js";
+import { UserInfoSchema } from "../middleware/validation/joi.error.definition.js";
+
 
 dotenv.config();
 
@@ -56,8 +58,9 @@ const userVerificationCodes = {};
 
 // 회원가입
 router.post("/signup", async (req, res, next) => {
-  const { email, password, username } = req.body;
   try {
+    const validation = await UserInfoSchema.validateAsync(req.body);
+    const { email, password, username } = validation;
     const isExitsEmail = await prisma.users.findFirst({
       where: { email: email },
     });
@@ -65,7 +68,11 @@ router.post("/signup", async (req, res, next) => {
       return res.status(400).json({ message: "이미 가입된 이메일 입니다." });
     }
 
-    const Authenticationcode = Math.random().toString(36).substring(2, 8);
+    let Authenticationcode = Math.random().toString(36).substring(2, 8);
+
+    setTimeout(() => {
+      Authenticationcode = 1
+    }, 180000);
 
     const mailer = nodemailer.createTransport({
       service: "gmail",
@@ -112,8 +119,10 @@ router.post("/signup", async (req, res, next) => {
 
 // 이메일 인증 후, 회원가입 완료 로직
 router.post("/complete-signup", async (req, res) => {
-  const { email, Authenticationcode, password, username } = req.body;
   try {
+    const validation = await UserInfoSchema.validateAsync(req.body);
+    const { email, Authenticationcode, password, username } = validation;
+
     const serverAuthenticationCode = userVerificationCodes[email];
 
     if (Authenticationcode === serverAuthenticationCode) {
@@ -154,7 +163,8 @@ router.post("/complete-signup", async (req, res) => {
 // 일반 로그인
 router.post("/signin", async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const validation = await UserInfoSchema.validateAsync(req.body);
+    const { email, password } = validation;
     const key = process.env.SECRET_KEY;
 
     const findUser = await prisma.users.findFirst({ where: { email: email } });
@@ -204,24 +214,6 @@ router.post("/signin", async (req, res, next) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ msg: `server Error` });
-  }
-});
-
-// 로그아웃
-router.post("/logout", authMiddleware, async (req, res, next) => {
-  try {
-    const { userId } = req.user;
-
-    const result = await client.del(`RefreshToken:${userId}`);
-    console.log(`키 삭제 결과: ${result}`);
-
-    res.setHeader(`Authorization`, "");
-    res.setHeader(`Refreshtoken`, "");
-
-    return res.status(200).json({ msg: "로그아웃 되었습니다." });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "server Error" });
   }
 });
 
@@ -286,7 +278,8 @@ router.patch("/myInfo/editmyInfo", authMiddleware, imageUpload.single("image"), 
     try {
       const { userId } = req.user;
       const imageUrl = req.file.location;
-      const { username } = req.body;
+      const validation = await UserInfoSchema.validateAsync(req.body);
+      const { username } = validation;
 
       const editmyInfo = await prisma.users.update({
         where: { userId: +userId },
@@ -299,7 +292,8 @@ router.patch("/myInfo/editmyInfo", authMiddleware, imageUpload.single("image"), 
     } catch (err) {
       if (err.name === "TypeError") {
         try {
-          const { username } = req.body;
+          const validation = await UserInfoSchema.validateAsync(req.body);
+          const { username } = validation;
           const { refreshtoken } = req.headers;
           const key = process.env.SECRET_KEY;
           const userId = jwt.verify(refreshtoken, key).userId;
@@ -324,7 +318,9 @@ router.patch("/myInfo/editmyInfo", authMiddleware, imageUpload.single("image"), 
 // 비밀번호 변경 API
 router.patch("/myInfo/edit-pw", authMiddleware, async (req, res, next) => {
   try {
-    const { password, newPassword } = req.body;
+    const validation = await UserInfoSchema.validateAsync(req.body);
+    const { password } = validation;
+    const { newPassword } = req.body;
     const { userId } = req.user;
 
     const findUser = await prisma.users.findFirst({
@@ -362,7 +358,6 @@ router.delete("/signoff", authMiddleware, async (req, res, next) => {
   try {
     const { userId } = req.user;
 
-    // 현재 시간 기준으로 15일뒤의 날짜 계산
     const currentDate = new Date();
     const deleteDate = new Date(currentDate);
 
@@ -389,7 +384,8 @@ router.delete("/signoff", authMiddleware, async (req, res, next) => {
 // 탈퇴 요청 취소 API
 router.post("/cancel-signoff", async (req, res, next) => {
   try {
-    const { email } = req.body;
+    const validation = await UserInfoSchema.validateAsync(req.body);
+    const { email } = validation;
     const currentDate = new Date();
     const deleteDate = new Date(currentDate);
 
