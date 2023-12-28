@@ -273,14 +273,22 @@ router.patch('/myInfo/editmyInfo', authMiddleware ,imageUpload.single('image'), 
     const {username} = req.body;
 
     const imageUrl = req.file.location
-
-    const editmyInfo = await prisma.users.update({
-      where : {userId : +userId},
-      data : {
-        username : username,
-        profileImg : imageUrl
-      }
-    })
+    if (!imageUrl) {
+      const editmyInfo = await prisma.users.update({
+        where : {userId : +userId},
+        data : {
+          username : username,
+        }
+      })
+    } else {
+      const editmyInfo = await prisma.users.update({
+        where : {userId : +userId},
+        data : {
+          username : username,
+          profileImg : imageUrl,
+        }
+      })
+    }
 
     return res.status(201).json({message : "수정이 완료되었습니다."});
   }catch(err) {
