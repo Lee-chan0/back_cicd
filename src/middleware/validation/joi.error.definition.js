@@ -6,7 +6,7 @@ const UserInfoSchema = joi.object({
   username: joi.string().min(3).max(20),
   password: joi.string().min(8).max(20).pattern(new RegExp("^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])")),
   email: joi.string().email(),
+  Authenticationcode: joi.string(),
 });
 
-export { UserInfoSchema }
-;
+export { UserInfoSchema };

@@ -70,9 +70,9 @@ router.post("/signup", async (req, res, next) => {
 
     let Authenticationcode = Math.random().toString(36).substring(2, 8);
 
-    // setTimeout(() => {
-    //   Authenticationcode = 1
-    // }, 180000);
+    setTimeout(() => {
+      Authenticationcode = 1
+    }, 180000);
 
     const mailer = nodemailer.createTransport({
       service: "gmail",
@@ -119,7 +119,7 @@ router.post("/signup", async (req, res, next) => {
 router.post("/complete-signup", async (req, res) => {
   try {
     const validation = await UserInfoSchema.validateAsync(req.body);
-    const { email, Authenticationcode, password, username } = validation;
+    const { email, password, username, Authenticationcode } = validation;
 
     const serverAuthenticationCode = userVerificationCodes[email];
 
