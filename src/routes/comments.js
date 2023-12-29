@@ -19,8 +19,8 @@ router.post("/diary/detail/comment/:diaryId", authMiddleware, async (req, res, n
         },
       });
       res.status(201).json({ message: "댓글이 등록되었습니다" });
-    } catch (error) {
-      res.status(400).json({ error: error.message });
+    } catch (err) {
+      next(err);
     }
   }
 );
@@ -46,8 +46,8 @@ router.get("/diary/detail/comment/:diaryId", async (req, res, next) => {
     });
 
     return res.status(200).json({ data: comments });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+  } catch (err) {
+    next(err);
   }
 });
 
@@ -81,8 +81,8 @@ router.patch(
         },
       });
       return res.status(201).json({ message: "댓글 수정 완료" });
-    } catch (error) {
-      res.status(400).json({ error: error.message });
+    } catch (err) {
+      next(err);
     }
   }
 );
@@ -115,8 +115,8 @@ router.delete(
         },
       });
       return res.status(201).json({ message: "댓글 삭제 완료" });
-    } catch (error) {
-      res.status(400).json({ error: error.message });
+    } catch (err) {
+      next(err);
     }
   }
 );

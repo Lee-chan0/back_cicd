@@ -35,13 +35,10 @@ router.post('/google/callback', async (req, res, next) => {
         const accesstoken = jwt.sign({ userId: findUser.userId }, key, { expiresIn: '1h' });
         const refreshtoken = jwt.sign({ userId: findUser.userId }, key, { expiresIn: '7d' });
   
-        const access_token_time = jwt.verify(accesstoken, key);
-  
         await client.set(`RefreshToken:${findUser.userId}`, refreshtoken, 'EX', 7 * 24 * 60 * 60);
   
         res.setHeader('Authorization', `Bearer ${accesstoken}`);
         res.setHeader('Refreshtoken', refreshtoken);
-        res.setHeader('Expiredtime', access_token_time.exp);
   
         return res.status(201).json({ message: `${findUser.username}님 환영합니다.` });
       } else {
@@ -60,19 +57,15 @@ router.post('/google/callback', async (req, res, next) => {
         const accesstoken = jwt.sign({ userId: createUser.userId }, key, { expiresIn: '1h' });
         const refreshtoken = jwt.sign({ userId: createUser.userId }, key, { expiresIn: '7d' });
   
-        const access_token_time = jwt.verify(accesstoken, key);
-  
         await client.set(`RefreshToken:${createUser.userId}`, refreshtoken, 'EX', 7 * 24 * 60 * 60);
   
         res.setHeader('Authorization', `Bearer ${accesstoken}`);
         res.setHeader('Refreshtoken', refreshtoken);
-        res.setHeader('Expiredtime', access_token_time.exp);
   
         return res.status(201).json({ message: '회원가입이 완료되었습니다.' });
       }
     } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: '서버 오류' });
+      next(err);
     }
   });
   

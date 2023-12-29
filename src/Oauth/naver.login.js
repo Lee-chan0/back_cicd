@@ -21,7 +21,6 @@ router.post("/naver/callback", async (req, res) => {
     const { code } = req.body;
     const { state } = req.body;
 
-    // 토큰 요청
     const tokenParams = {
       grant_type: "authorization_code",
       client_id: clientId,
@@ -62,11 +61,8 @@ router.post("/naver/callback", async (req, res) => {
 
       await client.set(`RefreshToken:${findUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60);
 
-      const accesstoken_time = jwt.verify(accesstoken, key);
-
       res.setHeader('Authorization', `Bearer ${accesstoken}`);
       res.setHeader('Refreshtoken', refreshtoken);
-      res.setHeader('Expiredtime', accesstoken_time.exp);
 
       return res.status(201).json({ message: `${findUser.username}님 환영합니다.` });
     } else {
@@ -86,17 +82,13 @@ router.post("/naver/callback", async (req, res) => {
 
       await client.set(`RefreshToken:${createUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60);
 
-      const accesstoken_time = jwt.verify(accesstoken, key);
-
       res.setHeader('Authorization', `Bearer ${accesstoken}`);
       res.setHeader('Refreshtoken', refreshtoken);
-      res.setHeader('Expiredtime', accesstoken_time.exp);
 
       return res.status(201).json({ message: `회원가입이 완료되었습니다.` });
     };
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Server Error" });
+    next(err);
   }
 });
 

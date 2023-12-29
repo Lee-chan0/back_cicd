@@ -17,6 +17,7 @@ import YAML from 'yamljs';
 import http from 'http'
 import initializeSocketIO from '../src/utils/io.js'
 import os from 'os';
+import errorHandlingMiddleware from './middleware/error-handling.middleware.js';
 
 const app = express();
 const PORT = 3000;
@@ -26,7 +27,7 @@ dotenv.config();
 const corsOptions = {
   origin: ['http://localhost:3001', 'http://localhost:3000', 'https://nine-cloud9.vercel.app'],
   credentials: true,
-  exposedHeaders: ['Authorization', 'Refreshtoken', 'Expiredtime'],
+  exposedHeaders: ['Authorization', 'Refreshtoken'],
 };
 const atlasURI = process.env.DB;
 
@@ -40,11 +41,9 @@ mongoose.connect(atlasURI, {
 const swaggerDocument = YAML.load('./src/utils/swagger.yaml');
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
-
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
-
 app.use('/', [
   UserRouter,
   MainCalender,
@@ -55,6 +54,7 @@ app.use('/', [
   kakaoLogin,
   googleLogin,
 ]);
+app.use(errorHandlingMiddleware);
 
 app.get('/', (req, res) => {
   res.send('<h1>SUCCESS</h1>');

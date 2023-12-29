@@ -33,12 +33,7 @@ export default async (req, res, next) => {
     console.log('======미들웨어 OUT=======');
     next();
   } catch(err) {
-    console.log('catch로 error 발생');
-    console.error(err);
-    if(err.name === "TokenExpiredError")
-    {return res.status(419).json({message : "토큰이 만료되었습니다."})}
-    else{
-      return res.status(500).json({message : "Server Error"})
-    }
+    console.log('AuthMiddleWare에서 발생한 Error');
+    next(err);
   }
 };

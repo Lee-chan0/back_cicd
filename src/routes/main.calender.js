@@ -62,8 +62,8 @@ router.get("/diary/calendar/:year/:month", authMiddleware, async (req, res, next
     });
 
     res.status(200).json({ data: arrayedDiaries, userProfileImg });
-  } catch (error) {
-    return res.status(400).json({ error: error.message });
+  } catch (err) {
+    next(err);
   }
 });
 

@@ -24,8 +24,8 @@ router.post(
         },
       });
       res.status(201).json({ message: "대댓글이 등록되었습니다" });
-    } catch (error) {
-      res.status(400).json({ error: error.message });
+    } catch (err) {
+      next(err);
     }
   }
 );
@@ -45,8 +45,8 @@ router.get(
       });
 
       return res.status(200).json({ data: secondaryComments });
-    } catch (error) {
-      return res.status(400).json({ error: error.message });
+    } catch (err) {
+      next(err);
     }
   }
 );
@@ -77,8 +77,8 @@ router.patch(
         },
       });
       return res.status(201).json({ message: "댓글 수정 완료" });
-    } catch (error) {
-      return res.status(400).json({ error: error.message });
+    } catch (err) {
+      next(err);
     }
   }
 );
@@ -107,8 +107,8 @@ router.delete(
         where: { secondaryCommentId: +secondaryCommentId },
       });
       return res.status(201).json({ message: "댓글 삭제 완료" });
-    } catch (error) {
-      return res.status(400).json({ error: error.message });
+    } catch (err) {
+      next(err);
     }
   }
 );

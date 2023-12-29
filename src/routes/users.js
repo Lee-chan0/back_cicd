@@ -49,8 +49,7 @@ async function deleteUser() {
 
     console.log(`${deletedAtUser.length}명의 데이터가 삭제되었습니다.`);
   } catch (err) {
-    console.error(err);
-    return res.status(500);
+    next(err);
   }
 }
 
@@ -105,8 +104,7 @@ router.post("/signup", async (req, res, next) => {
       return res.status(201).json({ message: "이메일 전송 완료" });
     });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Server Error" });
+    next(err);
   }
 });
 
@@ -148,8 +146,7 @@ router.post("/complete-signup", async (req, res) => {
       return res.status(400).json({ message: "인증 코드가 올바르지 않습니다." });
     }
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Server Error" });
+    next(err);
   }
 });
 
@@ -205,8 +202,7 @@ router.post("/signin", async (req, res, next) => {
       profileImage: profileImage,
     });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: `server Error` });
+    next(err);
   }
 });
 
@@ -232,8 +228,7 @@ router.get("/myInfo", authMiddleware, async (req, res, next) => {
 
     return res.status(200).json({ data: user });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "내부 서버 오류" });
+    next(err);
   }
 });
 
@@ -259,8 +254,7 @@ router.post("/token", async (req, res, next) => {
       return res.status(201).json({ message: "AccessToken 발급 완료" });
     }
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Server Error" });
+    next(err);
   }
 });
 
@@ -296,12 +290,10 @@ router.patch("/myInfo/editmyInfo", authMiddleware, imageUpload.single("image"), 
           });
           return res.status(201).json({ message: "수정이 완료되었습니다." });
         } catch (err) {
-          console.error(err);
-          return res.status(500).json({ message: "Server Error" });
+          next(err);
         }
       }
-      console.error(err);
-      return res.status(500).json({ message: "Server Error" });
+      next(err);
     }
   }
 );
@@ -339,8 +331,7 @@ router.patch("/myInfo/edit-pw", authMiddleware, async (req, res, next) => {
     });
     return res.status(201).json({ message: "비밀번호가 변경 되었습니다." });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Server Error" });
+    next(err);
   }
 });
 
@@ -367,8 +358,7 @@ router.delete("/signoff", authMiddleware, async (req, res, next) => {
       message: "탈퇴처리가 완료되었습니다. 15일 동안 회원정보가 보류됩니다.",
     });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Server Error" });
+    next(err);
   }
 });
 
@@ -408,8 +398,7 @@ router.post("/cancel-signoff", async (req, res, next) => {
       msg: `탈퇴까지 ${days}일, ${hours}시간 남았습니다.`,
     });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Server Error" });
+    next(err);
   }
 });
 

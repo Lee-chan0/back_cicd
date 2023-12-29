@@ -70,8 +70,8 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
       } else {
         return res.status(200).json({ data: diaryDetail, like: isliked})
       }
-  } catch (error) {
-      return res.status(400).json({ error: error.message });
+  } catch (err) {
+    next(err);
   }
 });
 
@@ -122,8 +122,8 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
     });
 
     return res.status(201).json({ message: '다이어리 등록 완료', data: savedDiary });
-  } catch (error) {
-    return res.status(400).json({ error: error.message });
+  } catch (err) {
+    next(err);
   }
 });
 
@@ -156,8 +156,8 @@ router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
     });
 
     return res.status(201).json({ message: '다이어리 수정 완료', data: savedDiary });
-  } catch (error) {
-    return res.status(400).json({ error: error.message });
+  } catch (err) {
+    next(err);
   }
 });
   
@@ -179,8 +179,8 @@ try{
   })
 
   return res.status(201).json({ message : "삭제 완료"})
-}catch(error) {
-  return res.status(400).json({ error: error.message })
+} catch (err) {
+  next(err);
 }
 })
   

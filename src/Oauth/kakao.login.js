@@ -12,7 +12,6 @@ const router = express.Router();
 
 router.post("/kakao/callback", async function (req, res) {
   const { code } = req.body;
-  console.log(code);
   const key = process.env.SECRET_KEY;
   try {
     const response = await axios({
@@ -50,17 +49,11 @@ router.post("/kakao/callback", async function (req, res) {
       const refreshtoken = jwt.sign({ userId: findUser.userId }, key, {
         expiresIn: "7d",
       });
-      
-      const token_time = jwt.verify(accesstoken, key);
 
       await client.set(`RefreshToken:${findUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60 );
 
-
       res.setHeader("Authorization", `Bearer ${accesstoken}`);
       res.setHeader("Refreshtoken", refreshtoken);
-      res.setHeader("Expiredtime", token_time.exp);
-
-      console.log("======성공1======");
 
       return res.json({ message: `${findUser.username}님 환영합니다.` });
     } else {
@@ -83,17 +76,13 @@ router.post("/kakao/callback", async function (req, res) {
 
       await client.set(`RefreshToken:${createUser.userId}`, refreshtoken, "EX", 7 * 24 * 60 * 60 );
 
-      const token_time = jwt.verify(accesstoken, key);
-
       res.setHeader("Authorization", `Bearer ${accesstoken}`);
       res.setHeader("Refreshtoken", refreshtoken);
-      res.setHeader("Expiredtime", token_time.exp);
-      console.log("======성공2======");
+
       return res.json({ message: "회원가입이 완료되었습니다." });
     }
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Server_Error" });
+    next(err);
   }
 });
 

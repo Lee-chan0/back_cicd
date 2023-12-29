@@ -40,8 +40,8 @@ router.get("/feeds", async (req, res, next) => {
       });
 
       res.status(200).json({ data: diaryEntries });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+  } catch (err) {
+    next(err);
   }
 });
 
@@ -68,14 +68,10 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
       });
 
       res.status(200).json({ data: diaryEntries });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+  } catch (err) {
+    next(err);
   }
 });
-
-
-
-
 
 // 피드에 좋아요 기능
 router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
@@ -129,8 +125,7 @@ router.post("/feeds/:diaryId/like", authMiddleware, async (req, res, next) => {
       return res.status(201).json({message: "좋아요가 추가되었습니다.",data: likeClick});
     }
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "서버오류" });
+    next(err);
   }
 });
 
