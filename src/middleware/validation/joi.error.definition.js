@@ -8,4 +8,5 @@ const UserInfoSchema = joi.object({
   email: joi.string().email(),
 });
 
-export { UserInfoSchema };
+export { UserInfoSchema }
+;

@@ -65,7 +65,7 @@ router.post("/signup", async (req, res, next) => {
       where: { email: email },
     });
     if (isExitsEmail) {
-      return res.status(400).json({ message: "이미 가입된 이메일 입니다." });
+      return res.status(403).json({ message: "이미 가입된 이메일 입니다." });
     }
 
     let Authenticationcode = Math.random().toString(36).substring(2, 8);
