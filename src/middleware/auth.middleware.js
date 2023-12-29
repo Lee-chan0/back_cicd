@@ -36,7 +36,7 @@ export default async (req, res, next) => {
     console.log('catch로 error 발생');
     console.error(err);
     if(err.name === "TokenExpiredError")
-    {return res.status(401).json({message : "토큰이 만료되었습니다."})}
+    {return res.status(419).json({message : "토큰이 만료되었습니다."})}
     else{
       return res.status(500).json({message : "Server Error"})
     }
