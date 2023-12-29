@@ -70,9 +70,9 @@ router.post("/signup", async (req, res, next) => {
 
     let Authenticationcode = Math.random().toString(36).substring(2, 8);
 
-    setTimeout(() => {
-      Authenticationcode = 1
-    }, 180000);
+    // setTimeout(() => {
+    //   Authenticationcode = 1
+    // }, 180000);
 
     const mailer = nodemailer.createTransport({
       service: "gmail",
@@ -101,9 +101,7 @@ router.post("/signup", async (req, res, next) => {
     mailer.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error(error);
-        return res
-          .status(500)
-          .json({ message: "메일 전송도중 Error가 발생했습니다." });
+        return res.status(500).json({ message: "메일 전송도중 Error가 발생했습니다." });
       }
       console.log(`이메일 전송 정보 : ${info.response}`);
 
