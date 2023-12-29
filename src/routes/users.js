@@ -54,8 +54,6 @@ async function deleteUser() {
   }
 }
 
-const userVerificationCodes = {};
-
 // 회원가입
 router.post("/signup", async (req, res, next) => {
   try {
@@ -70,9 +68,8 @@ router.post("/signup", async (req, res, next) => {
 
     let Authenticationcode = Math.random().toString(36).substring(2, 8);
 
-    setTimeout(() => {
-      Authenticationcode = 1
-    }, 180000);
+    await client.setex(email, 180, Authenticationcode);
+
 
     const mailer = nodemailer.createTransport({
       service: "gmail",
@@ -105,8 +102,6 @@ router.post("/signup", async (req, res, next) => {
       }
       console.log(`이메일 전송 정보 : ${info.response}`);
 
-      userVerificationCodes[email] = Authenticationcode;
-
       return res.status(201).json({ message: "이메일 전송 완료" });
     });
   } catch (err) {
@@ -121,7 +116,9 @@ router.post("/complete-signup", async (req, res) => {
     const validation = await UserInfoSchema.validateAsync(req.body);
     const { email, password, username, Authenticationcode } = validation;
 
-    const serverAuthenticationCode = userVerificationCodes[email];
+    const serverAuthenticationCode = await client.get(email);
+
+    if(!serverAuthenticationCode){return res.status(401).json({message : "인증코드가 만료되었습니다."})}
 
     if (Authenticationcode === serverAuthenticationCode) {
       const encryptionPassword = await bcrypt.hash(password, 10);
