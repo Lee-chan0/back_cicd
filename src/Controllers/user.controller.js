@@ -2,7 +2,7 @@ import UserModel from '../models/user.js'
 
 const userController = {}
 
-userController.saveUser=async(userName, sid)=>{
+userController.saveUser=async(userName, sid, res)=>{
     // 이미 있는 유저인지 확인
     try {
         
@@ -25,11 +25,11 @@ userController.saveUser=async(userName, sid)=>{
         return user;
     } catch (err) {
         console.error(err);
-        throw new Error(err.message)
+        res.status(500).json({ error: err.message });
     }
 }
 
-userController.checkUser = async(sid) => {
+userController.checkUser = async(sid, res) => {
     try {
         const user = await UserModel.findOne({token:sid})
         console.log(user)
@@ -37,7 +37,7 @@ userController.checkUser = async(sid) => {
         return user
     } catch(err) {
         console.error(err);
-        throw new Error(err.message)
+        res.status(500).json({ error: err.message });
     }
 }
 
