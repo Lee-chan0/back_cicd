@@ -18,7 +18,7 @@ const initializeSocketIO = function (server) {
       try {
         const user = await userController.saveUser(userName, socket.id);
         const welcomeMessage = {
-          chat: `${user.name} has joined the chat room`,
+          chat: `${user.name.split(".")[0]} has joined the chat room`,
           user: { id: null, name: 'system' },
         };
         io.emit('message', welcomeMessage);
