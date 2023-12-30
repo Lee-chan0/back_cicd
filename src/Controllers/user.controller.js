@@ -2,10 +2,9 @@ import UserModel from '../models/user.js'
 
 const userController = {}
 
-userController.saveUser = async(userName, sid, res)=>{
+userController.saveUser = async(userName, sid)=>{
     // 이미 있는 유저인지 확인
-    try {
-        
+
         let user = await UserModel.findOne({ name: userName });
         // 없다면 새로 유저 정보 만들기
         if(!user){
@@ -23,22 +22,14 @@ userController.saveUser = async(userName, sid, res)=>{
         
         await user.save();
         return user;
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
-    }
 }
 
 userController.checkUser = async(sid, res) => {
-    try {
+   
         const user = await UserModel.findOne({token:sid})
         console.log(user)
         // if(!user) throw new Error("user not found")
         return user
-    } catch(err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
-    }
 }
 
 export default userController
