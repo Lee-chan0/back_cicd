@@ -30,10 +30,15 @@ userController.saveUser=async(userName, sid)=>{
 }
 
 userController.checkUser = async(sid) => {
-    const user = await UserModel.findOne({token:sid})
-    console.log(user)
-    // if(!user) throw new Error("user not found")
-    return user
+    try {
+        const user = await UserModel.findOne({token:sid})
+        console.log(user)
+        // if(!user) throw new Error("user not found")
+        return user
+    } catch(err) {
+        console.error(err);
+        throw new Error(err.message)
+    }
 }
 
 export default userController
