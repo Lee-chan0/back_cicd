@@ -102,7 +102,10 @@ app.get("/health", (req, res) => {
 
 const server = http.createServer(app)
 
-initializeSocketIO(server);
+app.use('community/chat', (req, res, next) => {
+  initializeSocketIO(server);
+  next();
+})
 
 
 server.listen(PORT, () => {
