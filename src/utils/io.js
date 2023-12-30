@@ -6,7 +6,7 @@ const initializeSocketIO = function (server) {
   const io = new Server(server, {
     path: '/community/chat', // 해당 경로로 소켓 연결 설정
     cors: {
-      origin: ['http://localhost:3001', 'http://localhost:3000', 'https://clound-nine-4x2j.vercel.app'],
+      origin: ['http://localhost:3001', 'http://localhost:3000', 'https://clound-nine-4x2j.vercel.app', 'https://clound-nine.vercel.app'],
       credentials: true,
     },
   });
