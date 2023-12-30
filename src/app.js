@@ -25,7 +25,7 @@ const PORT = 3000;
 dotenv.config();
 
 const corsOptions = {
-  origin: '*', //['http://localhost:3001', 'http://localhost:3000', 'https://nine-cloud9.vercel.app'],
+  origin: ['http://localhost:3000', 'https://nine-cloud9.vercel.app'],
   credentials: true,
   exposedHeaders: ['Authorization', 'Refreshtoken'],
 };

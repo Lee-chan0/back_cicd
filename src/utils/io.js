@@ -6,7 +6,7 @@ const initializeSocketIO = function (server) {
   const io = new Server(server, {
     path: '/community/chat', // 해당 경로로 소켓 연결 설정
     cors: {
-      origin: '*',// 'http://localhost:3000','https://nine-cloud9.vercel.app'
+      origin: ['http://localhost:3000','https://nine-cloud9.vercel.app'],
       credentials: true,
     },
   });
@@ -18,7 +18,7 @@ const initializeSocketIO = function (server) {
       try {
         const user = await userController.saveUser(userName, socket.id);
         const welcomeMessage = {
-          chat: `${user.name.split(".")[0]} has joined the chat room`,
+          chat: `${(user.name).split(".")[0]} has joined the chat room`,
           user: { id: null, name: 'system' },
         };
         io.emit('message', welcomeMessage);
