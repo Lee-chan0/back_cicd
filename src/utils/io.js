@@ -11,6 +11,8 @@ const initializeSocketIO = function (server) {
     },
   });
 
+  io.origins(['https://nine-cloud9.vercel.app']);
+
   io.on('connection', async (socket) => {
     console.log('Client connected', socket.id);
 
