@@ -48,6 +48,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explore
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
+io.origins(corsOptions.origin);
 app.use('/', [
   UserRouter,
   MainCalender,
