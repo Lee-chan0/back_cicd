@@ -31,12 +31,16 @@ const corsOptions = {
 };
 const atlasURI = process.env.DB;
 
-mongoose.connect(atlasURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('Connected to MongoDB Atlas'))
-.catch((err) => console.error('Error connecting to MongoDB Atlas:', err));
+const MongoConnect = async() => {
+  await mongoose.connect(atlasURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log('Connected to MongoDB Atlas'))
+  .catch((err) => console.error('Error connecting to MongoDB Atlas:', err));
+}
+
+MongoConnect()
 
 const swaggerDocument = YAML.load('./src/utils/swagger.yaml');
 

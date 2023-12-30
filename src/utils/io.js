@@ -6,7 +6,7 @@ const initializeSocketIO = function (server) {
   const io = new Server(server, {
     path: '/community/chat', // 해당 경로로 소켓 연결 설정
     cors: {
-      origin: [ 'localhost:3000' ], // 'https://nine-cloud9.vercel.app'
+      origin: [ 'https://nine-cloud9.vercel.app' ], // 'https://nine-cloud9.vercel.app'
       credentials: true,
     },
   });

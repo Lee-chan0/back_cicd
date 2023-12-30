@@ -2,7 +2,7 @@ import UserModel from '../models/user.js'
 
 const userController = {}
 
-userController.saveUser=async(userName, sid, res)=>{
+userController.saveUser = async(userName, sid, res)=>{
     // 이미 있는 유저인지 확인
     try {
         
