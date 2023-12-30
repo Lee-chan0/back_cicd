@@ -102,7 +102,7 @@ app.get("/health", (req, res) => {
 
 const server = http.createServer(app)
 
-app.use('community/chat', (req, res, next) => {
+app.use('/community/chat', (req, res, next) => {
   initializeSocketIO(server);
   next();
 })
