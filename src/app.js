@@ -32,13 +32,18 @@ const corsOptions = {
 const atlasURI = process.env.DB;
 
 const MongoConnect = async() => {
-  await mongoose.connect(atlasURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log('Connected to MongoDB Atlas'))
-  .catch((err) => console.error('Error connecting to MongoDB Atlas:', err));
-}
+  try {
+    await mongoose.connect(atlasURI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    })
+    .then(() => console.log('Connected to MongoDB Atlas'))
+    .catch((err) => console.error('Error connecting to MongoDB Atlas:', err));
+  } catch(Err) {
+    console.error('MONGODB CONNECTION ERROR:', Err)
+  }
+
+  }
 
 MongoConnect()
 

@@ -112,7 +112,7 @@ router.post("/signup", async (req, res, next) => {
 router.post("/complete-signup", async (req, res) => {
   try {
     const validation = await UserInfoSchema.validateAsync(req.body);
-    const { email, password, username, Authenticationcode } = validation;
+    const { email, password, username, Authenticationcode } = validation; 
 
     const serverAuthenticationCode = await client.get(email);
 
