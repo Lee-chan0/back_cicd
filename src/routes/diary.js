@@ -151,7 +151,7 @@ router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
       },
       data: {
         content,
-        isPublic: Boolean(isPublic),
+        isPublic: Boolean(isPublic), 
       }
     });
 
