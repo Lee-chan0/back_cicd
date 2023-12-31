@@ -88,10 +88,7 @@ router.patch(
 );
 
 /* 댓글 삭제 */
-router.delete(
-  "/diary/detail/comment/:commentId",
-  authMiddleware,
-  async (req, res, next) => {
+router.delete("/diary/detail/comment/:commentId", authMiddleware, async (req, res, next) => {
     try {
       const { commentId } = req.params;
       const { userId } = req.user;

@@ -56,7 +56,9 @@ jobs:
         echo DB=${{ secrets.DB }} >> .env
         cat .env
 
-
+    - name: Debug DB Value
+      run: echo $DB
+      
     - name: zip file
       run: zip -r CI.zip ./src/* ./prisma/* ./scripts/* ./appspec.yml ./package.json ./package-lock.json ./deploy.sh ./docker-compose.yml ./Dockerfile ./nginx.conf ./.env ./healthcheck_restart.sh
 
