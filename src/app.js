@@ -93,12 +93,9 @@ app.get("/health", (req, res) => {
 });
 
 const server = http.createServer(app)
-const io = new Server(server, {
-  path: '/community/chat',
-  cors: corsOptions,
-})
 
-initializeSocketIO(io);
+
+initializeSocketIO(server);
 
 
 server.listen(PORT, () => {

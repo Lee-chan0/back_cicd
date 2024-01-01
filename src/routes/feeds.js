@@ -11,10 +11,11 @@ router.get("/feeds", async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const pageSize = 10;
-    const { thismonth } = req.body
+    const date = req.query.date
+    const thismonth = new Date(date)
 
     const timeZone = "Asia/Seoul";
-    if (!thismonth) {
+    if (!date) {
 
       // 이전 페이지에서 마지막 데이터의 createdAt 값 가져오기 (데이터의 마지막 index값에 해당하는 value의 createdAt 값을 전달받는다)
       const lastCreatedAt = req.query.lastCreatedAt; // 클라이언트에서 전달된 마지막 데이터의 createdAt 값
@@ -119,13 +120,14 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
     const { userId } = req.user
     const page = parseInt(req.query.page) || 1;
     const pageSize = 10;
-    const { thismonth } = req.body
+    const date = req.query.date
+    const thismonth = new Date(date)
 
     const firstday = startOfDay(thismonth)
     const lastday = endOfDay(thismonth)
 
     // 이전 페이지에서 마지막 데이터의 createdAt 값 가져오기 (데이터의 마지막 index값에 해당하는 value의 createdAt 값을 전달받는다)
-    if (!thismonth) {
+    if (!date) {
       const lastCreatedAt = req.query.lastCreatedAt; // 클라이언트에서 전달된 마지막 데이터의 createdAt 값
   
         const diaryEntries = await prisma.diaries.findMany({
