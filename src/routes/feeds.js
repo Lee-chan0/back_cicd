@@ -11,20 +11,46 @@ router.get("/feeds", async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const pageSize = 10;
+    const { thismonth } = req.body
 
-    // 이전 페이지에서 마지막 데이터의 createdAt 값 가져오기 (데이터의 마지막 index값에 해당하는 value의 createdAt 값을 전달받는다)
-    const lastCreatedAt = req.query.lastCreatedAt; // 클라이언트에서 전달된 마지막 데이터의 createdAt 값
-
-    const today = new Date();
     const timeZone = "Asia/Seoul";
-    const twoMonthsAgo = utcToZonedTime(
-      startOfDay(subMonths(today, 2)),
-      timeZone
-    );
-    const todaySeoulTime = utcToZonedTime(endOfDay(today), timeZone);
+    if (!thismonth) {
 
+      // 이전 페이지에서 마지막 데이터의 createdAt 값 가져오기 (데이터의 마지막 index값에 해당하는 value의 createdAt 값을 전달받는다)
+      const lastCreatedAt = req.query.lastCreatedAt; // 클라이언트에서 전달된 마지막 데이터의 createdAt 값
+  
+      const today = new Date();
+      const twoMonthsAgo = utcToZonedTime(
+        startOfDay(subMonths(today, 2)),
+        timeZone
+      );
+      const todaySeoulTime = utcToZonedTime(endOfDay(today), timeZone);
+  
+  
+        const diaryEntries = await prisma.diaries.findMany({
+            where: {
+                isPublic : true,
+                createdAt: {
+                    gte: twoMonthsAgo, 
+                    lte: todaySeoulTime,
+                    // lastCreatedAt 값보다 큰 데이터만 가져오기 (중복 제거)
+                    lt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
+                }
+            },
+            take: pageSize,
+            skip: page > 1 ? (page - 1) * pageSize : 0,
+            orderBy: { createdAt: 'desc' }
+        });
+  
+        return res.status(200).json({ data: diaryEntries });
+    } else {
+        const twoMonthsAgo = utcToZonedTime(
+        startOfDay(subMonths(thismonth, 2)),
+        timeZone
+        );
+        const todaySeoulTime = utcToZonedTime(endOfDay(thismonth), timeZone)
 
-      const diaryEntries = await prisma.diaries.findMany({
+        const diaryEntries = await prisma.diaries.findMany({
           where: {
               isPublic : true,
               createdAt: {
@@ -39,7 +65,9 @@ router.get("/feeds", async (req, res, next) => {
           orderBy: { createdAt: 'desc' }
       });
 
-      res.status(200).json({ data: diaryEntries });
+      return res.status(200).json({ data: diaryEntries });
+    }
+
   } catch (err) {
     next(err);
   }
@@ -107,7 +135,7 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
           orderBy: { createdAt: 'desc' }
       });
 
-      res.status(200).json({ data: diaryEntries });
+      return res.status(200).json({ data: diaryEntries });
   } catch (err) {
     next(err);
   }
