@@ -25,27 +25,18 @@ const PORT = 3000;
 dotenv.config();
 
 const corsOptions = {
-  origin: ['http://localhost:3000', 'https://nine-cloud9.vercel.app'],
+  origin: ['http://localhost:3001', 'http://localhost:3000', 'https://nine-cloud9.vercel.app'],
   credentials: true,
   exposedHeaders: ['Authorization', 'Refreshtoken'],
 };
 const atlasURI = process.env.DB;
 
-const MongoConnect = async() => {
-  try {
-    await mongoose.connect(atlasURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
-    .then(() => console.log('Connected to MongoDB Atlas'))
-    .catch((err) => console.error('Error connecting to MongoDB Atlas:', err));
-  } catch(Err) {
-    console.error('MONGODB CONNECTION ERROR:', Err)
-  }
-
-  }
-
-MongoConnect()
+mongoose.connect(atlasURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('Connected to MongoDB Atlas'))
+.catch((err) => console.error('Error connecting to MongoDB Atlas:', err));
 
 const swaggerDocument = YAML.load('./src/utils/swagger.yaml');
 
@@ -81,6 +72,7 @@ app.get("/health", (req, res) => {
   const usedMemory = totalMemory - freeMemory;
 
   const diskInfo = os.cpus(); 
+  
 
   const healthStatus = {
     serverStatus: isServerOnline ? "Online" : "Offline",
@@ -101,11 +93,12 @@ app.get("/health", (req, res) => {
 });
 
 const server = http.createServer(app)
-
-app.use('/community/chat', (req, res, next) => {
-  initializeSocketIO(server);
-  next();
+const io = new Server(server, {
+  path: '/community/chat',
+  cors: corsOptions,
 })
+
+initializeSocketIO(io);
 
 
 server.listen(PORT, () => {
