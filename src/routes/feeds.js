@@ -119,23 +119,44 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
     const { userId } = req.user
     const page = parseInt(req.query.page) || 1;
     const pageSize = 10;
+    const { thismonth } = req.body
+
+    const firstday = startOfDay(thismonth)
+    const lastday = endOfDay(thismonth)
 
     // 이전 페이지에서 마지막 데이터의 createdAt 값 가져오기 (데이터의 마지막 index값에 해당하는 value의 createdAt 값을 전달받는다)
-    const lastCreatedAt = req.query.lastCreatedAt; // 클라이언트에서 전달된 마지막 데이터의 createdAt 값
-
+    if (!thismonth) {
+      const lastCreatedAt = req.query.lastCreatedAt; // 클라이언트에서 전달된 마지막 데이터의 createdAt 값
+  
+        const diaryEntries = await prisma.diaries.findMany({
+            where: {
+                UserId : userId,
+                createdAt: {
+                    lt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
+                }
+            },
+            take: pageSize,
+            skip: page > 1 ? (page - 1) * pageSize : 0,
+            orderBy: { createdAt: 'desc' }
+        });
+  
+        return res.status(200).json({ data: diaryEntries });
+    } else {
       const diaryEntries = await prisma.diaries.findMany({
-          where: {
-              UserId : userId,
-              createdAt: {
-                  lt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
-              }
-          },
-          take: pageSize,
-          skip: page > 1 ? (page - 1) * pageSize : 0,
-          orderBy: { createdAt: 'desc' }
-      });
+        where: {
+            UserId : userId,
+            createdAt: {
+                gte : firstday,
+                lte: lastday,
+            }
+        },
+        take: pageSize,
+        skip: page > 1 ? (page - 1) * pageSize : 0,
+        orderBy: { createdAt: 'desc' }
+    });
 
-      return res.status(200).json({ data: diaryEntries });
+    return res.status(200).json({ data: diaryEntries });
+    }
   } catch (err) {
     next(err);
   }
