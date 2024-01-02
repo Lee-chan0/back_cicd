@@ -1,7 +1,7 @@
 import express from "express";
 import { prisma } from "../utils/prisma/index.js";
 import authMiddleware from "../middleware/auth.middleware.js";
-import { startOfDay, endOfDay, subMonths } from "date-fns";
+import { startOfDay, endOfDay, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 
 const router = express.Router();
@@ -38,7 +38,7 @@ router.get("/feeds", async (req, res, next) => {
                     lt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
                 }
             },
-            take: pageSize,
+            take: pageSize, 
             skip: page > 1 ? (page - 1) * pageSize : 0,
             orderBy: { createdAt: 'desc' }
         });
@@ -122,14 +122,14 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
     const pageSize = 10;
     const date = req.query.date
     const thismonth = new Date(date)
+    const timezone = "Asia/Seoul"
 
-    const firstday = startOfDay(thismonth)
-    const lastday = endOfDay(thismonth)
+    const firstday = utcToZonedTime(startOfMonth(thismonth), timezone)
+    const lastday = utcToZonedTime(endOfMonth(thismonth), timezone)
 
     // 이전 페이지에서 마지막 데이터의 createdAt 값 가져오기 (데이터의 마지막 index값에 해당하는 value의 createdAt 값을 전달받는다)
     if (!date) {
-      const lastCreatedAt = req.query.lastCreatedAt; // 클라이언트에서 전달된 마지막 데이터의 createdAt 값
-  
+
         const diaryEntries = await prisma.diaries.findMany({
             where: {
                 UserId : userId,
