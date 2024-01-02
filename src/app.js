@@ -57,7 +57,7 @@ app.use('/', [
 app.use(errorHandlingMiddleware);
 
 app.get('/', (req, res) => {
-  res.send('<h1>SUCCESS</h1>');
+  res.send('<h1>Success</h1>');
 });
 
 // health체크 엔드포인트
