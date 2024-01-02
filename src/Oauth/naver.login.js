@@ -11,15 +11,15 @@ dotenv.config();
 
 const router = express.Router();
 
-router.post("/naver/callback", async (req, res) => {
+router.post("/naver/callback", async (req, res, next) => {
   try {
+    const { code } = req.body;
+    const { state } = req.body;
+
     const key = process.env.SECRET_KEY;
     const clientId = process.env.NAVER_CLIENT_ID;
     const clientSecret = process.env.NAVER_CLIENT_SECRET;
     const redirectUri = process.env.NAVER_REDIRECT_URI;
-
-    const { code } = req.body;
-    const { state } = req.body;
 
     const tokenParams = {
       grant_type: "authorization_code",
