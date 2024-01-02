@@ -19,7 +19,7 @@ import initializeSocketIO from '../src/utils/io.js'
 import os from 'os';
 import errorHandlingMiddleware from './middleware/error-handling.middleware.js';
 
-const app = express();
+const app = express()
 const PORT = 3000;
 
 dotenv.config();
