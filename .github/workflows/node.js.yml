@@ -55,6 +55,7 @@ jobs:
         echo S3_SECRET_ACCESS_KEY2=${{ secrets.S3_SECRET_ACCESS_KEY2 }} >> .env
         echo MONGO_DB=${{ secrets.MONGO_DB }} >> .env
         echo MAILER_EMAIL=${{ secrets.MAILER_EMAIL }} >> .env
+        echo MAILER_PASSWORD=${{ secrets.MAILER_PASSWORD }} >> .env
         cat .env
 
     - name: Debug MONGO_DB Value

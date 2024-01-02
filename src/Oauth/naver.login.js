@@ -28,7 +28,7 @@ router.post("/naver/callback", async (req, res, next) => {
       redirect_uri: redirectUri,
       code: code,
       state: state,
-    }
+    };
 
     const tokenResponse = await axios.post(
       "https://nid.naver.com/oauth2.0/token",

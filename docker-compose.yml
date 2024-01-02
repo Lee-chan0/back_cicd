@@ -42,6 +42,7 @@ services:
       - MONGO_DB=${MONGO_DB}
       - NAVER_REDIRECT_URI=${NAVER_REDIRECT_URI}
       - MAILER_EMAIL=${MAILER_EMAIL}
+      - MAILER_PASSWORD=${MAILER_PASSWORD}
     networks:
       - webnet
 
@@ -73,6 +74,7 @@ services:
       - MONGO_DB=${MONGO_DB}
       - NAVER_REDIRECT_URI=${NAVER_REDIRECT_URI}
       - MAILER_EMAIL=${MAILER_EMAIL}
+      - MAILER_PASSWORD=${MAILER_PASSWORD}
     networks:
       - webnet
 
