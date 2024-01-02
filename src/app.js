@@ -29,7 +29,7 @@ const corsOptions = {
   credentials: true,
   exposedHeaders: ['Authorization', 'Refreshtoken'],
 };
-const atlasURI = process.env.DB;
+const atlasURI = process.env.mongo_DB;
 
 mongoose.connect(atlasURI, {
   useNewUrlParser: true,
