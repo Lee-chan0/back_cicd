@@ -1,7 +1,7 @@
 import express from "express";
 import { prisma } from "../utils/prisma/index.js";
 import authMiddleware from "../middleware/auth.middleware.js";
-import { startOfDay, endOfDay, subMonths } from "date-fns";
+import { startOfDay, endOfDay, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
 
 const router = express.Router();
@@ -11,20 +11,47 @@ router.get("/feeds", async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const pageSize = 10;
+    const date = req.query.date
+    const thismonth = new Date(date)
 
-    // 이전 페이지에서 마지막 데이터의 createdAt 값 가져오기 (데이터의 마지막 index값에 해당하는 value의 createdAt 값을 전달받는다)
-    const lastCreatedAt = req.query.lastCreatedAt; // 클라이언트에서 전달된 마지막 데이터의 createdAt 값
-
-    const today = new Date();
     const timeZone = "Asia/Seoul";
-    const twoMonthsAgo = utcToZonedTime(
-      startOfDay(subMonths(today, 2)),
-      timeZone
-    );
-    const todaySeoulTime = utcToZonedTime(endOfDay(today), timeZone);
+    if (!date) {
 
+      // 이전 페이지에서 마지막 데이터의 createdAt 값 가져오기 (데이터의 마지막 index값에 해당하는 value의 createdAt 값을 전달받는다)
+      const lastCreatedAt = req.query.lastCreatedAt; // 클라이언트에서 전달된 마지막 데이터의 createdAt 값
+  
+      const today = new Date();
+      const twoMonthsAgo = utcToZonedTime(
+        startOfDay(subMonths(today, 2)),
+        timeZone
+      );
+      const todaySeoulTime = utcToZonedTime(endOfDay(today), timeZone);
+  
+  
+        const diaryEntries = await prisma.diaries.findMany({
+            where: {
+                isPublic : true,
+                createdAt: {
+                    gte: twoMonthsAgo, 
+                    lte: todaySeoulTime,
+                    // lastCreatedAt 값보다 큰 데이터만 가져오기 (중복 제거)
+                    lt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
+                }
+            },
+            take: pageSize, 
+            skip: page > 1 ? (page - 1) * pageSize : 0,
+            orderBy: { createdAt: 'desc' }
+        });
+  
+        return res.status(200).json({ data: diaryEntries });
+    } else {
+        const twoMonthsAgo = utcToZonedTime(
+        startOfDay(subMonths(thismonth, 2)),
+        timeZone
+        );
+        const todaySeoulTime = utcToZonedTime(endOfDay(thismonth), timeZone)
 
-      const diaryEntries = await prisma.diaries.findMany({
+        const diaryEntries = await prisma.diaries.findMany({
           where: {
               isPublic : true,
               createdAt: {
@@ -39,7 +66,9 @@ router.get("/feeds", async (req, res, next) => {
           orderBy: { createdAt: 'desc' }
       });
 
-      res.status(200).json({ data: diaryEntries });
+      return res.status(200).json({ data: diaryEntries });
+    }
+
   } catch (err) {
     next(err);
   }
@@ -91,23 +120,46 @@ router.get("/feeds/mydiaries", authMiddleware, async (req, res, next) => {
     const { userId } = req.user
     const page = parseInt(req.query.page) || 1;
     const pageSize = 10;
+    const date = req.query.date
+    const thismonth = new Date(date)
+
+    const firstday = startOfMonth(thismonth)
+    const lastday = endOfMonth(thismonth)
 
     // 이전 페이지에서 마지막 데이터의 createdAt 값 가져오기 (데이터의 마지막 index값에 해당하는 value의 createdAt 값을 전달받는다)
-    const lastCreatedAt = req.query.lastCreatedAt; // 클라이언트에서 전달된 마지막 데이터의 createdAt 값
+    if (!date) {
 
+        const today = new Date()
+        const diaryEntries = await prisma.diaries.findMany({
+            where: {
+                UserId : userId,
+                createdAt: {
+                    lte: today,
+                    lt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
+                }
+            },
+            take: pageSize,
+            skip: page > 1 ? (page - 1) * pageSize : 0,
+            orderBy: { createdAt: 'desc' }
+        });
+  
+        return res.status(200).json({ data: diaryEntries });
+    } else {
       const diaryEntries = await prisma.diaries.findMany({
-          where: {
-              UserId : userId,
-              createdAt: {
-                  lt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
-              }
-          },
-          take: pageSize,
-          skip: page > 1 ? (page - 1) * pageSize : 0,
-          orderBy: { createdAt: 'desc' }
-      });
+        where: {
+            UserId : userId,
+            createdAt: {
+                gte : firstday,
+                lte: lastday,
+            }
+        },
+        take: pageSize,
+        skip: page > 1 ? (page - 1) * pageSize : 0,
+        orderBy: { createdAt: 'desc' }
+    });
 
-      res.status(200).json({ data: diaryEntries });
+    return res.status(200).json({ data: diaryEntries });
+    }
   } catch (err) {
     next(err);
   }

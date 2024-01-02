@@ -29,7 +29,7 @@ const corsOptions = {
   credentials: true,
   exposedHeaders: ['Authorization', 'Refreshtoken'],
 };
-const atlasURI = process.env.DB;
+const atlasURI = process.env.mongo_DB;
 
 mongoose.connect(atlasURI, {
   useNewUrlParser: true,
@@ -93,12 +93,9 @@ app.get("/health", (req, res) => {
 });
 
 const server = http.createServer(app)
-const io = new Server(server, {
-  path: '/community/chat',
-  cors: corsOptions,
-})
 
-initializeSocketIO(io);
+
+initializeSocketIO(server);
 
 
 server.listen(PORT, () => {
