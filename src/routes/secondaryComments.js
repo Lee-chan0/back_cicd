@@ -1,6 +1,7 @@
 import express from "express";
 import { prisma } from "../utils/prisma/index.js";
 import authMiddleware from "../middleware/auth.middleware.js";
+import { CommentSchema } from '../middleware/validation/joi.error.definition.js'
 
 const router = express.Router();
 
@@ -11,8 +12,8 @@ router.post(
   authMiddleware,
   async (req, res, next) => {
     try {
-      const { diaryId, commentId } = req.params;
-      const { content } = req.body;
+      const { diaryId, commentId } = await CommentSchema.validateAsync(req.params);
+      const { content } = await CommentSchema.validateAsync(req.body);
       const { userId } = req.user;
 
       await prisma.secondaryComments.create({
@@ -36,7 +37,7 @@ router.get(
   "/diary/detail/secondaryComment/:diaryId",
   async (req, res, next) => {
     try {
-      const { diaryId } = req.params;
+      const { diaryId } = await CommentSchema.validateAsync(req.params);
 
       const secondaryComments = await prisma.secondaryComments.findMany({
         where: {
@@ -57,9 +58,9 @@ router.patch(
   authMiddleware,
   async (req, res, next) => {
     try {
-      const { commentId } = req.params;
+      const { commentId } = await CommentSchema.validateAsync(req.params);
       const { userId } = req.user;
-      const { content } = req.body;
+      const { content } = await CommentSchema.validateAsync(req.body);
 
       let comment = await prisma.comments.findFirst({
         where: { commentId: +commentId },
@@ -89,7 +90,7 @@ router.delete(
   authMiddleware,
   async (req, res, next) => {
     try {
-      const { secondaryCommentId } = req.params;
+      const { secondaryCommentId } = CommentSchema.validateAsync(req.params);
       const { userId } = req.user;
 
       const comment = await prisma.secondaryComments.findFirst({

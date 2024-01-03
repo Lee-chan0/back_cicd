@@ -16,7 +16,8 @@ const UserInfoSchema = joi.object({
 const CommentSchema = joi.object({
   content: joi.string().pattern(commentPattern),
   diaryId: joi.number().integer(),
-  commentId: joi.number().integer()
+  commentId: joi.number().integer(),
+  secondaryCommentId : joi.number().integer()
 })
 
 const DiarySchema = joi.object({
@@ -31,4 +32,9 @@ const DiarySchema = joi.object({
   sleep : joi.string()
 })
 
-export { UserInfoSchema, CommentSchema, DiarySchema };
+const CalendarSchema = joi.object({
+  year : joi.number().integer(),
+  month : joi.number().integer()
+})
+
+export { UserInfoSchema, CommentSchema, DiarySchema, CalendarSchema };

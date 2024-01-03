@@ -2,6 +2,7 @@ import express from "express";
 import { prisma } from "../utils/prisma/index.js";
 import authMiddleware from "../middleware/auth.middleware.js";
 import { getDate, addHours } from "date-fns";
+import { CalendarSchema}  from '../middleware/validation/joi.error.definition.js'
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ const router = express.Router();
 router.get("/diary/calendar/:year/:month", authMiddleware, async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { year, month } = req.params; // 파라미터로부터 년도와 월 값 가져오기
+    const { year, month } = await CalendarSchema.validateAsync(req.params); // 파라미터로부터 년도와 월 값 가져오기
 
     // year와 month를 기반으로 날짜 범위 계산
     const startDate = new Date(year, month - 1, 1); // month는 0부터 시작하기 때문에 -1
