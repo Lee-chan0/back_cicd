@@ -4,7 +4,7 @@ const usernamePattern = /^[가-힣a-zA-Z0-9]{2,10}$/;
 const passwordPattern = /^(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,20}$/;
 
 const commentPattern = /^.{1,200}$/
-const contentPatter = /^.{1,200}$/
+const contentPattern = /^.{1,200}$/
 
 const UserInfoSchema = joi.object({
   username: joi.string().pattern(usernamePattern),
@@ -21,8 +21,8 @@ const CommentSchema = joi.object({
 
 const DiarySchema = joi.object({
   diaryId : joi.number().integer(),
-  EmotionalStatus : joi.number(),
-  content : joi.string().pattern(contentPatter),
+  EmotionStatus : joi.number(),
+  content : joi.string().pattern(contentPattern),
   isPublic : joi.boolean(),
   weather : joi.string(),
   sentence : joi.string(),
