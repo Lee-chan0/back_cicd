@@ -24,7 +24,7 @@ const DiarySchema = joi.object({
   EmotionalStatus : joi.number(),
   content : joi.string().pattern(contentPatter),
   isPublic : joi.boolean(),
-  weather : joi.number(),
+  weather : joi.string(),
   sentence : joi.string(),
   temperature : joi.number(),
   humid : joi.number(),
