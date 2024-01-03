@@ -17,9 +17,6 @@ const initializeSocketIO = function (server) {
     socket.on('login', async (userName, cb) => {
       try {
         const user = await userController.saveUser(userName, socket.id);
-        connectedUsers[socket.id] = user;
-
-        io.emit('connectedUsers', Object.values(connectedUsers).map(user => user.name))
         
         const welcomeMessage = {
           chat: `${(user.name).split(".")[0]} has joined the chat room`,
@@ -46,9 +43,6 @@ const initializeSocketIO = function (server) {
     socket.on('disconnect', async () => {
       const user = await userController.checkUser(socket.id);
       if (user) {
-        delete connectedUsers[socket.id]
-
-        io.emit('connectedUsers', Object.values(connectedUsers).map(user => user.name))
         const leavingMessage = {
           chat: `${(user.name).split(".")[0]} has left the chat room`,
           user: { id: null, name: 'system' },
