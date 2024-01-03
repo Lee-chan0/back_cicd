@@ -258,45 +258,81 @@ router.post("/token", async (req, res, next) => {
   }
 });
 
-// 내 정보 수정 API
 router.patch("/myInfo/editmyInfo", authMiddleware, imageUpload.single("image"), async (req, res, next) => {
-    try {
-      const { userId } = req.user;
+  try{
+    if(!req.file){
+      const {userId} = req.user;
+      const validation = await UserInfoSchema.validateAsync(req.body);
+      const {username} = validation;
+      const editmyInfo = await prisma.users.update({
+        where : {
+          userId : +userId
+        },
+        data : {
+          username : username,
+        }
+      })
+      return res.status(201).json({message : "수정이 완료되었습니다."})
+    }else{
+      const {userId} = req.user;
       const imageUrl = req.file.location;
       const validation = await UserInfoSchema.validateAsync(req.body);
-      const { username } = validation;
-
+      const {username} = validation;
       const editmyInfo = await prisma.users.update({
-        where: { userId: +userId },
-        data: {
-          username: username,
-          profileImg: imageUrl,
-        },
-      });
-      return res.status(201).json({ message: "수정이 완료되었습니다." });
-    } catch (err) {
-      if (err.name === "TypeError") {
-        try {
-          const validation = await UserInfoSchema.validateAsync(req.body);
-          const { username } = validation;
-          const { refreshtoken } = req.headers;
-          const key = process.env.SECRET_KEY;
-          const userId = jwt.verify(refreshtoken, key).userId;
-          const editmyInfo = await prisma.users.update({
-            where: { userId: +userId },
-            data: {
-              username: username,
-            },
-          });
-          return res.status(201).json({ message: "수정이 완료되었습니다." });
-        } catch (err) {
-          next(err);
+        where : {userId : +userId},
+        data : {
+          username : username,
+          profileImg : imageUrl
         }
-      }
-      next(err);
+      })
+      return res.status(201).json({message : "수정이 완료되었습니다."});
     }
+  }catch(err){
+    next(err);
   }
-);
+})
+// 내 정보 수정 API
+// router.patch("/myInfo/editmyInfo", authMiddleware, imageUpload.single("image"), async (req, res, next) => {
+//     try {
+//       if(!req.file){
+
+//       }
+//       const { userId } = req.user;
+//       const imageUrl = req.file.location;
+//       const validation = await UserInfoSchema.validateAsync(req.body);
+//       const { username } = validation;
+
+//       const editmyInfo = await prisma.users.update({
+//         where: { userId: +userId },
+//         data: {
+//           username: username,
+//           profileImg: imageUrl,
+//         },
+//       });
+//       return res.status(201).json({ message: "수정이 완료되었습니다." });
+//     } catch (err) {
+//       if (err.name === "TypeError") {
+//         try {
+//           const validation = await UserInfoSchema.validateAsync(req.body);
+//           const { username } = validation;
+//           const { refreshtoken } = req.headers;
+//           const key = process.env.SECRET_KEY;
+//           const userId = jwt.verify(refreshtoken, key).userId;
+//           const editmyInfo = await prisma.users.update({
+//             where: { userId: +userId },
+//             data: {
+//               username: username,
+//             },
+//           });
+//           return res.status(201).json({ message: "수정이 완료되었습니다." });
+//         } catch (err) {
+//           next(err);
+//         }
+//       }
+//       next(err);
+//     }
+//   }
+// );
 
 // 비밀번호 변경 API
 router.patch("/myInfo/edit-pw", authMiddleware, async (req, res, next) => {
