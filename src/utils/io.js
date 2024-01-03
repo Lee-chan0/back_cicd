@@ -31,16 +31,8 @@ const initializeSocketIO = function (server) {
     socket.on('sendMessage', async (message, cb) => {
       try {
         const user = await userController.checkUser(socket.id);
-        const newMessage = {
-          message: messageData.message,
-          user: {
-            id: user.id,
-            name: user.name,
-          }
-        }
-        
-        const savedMessage = await chatController.saveChat(newMessage, user);
-        io.emit('message', savedMessage);
+        const newMessage = await chatController.saveChat(message, user);
+        io.emit('message', newMessage);
         cb({ ok: true });
       } catch (error) {
         cb({ ok: false, error: error.message });
