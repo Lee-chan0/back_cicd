@@ -4,6 +4,7 @@ import authMiddleware from '../middleware/auth.middleware.js';
 import { startOfDay, endOfDay } from 'date-fns';
 import { utcToZonedTime } from 'date-fns-tz';
 import { upload } from '../middleware/S3.upload/multer.js'
+import { DiarySchema } from '../middleware/validation/joi.error.definition.js';
 
 
 
@@ -23,7 +24,7 @@ setInterval(() => {
 /* 일기 상세 조회 */
 router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
   try {
-      const { diaryId } = req.params;
+      const { diaryId } = await DiarySchema.validateAsync(req.params);
       const { userId } = req.user
 
       
@@ -79,7 +80,7 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
 router.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { EmotionStatus, content, isPublic, weather, sentence, temperature, humid, sleep } = req.body;
+    const { EmotionStatus, content, isPublic, weather, sentence, temperature, humid, sleep } = await DiarySchema.validateAsync(req.body);
 
     const  imageUrl = req.file.location
 
@@ -131,8 +132,8 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
 router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { diaryId } = req.params
-    const { content, isPublic } = req.body;
+    const { diaryId } = await DiarySchema.validateAsync(req.params);
+    const { content, isPublic } = await DiarySchema.validateAsync(req.body);
 
     const diaryExists = await prisma.diaries.findFirst({
       where: {
@@ -164,7 +165,7 @@ router.patch('/diary/edit/:diaryId', authMiddleware, async (req, res, next) => {
 /* 일기 삭제 */
 router.delete('/diary/delete/:diaryId', authMiddleware, async (req, res, next) => {
 try{
-  const {diaryId} = req.params
+  const {diaryId} = await DiarySchema.validateAsync(req.params);
 
   const diary = await prisma.diaries.findFirst({
     where: {diaryId : +diaryId}
