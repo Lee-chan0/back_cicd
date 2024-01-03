@@ -80,7 +80,7 @@ router.get('/diary/detail/:diaryId', authMiddleware, async (req, res, next) => {
 router.post('/diary/posting', authMiddleware, upload.single('image'), async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { EmotionStatus, content, isPublic, weather, sentence, temperature, humid, sleep } = await DiarySchema.validateAsync(req.body);
+    const { EmotionalStatus, content, isPublic, weather, sentence, temperature, humid, sleep } = await DiarySchema.validateAsync(req.body);
 
     const  imageUrl = req.file.location
 
@@ -106,7 +106,7 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
 
     const savedDiary = await prisma.diaries.create({
       data: {
-        EmotionStatus : +EmotionStatus,
+        EmotionStatus : +EmotionalStatus,
         content,
         image: imageUrl,
         isPublic: Boolean(isPublic),
