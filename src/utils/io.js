@@ -32,7 +32,7 @@ const initializeSocketIO = function (server) {
       try {
         const user = await userController.checkUser(socket.id);
         const newMessage = await chatController.saveChat(message, user);
-        io.emit('message', user.name.split(".")[0], newMessage);
+        io.emit('message', newMessage);
         cb({ ok: true });
       } catch (error) {
         cb({ ok: false, error: error.message });
