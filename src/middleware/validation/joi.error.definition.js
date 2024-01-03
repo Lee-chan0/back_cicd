@@ -21,9 +21,9 @@ const CommentSchema = joi.object({
 })
 
 const DiarySchema = joi.object({
-  diaryId : joi.number().integer(contentPattern),
+  diaryId : joi.number().integer(),
   EmotionStatus : joi.number(),
-  content : joi.string().pattern(),
+  content : joi.string().pattern(contentPattern),
   isPublic : joi.boolean(),
   weather : joi.string(),
   sentence : joi.string(),

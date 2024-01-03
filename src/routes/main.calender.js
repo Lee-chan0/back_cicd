@@ -2,7 +2,7 @@ import express from "express";
 import { prisma } from "../utils/prisma/index.js";
 import authMiddleware from "../middleware/auth.middleware.js";
 import { getDate, addHours } from "date-fns";
-import { CalendarSchema}  from '../middleware/validation/joi.error.definition.js'
+import { CalendarSchema }  from '../middleware/validation/joi.error.definition.js'
 
 const router = express.Router();
 
