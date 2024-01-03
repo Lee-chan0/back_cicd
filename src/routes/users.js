@@ -263,8 +263,7 @@ router.patch("/myInfo/editmyInfo", authMiddleware, imageUpload.single("image"), 
     try {
       const { userId } = req.user;
       const imageUrl = req.file.location;
-      const validation = await UserInfoSchema.validateAsync(req.body);
-      const { username } = validation;
+      const { username } = req.body;
 
       const editmyInfo = await prisma.users.update({
         where: { userId: +userId },
@@ -277,8 +276,7 @@ router.patch("/myInfo/editmyInfo", authMiddleware, imageUpload.single("image"), 
     } catch (err) {
       if (err.name === "TypeError") {
         try {
-          const validation = await UserInfoSchema.validateAsync(req.body);
-          const { username } = validation;
+          const { username } = req.body;
           const { refreshtoken } = req.headers;
           const key = process.env.SECRET_KEY;
           const userId = jwt.verify(refreshtoken, key).userId;
