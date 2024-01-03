@@ -19,7 +19,7 @@ import initializeSocketIO from '../src/utils/io.js'
 import os from 'os';
 import errorHandlingMiddleware from './middleware/error-handling.middleware.js';
 
-const app = express();
+const app = express()
 const PORT = 3000;
 
 dotenv.config();
@@ -57,7 +57,7 @@ app.use('/', [
 app.use(errorHandlingMiddleware);
 
 app.get('/', (req, res) => {
-  res.send('<h1>SUCCESS</h1>');
+  res.send('<h1>Success</h1>');
 });
 
 // health체크 엔드포인트

@@ -10,7 +10,7 @@ import qs from "qs";
 dotenv.config();
 const router = express.Router();
 
-router.post("/kakao/callback", async function (req, res) {
+router.post("/kakao/callback", async function (req, res, next) {
   const { code } = req.body;
   const key = process.env.SECRET_KEY;
   try {
