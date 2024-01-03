@@ -17,6 +17,7 @@ const initializeSocketIO = function (server) {
     socket.on('login', async (userName, cb) => {
       try {
         const user = await userController.saveUser(userName, socket.id);
+        
         const welcomeMessage = {
           chat: `${(user.name).split(".")[0]} has joined the chat room`,
           user: { id: null, name: 'system' },
@@ -43,7 +44,7 @@ const initializeSocketIO = function (server) {
       const user = await userController.checkUser(socket.id);
       if (user) {
         const leavingMessage = {
-          chat: `${user.name} has left the chat room`,
+          chat: `${(user.name).split(".")[0]} has left the chat room`,
           user: { id: null, name: 'system' },
         };
         io.emit('message', leavingMessage);
