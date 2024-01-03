@@ -26,9 +26,9 @@ const DiarySchema = joi.object({
   isPublic : joi.boolean(),
   weather : joi.string(),
   sentence : joi.string(),
-  temperature : joi.number(),
-  humid : joi.number(),
-  sleep : joi.number()
+  temperature : joi.string(),
+  humid : joi.string(),
+  sleep : joi.string()
 })
 
 export { UserInfoSchema, CommentSchema, DiarySchema };
