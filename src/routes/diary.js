@@ -106,7 +106,7 @@ router.post('/diary/posting', authMiddleware, upload.single('image'), async (req
 
     const savedDiary = await prisma.diaries.create({
       data: {
-        EmotionalStatus : +EmotionStatus,
+        EmotionStatus : +EmotionStatus,
         content,
         image: imageUrl,
         isPublic: Boolean(isPublic),

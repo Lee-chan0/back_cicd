@@ -22,7 +22,7 @@ const CommentSchema = joi.object({
 const DiarySchema = joi.object({
   diaryId : joi.number().integer(),
   EmotionStatus : joi.number(),
-  content : joi.string().pattern(contentPattern),
+  content : joi.string(),
   isPublic : joi.boolean(),
   weather : joi.string(),
   sentence : joi.string(),
