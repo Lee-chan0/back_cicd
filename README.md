@@ -123,7 +123,7 @@ NINE Cloud는 매일 하나의 일기를 작성하며 자신의 감정을 되돌
 
 ## 🔎 API
 
-[Notion API 명세서 주소 => ](https://www.notion.so/API-22f9456b7c254576b2a9cbc101c603d1)
+[Notion API 명세서 주소 바로가기](https://www.notion.so/API-22f9456b7c254576b2a9cbc101c603d1)
 
 <details>
 <summary>NINE Cloud Swagger (API)</summary>
