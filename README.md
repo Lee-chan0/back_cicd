@@ -125,13 +125,22 @@ NINE Cloud는 매일 하나의 일기를 작성하며 자신의 감정을 되돌
 
 [Notion API 명세서 주소 => ](https://www.notion.so/API-22f9456b7c254576b2a9cbc101c603d1)
 
-![캡처2](https://github.com/Lee-chan0/nomyproject/assets/147553654/b42a681c-1e56-4a08-94de-b601727e39a3)
-![캡처3](https://github.com/Lee-chan0/nomyproject/assets/147553654/980c3de8-3e8f-46b9-bd2c-2e5a0aedf415)
-![캡처4](https://github.com/Lee-chan0/nomyproject/assets/147553654/3ff9b052-0a8b-401c-b714-823ab3920227)
+<details>
+<summary>NINE Cloud Swagger (API)</summary>
+<br>
+<img src="https://github.com/Lee-chan0/nomyproject/assets/147553654/f06f41de-537a-4d8d-9bea-c63504c528d4" alt="swagger1">
+<img src="https://github.com/Lee-chan0/nomyproject/assets/147553654/ee1a0c9a-fd82-4bec-aa53-fe660985500a" alt="swagger2">
+<img src="https://github.com/Lee-chan0/nomyproject/assets/147553654/0d736c5e-6d8b-4028-ab28-0bc2d487d258" alt="swagger3">
+</details>
+
 
 ## 📋 ERD
 
-![drawSQL-finalproject-export-2023-12-21](https://github.com/Lee-chan0/nomyproject/assets/147553654/882e770c-f5b9-4b0b-8053-a73578bc256d)
+<details>
+<summary>NINE Cloud ERD</summary>
+<br>
+<img src="https://github.com/Lee-chan0/nomyproject/assets/147553654/1c663652-ece2-467a-9f03-80686c5b2412" alt="drawSQL-finalproject-export-2023-12-21">
+</details>
 
 ## 💣 트러블슈팅
 <details>
