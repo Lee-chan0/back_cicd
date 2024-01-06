@@ -48,7 +48,8 @@ NINE Cloud는 매일 하나의 일기를 작성하며 자신의 감정을 되돌
 
 ## ❄️ Project Architecture
 
-![Untitled Diagram drawio (3)](https://github.com/Lee-chan0/nomyproject/assets/147553654/40f530a0-16cd-4abd-9c66-c57508d5c5d4)
+
+![architecture drawio](https://github.com/Lee-chan0/nomyproject/assets/147553654/d2e4b840-1f3b-430c-9ec4-66394a65250e)
 
 
 ## Stacks
@@ -123,7 +124,7 @@ NINE Cloud는 매일 하나의 일기를 작성하며 자신의 감정을 되돌
 
 ## 🔎 API
 
-[Notion API 명세서 주소 바로가기](https://www.notion.so/API-22f9456b7c254576b2a9cbc101c603d1)
+[Notion API 명세서 주소 => ](https://www.notion.so/API-22f9456b7c254576b2a9cbc101c603d1)
 
 <details>
 <summary>NINE Cloud Swagger (API)</summary>
