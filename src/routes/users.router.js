@@ -16,6 +16,7 @@ router.patch('/myInfo/editmyInfo', authMiddleware, imageUpload.single("image"), 
 router.patch('/myInfo/edit-pw', authMiddleware, usersController.editPassWord);
 router.delete('/signoff', authMiddleware, usersController.signOffUser);
 router.post('/cancel-signoff', usersController.cancelSignOff);
+router.post('/signoffInProgress', usersController.signoffInProgress);
 
 
 export default router;

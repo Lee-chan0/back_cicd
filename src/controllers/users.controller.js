@@ -132,7 +132,20 @@ export class UsersController {
 
             const result = this.usersService.CancelSignOff(email);
 
-            return res.status(201).json({message : `탈퇴 요청이 취소되었습니다.`, msg : `탈퇴까지 ${result.days}일, ${result.hours}시간 남았습니다.`});
+            return res.status(201).json({message : `탈퇴 요청이 취소되었습니다.`});
+        }catch(err){
+            next(err);
+        }
+    }
+
+    signoffInProgress = async(req, res, next) => {
+        try{
+            const validation = await UserInfoSchema.validateAsync(req.body);
+            const {email} = validation;
+
+            const result = await this.usersService.SignoffInProgress(email);
+
+            return res.status(201).json({message : `탈퇴까지 ${result.days}일, ${result.hours}시간 남았습니다.`});
         }catch(err){
             next(err);
         }

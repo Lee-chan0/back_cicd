@@ -198,11 +198,6 @@ export class UsersService {
   }
 
   CancelSignOff = async(email) => {
-    const currentDate = new Date();
-    const deleteDate = new Date(currentDate);
-
-    deleteDate.setUTCHours(deleteDate.getUTCHours() + 9);
-
     const findUser = await this.usersRepository.findUserByEmail(email);
     if(!findUser){
         const error = new Error('사용자가 없습니다.');
@@ -210,20 +205,40 @@ export class UsersService {
         throw error;
     }
 
-    const subTime = findUser.deletedAt - deleteDate;
-
-    const Day = 24 * 60 * 60 * 1000;
-    const Hour = 60 * 60 * 1000;
-
-    const days = Math.floor(subTime / Day);
-    const hours = Math.floor((subTime % Day) / Hour);
-
     const Cancel_Signoff = await this.usersRepository.SignOffCancel(email);
 
     return {
-        Cancel_Signoff,
-        days,
-        hours,
+        Cancel_Signoff
+    }
+  }
+
+  SignoffInProgress = async(email) => {
+    const currentDate = new Date();
+    const deleteDate = new Date(currentDate);
+    console.log(currentDate);
+
+    deleteDate.setUTCHours(deleteDate.getUTCHours() + 9);
+    console.log(deleteDate);
+    const findUser = await this.usersRepository.findUserByEmail(email);
+    if(!findUser){
+        const error = new Error('사용자가 없습니다.');
+        error.status = 400;
+        throw error;
+    }else {
+      const subTime = findUser.deletedAt - deleteDate;
+      console.log(subTime);
+
+      const Day = 24 * 60 * 60 * 1000;
+      const Hour = 60 * 60 * 1000;
+
+      const days = Math.floor(subTime / Day);
+      const hours = Math.floor((subTime % Day) / Hour);
+      console.log(days)
+      console.log(hours)
+
+      return {
+        days, hours
+      }
     }
   }
 }
