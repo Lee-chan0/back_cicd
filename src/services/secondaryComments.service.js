@@ -1,6 +1,6 @@
 import { SecondaryCommentsRepository } from '../repositories/secondaryComments.repository.js'
 
-export class SecondaryCommmentService {
+export class SecondaryCommentsService {
     secondaryCommentRepository = new SecondaryCommentsRepository();
 
     findSecondaryComments = async (diaryId) => {

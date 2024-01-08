@@ -75,8 +75,6 @@ export class DiaryRepository{
         })
         return diary
     }
-}
-
     updateDiary = async ( diaryId, content, isPublic) => {
         const updatedDiary = await prisma.diaries.update({
             where : {
@@ -98,3 +96,4 @@ export class DiaryRepository{
         })
         return deletedDiary
     }
+}

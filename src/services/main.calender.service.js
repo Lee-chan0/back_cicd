@@ -1,7 +1,8 @@
 import { CalendarRepository } from '../repositories/main.calender.repository.js'
 
-export class CalenderService {
-    calendarRepository = CalendarRepository();
+export class CalendarService {
+    calendarRepository = new CalendarRepository();
+    
 
     getCalendar = async (userId, startDate, endDate) => {
         const diaries = await this.calendarRepository.getCalendar(

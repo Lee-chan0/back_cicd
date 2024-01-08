@@ -1,4 +1,4 @@
-import { CalendarService } from '../services/comments.service.js'
+import { CalendarService } from '../services/main.calender.service.js'
 import { CalendarSchema } from '../validation/joi.validation.js'
 import { getDate, addHours } from "date-fns";
 
