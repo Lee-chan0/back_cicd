@@ -25,9 +25,9 @@ export class DiaryController {
             const { diaryId } = await DiarySchema.validateAsync(req.params);
             const { userId } = req.user
 
-            const diary = this.diaryService.findDiary(diaryId, userId)
+            const diary = await this.diaryService.findDiary(diaryId, userId)
 
-            const isliked = this.diaryService.findliked(diaryId, userId)
+            const isliked = await this.diaryService.findliked(diaryId, userId)
 
             if (!diary) {
                 return res.status(400).json({ message : "존재하지 않는 일기입니다"})
@@ -38,7 +38,7 @@ export class DiaryController {
                 const currentTime = new Date().getTime()
         
                 if (currentTime - lastTime < 600000) {
-                  return res.status(200).json({ data: diaryDetail, like: isliked})
+                  return res.status(200).json({ data: diary, like: isliked})
                 }
               }
               /* 조회수 기능 */

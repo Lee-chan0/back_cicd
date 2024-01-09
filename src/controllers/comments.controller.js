@@ -8,8 +8,9 @@ export class CommentsController {
 createComments = async (req, res, next) => {
     try {
     const { diaryId } = await CommentSchema.validateAsync(req.params);
-    const { content } = await CommentSchema.validateAsync(req.body);
+    const { content } = req.body;
     const { userId } = req.user;
+
 
     await this.commentsService.createComment(
         diaryId,
@@ -81,11 +82,7 @@ deleteComment = async (req, res, next) => {
         }
 
         await this.commentsService.deleteComment(commentId, userId)
-        // where: {
-        //     commentId: +commentId,
-        //     UserId: userId,
-        //   }
-        
+
         return res.status(201).json({ message: "댓글 삭제 완료"})
     } catch (err) {
         next (err)

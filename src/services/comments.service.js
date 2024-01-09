@@ -27,19 +27,15 @@ export class CommentsService {
             return b.createdAt - a.createdAt
         })
 
-        return comments.map((comment) => {
-            return {
-                DiaryId : comment.DiaryId,
-                UserId : comment.UserId,
-                content: comment.content,
-                createdAt: comment.createdAt,
-                updatedAt: comment.updatedAt
-            }
-        })
+        return comments
+
     }
 
     findComment = async (commentId, userId) => {
-        const comment = await this.commentsRepository.findComment(commentId, userId)
+        const comment = await this.commentsRepository.findComment(
+            commentId, 
+            userId
+            )
 
         return comment
     }
@@ -51,14 +47,7 @@ export class CommentsService {
             content,
         )
 
-        return {
-            DiaryId: updatedcomment.DiaryId,
-            UserId: updatedcomment.UserId,
-            content: updatedcomment.content,
-            createdAt: updatedcomment.createdAt,
-            updatedAt : updatedcomment.updatedAt,
-            isEdited : updatedcomment.isEdited
-        }
+        return updatedcomment
     }
 
     deleteComment = async (commentId, userId) => {
