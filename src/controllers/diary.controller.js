@@ -27,6 +27,8 @@ export class DiaryController {
 
             const diary = this.diaryService.findDiary(diaryId, userId)
 
+            const isliked = this.diaryService.findliked(diaryId, userId)
+
             if (!diary) {
                 return res.status(400).json({ message : "존재하지 않는 일기입니다"})
             }

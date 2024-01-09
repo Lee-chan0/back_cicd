@@ -9,6 +9,6 @@ const secondaryCommentController = new SecondaryCommentController()
 router.post('/diary/detail/secondaryComment/:diaryId/:commentId', authMiddleware, secondaryCommentController.createSecondaryComment)
 router.get('/diary/detail/secondaryComment/:diaryId', authMiddleware, secondaryCommentController.getSecondComments)
 router.patch('/diary/detail/secondaryComment/:diaryId/:commentId', authMiddleware, secondaryCommentController.updateSecondaryComment)
-router.delete('/diary/detail/comment/:secondaryCommentId', authMiddleware, secondaryCommentController.deleteSecondaryComment)
+router.delete('/diary/detail/secondaryComment/:secondaryCommentId', authMiddleware, secondaryCommentController.deleteSecondaryComment)
 
 export default router;

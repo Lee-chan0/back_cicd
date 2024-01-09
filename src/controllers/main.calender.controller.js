@@ -13,6 +13,9 @@ export class CalendarController {
             const startDate = new Date(year, month - 1, 1); // month는 0부터 시작하기 때문에 -1
             const endDate = new Date(year, month, 0);
 
+            console.log(startDate)
+            console.log(endDate)
+
             const diaries = await this.calendarService.getCalendar(
                 userId,
                 startDate,

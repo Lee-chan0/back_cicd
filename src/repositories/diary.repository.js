@@ -14,6 +14,16 @@ export class DiaryRepository{
         return diary
     }
 
+    findliked = async (diaryId, userId) => {
+        const isliked = await prisma.diaryLikes.findFirst({
+            where : {
+              DiaryId : +diaryId,
+              UserId : +userId
+            }
+          })
+          return isliked
+    }
+
     findMyDiary = async (diaryId, userId) => {
         const diary = await prisma.diaries.findFirst({
             where : {
@@ -88,10 +98,11 @@ export class DiaryRepository{
         return updatedDiary
     }
 
-    deleteDiary = async (diaryId) => {
+    deleteDiary = async (diaryId, userId) => {
         const deletedDiary = await prisma.diaries.delete({
             where : {
-                diaryId : +diaryId
+                diaryId : +diaryId,
+                UserId : userId
             }
         })
         return deletedDiary

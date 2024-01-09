@@ -4,7 +4,7 @@ export class CalendarRepository {
     getCalendar = async (userId, startDate, endDate) => {
         const diaries = await prisma.diaries.findMany({
             where: {
-                userId: userId,
+                UserId: userId,
                 createdAt: {
                     gte: startDate,
                     lte: endDate,

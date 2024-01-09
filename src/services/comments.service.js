@@ -38,23 +38,15 @@ export class CommentsService {
         })
     }
 
-    findComment = async (commentId) => {
-        const comment = await this.commentsRepository.findComment(commentId)
+    findComment = async (commentId, userId) => {
+        const comment = await this.commentsRepository.findComment(commentId, userId)
 
-        return {
-            DiaryId: comment.DiaryId,
-            UserId: comment.UserId,
-            content: comment.content,
-            createdAt: comment.createdAt,
-            updatedAt : comment.updatedAt,
-        }
+        return comment
     }
 
     updateComment = async (commentId, content) => {
-        const comment = await this.commentsRepository.findComment(
-            commentId
-        )
-        const updatedcomment = await comment.commentsRepository.updateComment(
+
+        const updatedcomment = await this.commentsRepository.updateComment(
             commentId,
             content,
         )

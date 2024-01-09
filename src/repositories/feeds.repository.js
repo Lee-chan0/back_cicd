@@ -10,10 +10,10 @@ export class FeedsRepository {
                     lte: todaySeoulTime,
                     lt: lastCreatedAt ? new Date(lastCreatedAt) : undefined,
                 },
-                take: pageSize, 
-                skip: page > 1 ? (page - 1) * pageSize : 0,
-                orderBy: { createdAt: 'desc' }
-            }
+            },
+            take: pageSize, 
+            skip: page > 1 ? (page - 1) * pageSize : 0,
+            orderBy: { createdAt: 'desc' }
         })
         return feeds
     }
@@ -62,24 +62,36 @@ export class FeedsRepository {
         const existsDiary = await prisma.diaries.findFirst({
             where: { diaryId: +diaryId },
           });
+          return existsDiary
     }
 
     existsLikeDiaryLikeId = async (diaryId, userId) => {
         const existsLike = await prisma.diaryLikes.findFirst({
             where :{
                 DiaryId : +diaryId,
-                UserId : +userId
+                UserId : userId
             }
         })
         return existsLike.diarylikeId
     }
 
+
     deleteLike = async (diarylikeId, diaryId, userId) => {
         await prisma.diaryLikes.delete({
             where: {
-              diarylikeId: existsLike.diarylikeId,
+              diarylikeId: +diarylikeId, // 이부분 수정필요
               DiaryId: +diaryId,
               UserId: +userId,
+            },
+          });
+    }
+
+    newLike = async (userId, diaryId) => {
+        await prisma.diaryLikes.create({
+            data: {
+              UserId: +userId,
+              DiaryId: +diaryId,
+              likeExist: true
             },
           });
     }
@@ -96,7 +108,7 @@ export class FeedsRepository {
           return islike
     }
 
-    increasLikeCount = async (diaryId) => {
+    increaseLikeCount = async (diaryId) => {
         const likeClick = await prisma.diaries.update({
             where: { diaryId: +diaryId },
             data: {

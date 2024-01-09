@@ -80,6 +80,14 @@ export class FeedsService {
         )
     }
 
+    newLike = async (userId, diaryId) => {
+
+        await this.feedsRepository.newLike(
+            userId,
+            diaryId
+        )
+    }
+
     decreaseLikeCount = async (diaryId) => {
         const islike = await this.feedsRepository.decreaseLikeCount(
             diaryId

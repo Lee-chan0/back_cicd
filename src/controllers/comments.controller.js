@@ -3,7 +3,7 @@ import { CommentSchema } from '../validation/joi.validation.js'
 
 
 export class CommentsController {
-    commentsService = new CommentsService()
+    commentsService = new CommentsService() 
 
 createComments = async (req, res, next) => {
     try {
@@ -27,7 +27,7 @@ getComments = async (req, res, next) => {
     try {
         const { diaryId } = await CommentSchema.validateAsync(req.params);
 
-        const comments = await commentsService.findComments(diaryId) // by diaryId
+        const comments = await this.commentsService.findComments(diaryId) // by diaryId
 
         return res.status(200).json({ data: comments})
     } catch (err) {
@@ -41,7 +41,10 @@ updateComments = async (req, res, next) => {
         const { commentId } = await CommentSchema.validateAsync(req.params);
         const { content } = await CommentSchema.validateAsync(req.body);
 
-        const comment = await commentsService.findComment() // by commentId
+        const comment = await this.commentsService.findComment(
+            commentId, 
+            userId
+            )
 
         if (!comment) {
             return res.status(400).json({ message: "존재하지 않는 댓글입니다" });
@@ -51,10 +54,13 @@ updateComments = async (req, res, next) => {
             return res.status(401).json({ message: "수정 권한이 없습니다" });
           }
 
-          await commentsService.updateComment(commentId, content)
+          await this.commentsService.updateComment(
+            commentId, 
+            content
+            )
 
         return res.status(201).json({ meesage : "댓글 수정 완료"})
-    } catch {
+    } catch(err) {
         next(err)
     }
 }
@@ -64,7 +70,7 @@ deleteComment = async (req, res, next) => {
         const { commentId } = await CommentSchema.validateAsync(req.params);
         const { userId } = req.user;
 
-        const comment = await commentsService.findComment() // by commentId
+        const comment = await this.commentsService.findComment(commentId, userId) // by commentId
 
         if (!comment) {
             return res.status(401).json({ message: "댓글이 존재하지 않습니다"})
@@ -74,7 +80,7 @@ deleteComment = async (req, res, next) => {
             return res.status(401).sjon({ message: "삭제 권한이 없습니다"})
         }
 
-        await commentsService.deleteComment( commentId, userId)
+        await this.commentsService.deleteComment(commentId, userId)
         // where: {
         //     commentId: +commentId,
         //     UserId: userId,

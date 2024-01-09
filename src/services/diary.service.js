@@ -11,6 +11,14 @@ export class DiaryService {
         return diary
     }
 
+    findliked = async (diaryId, userId) => {
+        const isliked = await this.diaryRepository.findliked(
+            diaryId,
+            userId
+        )
+        return isliked
+    }
+
 
     findMyDiary = async (diaryId, userId) => {
         const diary = await this.diaryRepository.findMyDiary(
@@ -62,7 +70,7 @@ export class DiaryService {
         return updatedDiary
     }
 
-    deleteDiary = async (diaryId) => {
+    deleteDiary = async (diaryId, userId) => {
         const deletedDiary = await this.diaryRepository.deleteDiary(
             diaryId,
             userId

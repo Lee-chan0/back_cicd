@@ -116,7 +116,7 @@ export class FeedsController {
             } else {
                 if (existsLike) {
 
-                    const diarylikeId = existsLikeDiaryLikeId(diaryId, userId)
+                    const diarylikeId = await this.feedsService.existsLikeDiaryLikeId(diaryId, userId)
 
                     await this.feedsService.deleteLike(
                         diarylikeId,
