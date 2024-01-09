@@ -81,11 +81,7 @@ deleteComment = async (req, res, next) => {
         }
 
         await this.commentsService.deleteComment(commentId, userId)
-        // where: {
-        //     commentId: +commentId,
-        //     UserId: userId,
-        //   }
-        
+
         return res.status(201).json({ message: "댓글 삭제 완료"})
     } catch (err) {
         next (err)

@@ -16,6 +16,14 @@ export class CommentsRepository{
         const comments = await prisma.comments.findMany({
             where : {
                 DiaryId : +diaryId
+            },
+            include: {
+                User: {
+                    select: {
+                        username: true,
+                        profileImg: true,
+                    }
+                }
             }
         })
         return comments
