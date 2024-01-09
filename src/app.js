@@ -6,6 +6,7 @@ import FeedsRouter from './routes/feeds.router.js';
 import DiaryRouter from './routes/diary.router.js';
 import CommentsRouter from './routes/comments.router.js';
 import initializeSocketIO from '../src/utils/io.js'
+import os from 'os';
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -15,6 +16,7 @@ import cors from 'cors';
 import YAML from 'yamljs';
 import swaggerUi from 'swagger-ui-express';
 import ErrorHandlingMiddleware from './middlewares/error-handling.middleware.js';
+
 
 const app = express();
 const PORT = 3000;
@@ -35,6 +37,7 @@ useUnifiedTopology: true,
 .then(() => console.log('Connected to MongoDB Atlas'))
 .catch((err) => console.error('Error connecting to MongoDB Atlas:', err));
 
+
 const swaggerDocument = YAML.load('./src/utils/swagger.yaml');
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
@@ -45,7 +48,7 @@ app.use('/', [UsersRouter, OauthRouter, SecondaryCommentsRouter, MainCalenderRou
 app.use(ErrorHandlingMiddleware);
 
 app.get('/', (req, res) => {
-  res.send('<h1>Success</h1>');
+  res.send('<h1>SUCCESS</h1>');
 });
 
 // health체크 엔드포인트
@@ -87,6 +90,3 @@ initializeSocketIO(server);
 server.listen(PORT, () => {
   console.log(`Express server listening on port ${PORT}`, 'server', server.address());
 });
-// app.listen(PORT, () => {
-//   console.log(PORT, '포트로 서버가 열렸어요!');
-// });
