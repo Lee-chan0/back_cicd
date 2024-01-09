@@ -130,7 +130,7 @@ export class UsersController {
             const validation = await UserInfoSchema.validateAsync(req.body);
             const {email} = validation;
 
-            const result = this.usersService.CancelSignOff(email);
+            const result = await this.usersService.CancelSignOff(email);
 
             return res.status(201).json({message : `탈퇴 요청이 취소되었습니다.`});
         }catch(err){

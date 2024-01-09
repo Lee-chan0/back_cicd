@@ -105,6 +105,10 @@ export class UsersService {
         const error = new Error('존재하지 않는 email입니다.');
         error.status = 400;
         throw error;
+    }else if (findUser.deletedAt){
+      const error = new Error('탈퇴처리중입니다. 취소하시겠습니까?');
+      error.status = 403;
+      throw error;
     }
     const decodedPassword = await bcrypt.compare(password, findUser.password);
 
