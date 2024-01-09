@@ -60,7 +60,7 @@ export class UsersController {
     tokenReissue = async(req, res, next) => {
         try{
             const {refreshtoken} = req.headers;
-            const {newAccessToken} = await this.usersService.tokenReissue(refreshtoken);
+            const newAccessToken = await this.usersService.tokenReissue(refreshtoken);
 
             res.setHeader("Authorization", `Bearer ${newAccessToken}`);
             

@@ -7,6 +7,7 @@ export class OauthController {
             const {code} = req.body;
 
             const result = await this.oauthService.kakaoSignupOrSignin(code);
+            console.log(result)
             if(result.findUser){
                 res.setHeader("Authorization", `Bearer ${result.accesstoken}`);
                 res.setHeader("Refreshtoken", result.refreshtoken);
