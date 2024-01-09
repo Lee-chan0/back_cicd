@@ -8,8 +8,11 @@ export class CommentsController {
 createComments = async (req, res, next) => {
     try {
     const { diaryId } = await CommentSchema.validateAsync(req.params);
-    const { content } = await CommentSchema.validateAsync(req.body);
+    const { content } = req.body;
     const { userId } = req.user;
+
+    console.log('``````````````````````````')
+    console.log(content)
 
     await this.commentsService.createComment(
         diaryId,
@@ -38,8 +41,11 @@ getComments = async (req, res, next) => {
 updateComments = async (req, res, next) => {
     try {
         const { userId } = req.user;
-        const { commentId } = await CommentSchema.validateAsync(req.body);
+        const { commentId } = await CommentSchema.validateAsync(req.params);
         const { content } = await CommentSchema.validateAsync(req.body);
+
+        console.log('``````````````````````````')
+        console.log(content)
 
         const comment = await this.commentsService.findComment(
             commentId, 
@@ -67,7 +73,7 @@ updateComments = async (req, res, next) => {
 
 deleteComment = async (req, res, next) => {
     try {
-        const { commentId } = await CommentSchema.validateAsync(req.body);
+        const { commentId } = await CommentSchema.validateAsync(req.params);
         const { userId } = req.user;
 
         const comment = await this.commentsService.findComment(commentId, userId) // by commentId

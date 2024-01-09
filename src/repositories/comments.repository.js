@@ -33,13 +33,13 @@ export class CommentsRepository{
         const comment = await prisma.comments.findFirst({
             where : {
                 commentId : +commentId,
-                UserId : userId
             }
         })
         return comment
     }
 
     updateComment = async (commentId, content) => {
+
         const updatedComment = await prisma.comments.update({
             where : {
                 commentId : +commentId,
