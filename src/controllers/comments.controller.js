@@ -38,7 +38,7 @@ getComments = async (req, res, next) => {
 updateComments = async (req, res, next) => {
     try {
         const { userId } = req.user;
-        const { commentId } = await CommentSchema.validateAsync(req.params);
+        const { commentId } = await CommentSchema.validateAsync(req.body);
         const { content } = await CommentSchema.validateAsync(req.body);
 
         const comment = await this.commentsService.findComment(
@@ -67,7 +67,7 @@ updateComments = async (req, res, next) => {
 
 deleteComment = async (req, res, next) => {
     try {
-        const { commentId } = await CommentSchema.validateAsync(req.params);
+        const { commentId } = await CommentSchema.validateAsync(req.body);
         const { userId } = req.user;
 
         const comment = await this.commentsService.findComment(commentId, userId) // by commentId
