@@ -46,7 +46,7 @@ app.use('/', [UsersRouter, OauthRouter, SecondaryCommentsRouter, MainCalenderRou
 app.use(ErrorHandlingMiddleware);
 
 app.get('/', (req, res) => {
-  res.send('<h1>Success</h1>');
+  res.send('<h1>SUCCESS</h1>');
 });
 
 // health체크 엔드포인트
