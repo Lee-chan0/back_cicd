@@ -27,9 +27,7 @@ export class CommentsService {
             return b.createdAt - a.createdAt
         })
 
-        return comments.map((comment) => {
-            return comment
-        })
+        return comments
 
     }
 
