@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -57,9 +57,6 @@ jobs:
         echo MAILER_EMAIL=${{ secrets.MAILER_EMAIL }} >> .env
         echo MAILER_PASSWORD=${{ secrets.MAILER_PASSWORD }} >> .env
         cat .env
-
-    - name: Debug MONGO_DB Value
-      run: echo $MONGO_DB
       
     - name: zip file
       run: zip -r CI.zip ./src/* ./prisma/* ./scripts/* ./appspec.yml ./package.json ./package-lock.json ./deploy.sh ./docker-compose.yml ./Dockerfile ./nginx.conf ./.env ./healthcheck_restart.sh

@@ -35,6 +35,7 @@ useUnifiedTopology: true,
 .then(() => console.log('Connected to MongoDB Atlas'))
 .catch((err) => console.error('Error connecting to MongoDB Atlas:', err));
 
+
 const swaggerDocument = YAML.load('./src/utils/swagger.yaml');
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
@@ -87,6 +88,3 @@ initializeSocketIO(server);
 server.listen(PORT, () => {
   console.log(`Express server listening on port ${PORT}`, 'server', server.address());
 });
-// app.listen(PORT, () => {
-//   console.log(PORT, '포트로 서버가 열렸어요!');
-// });
