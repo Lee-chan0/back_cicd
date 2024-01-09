@@ -11,8 +11,6 @@ createComments = async (req, res, next) => {
     const { content } = req.body;
     const { userId } = req.user;
 
-    console.log('``````````````````````````')
-    console.log(content)
 
     await this.commentsService.createComment(
         diaryId,
@@ -44,20 +42,10 @@ updateComments = async (req, res, next) => {
         const { commentId } = await CommentSchema.validateAsync(req.params);
         const { content } = await CommentSchema.validateAsync(req.body);
 
-        console.log("------------------------------")
-        console.log(userId)
-        console.log(content)
-        console.log(commentId)
-
         const comment = await this.commentsService.findComment(
             commentId, 
             userId
             )
-
-            console.log("------------------------------")
-            console.log(comment)
-            console.log(comment.UserId)
-            console.log("------------------------------")
 
         if (!comment) {
             return res.status(400).json({ message: "존재하지 않는 댓글입니다" });

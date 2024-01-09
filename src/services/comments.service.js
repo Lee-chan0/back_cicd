@@ -28,13 +28,7 @@ export class CommentsService {
         })
 
         return comments.map((comment) => {
-            return {
-                DiaryId : comment.DiaryId,
-                UserId : comment.UserId,
-                content: comment.content,
-                createdAt: comment.createdAt,
-                updatedAt: comment.updatedAt
-            }
+            return comments
         })
     }
 
