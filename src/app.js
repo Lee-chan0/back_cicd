@@ -6,6 +6,7 @@ import FeedsRouter from './routes/feeds.router.js';
 import DiaryRouter from './routes/diary.router.js';
 import CommentsRouter from './routes/comments.router.js';
 import initializeSocketIO from '../src/utils/io.js'
+import os from 'os';
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -15,6 +16,7 @@ import cors from 'cors';
 import YAML from 'yamljs';
 import swaggerUi from 'swagger-ui-express';
 import ErrorHandlingMiddleware from './middlewares/error-handling.middleware.js';
+
 
 const app = express();
 const PORT = 3000;
