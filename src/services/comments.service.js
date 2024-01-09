@@ -28,8 +28,9 @@ export class CommentsService {
         })
 
         return comments.map((comment) => {
-            return comments
+            return comment
         })
+
     }
 
     findComment = async (commentId, userId) => {
