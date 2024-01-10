@@ -41,6 +41,10 @@ export class OauthService {
 
         const findUser = await this.oauthRepository.findUserByEmail(userResponse.data.kakao_account.email);
 
+        if(findUser.deletedAt){
+            return findUser
+        }
+
         if(findUser){
             const accesstoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : "1h"});
             const refreshtoken = jwt.sign({userId : findUser.userId}, key, {expiresIn : "7d"});
