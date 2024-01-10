@@ -42,7 +42,7 @@ export class OauthService {
         const findUser = await this.oauthRepository.findUserByEmail(userResponse.data.kakao_account.email);
 
         if(findUser.deletedAt){
-            return findUser
+            return {findUser}
         }
 
         if(findUser){
