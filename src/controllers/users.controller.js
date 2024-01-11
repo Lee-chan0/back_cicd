@@ -117,7 +117,7 @@ export class UsersController {
         try{
             const {userId} = req.user;
 
-            this.usersService.SoftDeleteUser(userId);
+            await this.usersService.SoftDeleteUser(userId);
 
             return res.status(201).json({message : "탈퇴처리가 완료되었습니다. 15일 동안 회원정보가 보류됩니다."});
         }catch(err){
