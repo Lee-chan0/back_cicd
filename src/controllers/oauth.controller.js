@@ -8,11 +8,6 @@ export class OauthController {
 
             const result = await this.oauthService.kakaoSignupOrSignin(code);
 
-            console.log(result.findUser)
-
-            if(result.findUser.deletedAt){
-                return res.status(403).json({data : result.findUser.email, message : "탈퇴처리중입니다. 취소하시겠습니까?"})
-            }
             if(result.findUser){
                 res.setHeader("Authorization", `Bearer ${result.accesstoken}`);
                 res.setHeader("Refreshtoken", result.refreshtoken);
